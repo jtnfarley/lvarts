@@ -1,4 +1,4 @@
-import { SignedIn, UserButton } from "@clerk/nextjs"
+
 import Image from "next/image"
 import Link from "next/link"
 import { dark } from '@clerk/themes'
@@ -20,9 +20,7 @@ const TopBar = () => {
                 </Link>
 
                 <div className="flex items-center gap-3">
-                    <SignedIn>
-                        <UserButton />
-                    </SignedIn>
+
                 </div>
             </nav>
         </>

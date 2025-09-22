@@ -6,3 +6,8 @@ export const UserValidation = z.object({
     }).max(1000),
 
 })
+
+export const RegisterValidation = z.object({
+    email: z.email(),
+    displayName: z.optional(z.string().trim().max(30)),
+})

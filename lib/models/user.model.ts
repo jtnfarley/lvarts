@@ -3,10 +3,8 @@
 import mongoose from "mongoose"
 
 const userSchema = new mongoose.Schema({
-    id: {type: String, required: true, unique: true},
-    username: {type: String, unique: true},
     email: {type: String, required: true, unique: true},
-    name: {type: String, required: true},
+    displayName: String,
     image: String,
     bio: String,
     posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post'}],
@@ -19,7 +17,20 @@ const userSchema = new mongoose.Schema({
     following: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     createdAt: {type: Date, default: Date.now},
     updatedAt: {type: Date, default: Date.now},
-})
+    otp: String,
+    otpExpiry: Date
+}
+// , {
+// 	toJSON: {
+// 		transform(doc, ret) {
+// 			ret.id = ret._id;
+// 			delete ret._id;
+// 			delete ret.__v;
+// 		}
+// 	}
+
+// }
+)
 
 const User = mongoose.models.User || mongoose.model('User', userSchema)
 

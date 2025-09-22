@@ -1,24 +1,27 @@
+import { auth } from '@/auth';
 import LandingPage from '@/components/shared/LandingPage';
-import { SignOutButton } from '@clerk/nextjs';
-import {currentUser} from '@clerk/nextjs/server'
+import AddPostForm from "@/components/forms/AddPostForm"
+import Feed from "@/components/shared/Feed";
 
 export default async function Home() {
-  const user = await currentUser()
+	const session = await auth();
 
-  if (!user) {
-    return (
-      <>
-        <LandingPage/>
-      </>
-    )
-  }
-  return (
-    <main>
-      <SignOutButton>
-        <button className="lg:w-full text-black mx-5 my-2 lg:mx-0 lg:my-2 px-6 py-2 rounded-lg bg-white hover:bg-slate-300">
-            Sign out
-        </button>
-      </SignOutButton>
-    </main>
-  );
+	if (!session?.user || !session?.user?.id) {
+		return (
+			<LandingPage/>
+		)
+	}
+
+	const userId = session?.user?.id
+
+	return (
+		<>
+			<div>
+				<AddPostForm userId={userId} postType='post' edited={false}/>
+			</div>
+			<div>
+				<Feed/>
+			</div>
+		</>
+	);
 }

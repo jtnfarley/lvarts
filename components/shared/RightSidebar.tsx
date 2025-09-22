@@ -1,15 +1,20 @@
-import { fetchUsers } from "@/lib/actions/user.actions"
-import { currentUser } from "@clerk/nextjs/server"
+import { fetchUsers } from "@/lib/data/user.data"
+import { auth } from '@/auth';
 import UserCard from "../cards/UserCard"
 
 export default async function RightSidebar() {
-	const user = await currentUser()
+	const session = await auth()
+	const user = session?.user
+
 	if (!user) return null
 
-	const similarMinds = await fetchUsers({
-		userId: user.id,
-		pageSize: 4
-	})
+	const similarMinds = {
+		users:[]
+	}
+	// await fetchUsers({
+	// 	userId: user.id,
+	// 	pageSize: 4
+	// })
 
 	return (
 		<section className="custom-scrollbar rightsidebar">

@@ -1,5 +1,5 @@
 import AccountInfo from "@/components/forms/AccountInfo"
-import { fetchUser } from "@/lib/actions/user.actions"
+import { fetchUser } from "@/lib/data/user.data"
 import { UserProfile } from "@clerk/nextjs"
 import { currentUser } from "@clerk/nextjs/server"
 import { dark } from "@clerk/themes"

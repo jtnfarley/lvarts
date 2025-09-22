@@ -2,16 +2,12 @@
 
 import { revalidatePath } from 'next/cache'
 import User from '../models/user.model'
-import { connectToDB } from '../mongoose'
+import dbConnect from '../mongooseConnect'
 import { FilterQuery, SortOrder } from 'mongoose'
-import { $ZodNaN } from 'zod/v4/core'
 
 interface CreateUserParams {
-    userId: string,
     email: string,
-    username: string,
-    name: string,
-    image: string
+    displayName?: string
 }
 
 interface UpdateUserParams {
@@ -25,24 +21,19 @@ interface UpdateUserParams {
 }
 
 export const createUser = async ({
-    userId,
     email,
-    username,
-    name,
-    image
+    displayName,
 }:CreateUserParams): Promise<void> => {
 
     try {
-        await connectToDB()
+        await dbConnect()
         await User.create({
-            id: userId,
-            username: username?.toLowerCase(),
             email,
-            name,
-            image
+            displayName,
+            otp: generateOtp(),
+            otpExpiry: new Date(Date.now() + 15 * 60 * 1000)
         })
     } catch (error:any) {
-        console.log(error)
         throw new Error(`Failed to create user: ${error.message}`)
     }   
 }
@@ -50,10 +41,8 @@ export const createUser = async ({
 export const fetchUser = async (userId:string) => {
 
     try {
-        await connectToDB()
-        return await User.findOne({
-            id: userId
-        })
+        await dbConnect()
+        return await User.findById(userId)
     } catch (error:any) {
         console.log(error)
         throw new Error(`Failed to create user: ${error.message}`)
@@ -71,9 +60,9 @@ export const updateUser = async ({
 }:UpdateUserParams): Promise<void> => {
 
     try {
-        await connectToDB()
-        await User.findOneAndUpdate(
-            {id: userId },
+        await dbConnect()
+        await User.findByIdAndUpdate(
+            userId,
             {
                 username: username?.toLowerCase(),
                 email,
@@ -107,11 +96,11 @@ export const fetchUsers = async ({
 }) => {
 
     try {
-        await connectToDB()
+        await dbConnect()
         const skipAmount = (pageNumber - 1) * pageSize
         const regex = new RegExp(searchString, 'i') 
         const query:FilterQuery<typeof User> = {
-            id: { $ne: userId }
+            _id: { $ne: userId }
         }
 
         if (searchString.trim() !== '') {
@@ -142,4 +131,10 @@ export const fetchUsers = async ({
         console.log(error)
         throw new Error(`Failed to fetch users: ${error.message}`)
     }   
+}
+
+
+const generateOtp = () => {
+    const otp = Math.floor(100000 + Math.random() * 900000)
+    return otp.toString()
 }

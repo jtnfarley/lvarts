@@ -1,8 +1,8 @@
 import { Inter } from "next/font/google";
 import { Metadata } from "next";
-import { ClerkProvider } from '@clerk/nextjs'
 import '../globals.css'
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from '@/auth';
+import SessionWrapper from "../../components/auth/SessionWrapper";
 import TopBar from "@/components/shared/TopBar";
 import LeftSidebar from "@/components/shared/LeftSidebar";
 import RightSidebar from "@/components/shared/RightSidebar";
@@ -21,32 +21,32 @@ export default async function RootLayout({
   	children: React.ReactNode;
 }>) {
 
-	const user = await currentUser()
+	const session = await auth()
+	
+	const user = session?.user
 
 	if (!user) {
 		return (
 			<html lang="en">
-				<ClerkProvider>
-					<body className={`${inter.className} bg-dark-1`}>
-						<div className="w-full flex justify-center items-center min-h-screen">
-							{children}
-						</div>
-					</body>
-				</ClerkProvider>
+				<body className={`${inter.className}`}>
+					<div className="w-full flex justify-center items-center min-h-screen">
+						{children}
+					</div>
+				</body>
 			</html>
 		)
 	}
 
 	return (
-		<html lang="en">
-			<ClerkProvider>
+		<SessionWrapper>
+			<html lang="en">
 				<body>
 					<main className={`${inter.className}`}>
 						<TopBar/>
 						<main className="flex flex-row">
 							<LeftSidebar/>
 							<section className="main-container">
-								<div className="w-full flex justify-center items-center min-h-screen">
+								<div className="flex flex-col w-full md:w-lg justify-center min-h-screen">
 									{children}
 								</div>
 							</section>
@@ -55,7 +55,7 @@ export default async function RootLayout({
 						<BottomBar/>
 					</main>
 				</body>
-			</ClerkProvider>
-		</html>
+			</html>
+		</SessionWrapper>
 	);
 }

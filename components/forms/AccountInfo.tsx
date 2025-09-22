@@ -14,7 +14,7 @@ import { Textarea } from '@/components/ui/textarea'
 import * as z from 'zod'
 import { UserValidation } from "@/lib/validations/user";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { updateUser } from "@/lib/actions/user.actions";
+import { updateUser } from "@/lib/data/user.data";
 import { usePathname, useRouter } from "next/navigation";
 import { Router } from "next/router";
 import { useEffect, useState } from "react";
