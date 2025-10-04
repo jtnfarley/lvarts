@@ -46,7 +46,7 @@ export default async function RootLayout({
 						<main className="flex flex-row">
 							<LeftSidebar/>
 							<section className="main-container">
-								<div className="flex flex-col w-full md:w-lg justify-center min-h-screen">
+								<div className="flex flex-col w-full md:w-lg min-h-screen">
 									{children}
 								</div>
 							</section>

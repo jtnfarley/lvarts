@@ -29,7 +29,7 @@ export default function ClientFeed(props:{feed:Array<Post>, getFeed:Function, us
 				(updatedFeed.length) &&
                 	updatedFeed.map((post:Post, index:number) => {
 						return (
-							<PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} getFeed={props.getFeed} user={props.user} />
+							<PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={props.user} />
 						)
 					})
 				}

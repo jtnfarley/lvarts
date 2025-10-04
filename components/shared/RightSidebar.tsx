@@ -1,20 +1,19 @@
-import { fetchUsers } from "@/lib/data/user.data"
-import { auth } from '@/auth';
-import UserCard from "../cards/UserCard"
+import { getRandoUsers } from "@/app/actions/user"
+import { currentUser } from '@/app/actions/currentUser';
+import UserCard from "./Cards/UserCard"
+import User from "@/lib/models/user";
 
 export default async function RightSidebar() {
-	const session = await auth()
-	const user = session?.user
+	const user = await currentUser()
 
 	if (!user) return null
 
-	const similarMinds = {
-		users:[]
+	const getRecUsers = async ():Promise<Array<User>> => {
+		'use server'
+		return await getRandoUsers(user.id)
 	}
-	// await fetchUsers({
-	// 	userId: user.id,
-	// 	pageSize: 4
-	// })
+	
+	let recUsers:Array<User> = await getRecUsers()
 
 	return (
 		<section className="custom-scrollbar rightsidebar">
@@ -30,16 +29,16 @@ export default async function RightSidebar() {
 				<h3 className="text-lg font-semibold text-light-1">Users</h3>
 				<div className="mt-7 flex w-[350] flex-col gap-10">
 					{
-						similarMinds.users.length > 0 ? (
+						recUsers.length > 0 ? (
 							<>
 								{
-									similarMinds.users.map((user: any) => (
+									recUsers.map((userDetails: any) => (
 										<UserCard
-											key={ user.id }
-											id={ user.id }
-											name={ user.name }
-											username={ user.username }
-											imgUrl={ user.imageUrl }
+											key={ userDetails.id }
+											currentUser={ user }
+											recUserId={ userDetails.userId }
+											displayName={ userDetails.displayName }
+											avatar={ userDetails.avatar }
 											// userType = 'User'
 										/>
 									))

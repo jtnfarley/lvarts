@@ -1,6 +1,75 @@
 'use server'
 
 import {prisma} from '@/lib/db/prisma'
+import User from '@/lib/models/user'
+import Post from '@/lib/models/post';
+import { cp } from 'fs';
+
+const include = {
+    user:true,
+    userDetails: true,
+    parentPost: {
+        include: {
+            userDetails: true
+        }
+    }
+}
+
+export const getFeed = async (user:User):Promise<Array<Post>> => {
+    const posts:Array<Post> = await prisma.posts.findMany({
+        where: {
+            OR: [
+                { userId: user?.id },
+                { userId: {
+                    in: user?.userDetails?.following
+                }},
+            ]
+        },
+        include,
+        orderBy: {
+            createdAt: 'desc'
+        }
+    })
+
+    return posts.map(post => ({
+        ...post,
+        parentPostId: post.parentPostId || undefined,
+        postFile: post.postFile || undefined,
+        postType: post.postType || undefined,
+        privatePost: post.privatePost || undefined,
+        tempFile: post.tempFile || undefined,
+        userDir: post.userDir || undefined,
+        chatId: post.chatId || undefined,
+        userDetailsId: post.userDetailsId || undefined,
+        likes: post.likes || 0,
+        commentCount: post.commentCount || 0
+    }))
+}
+
+export const getPost = async (postId:string):Promise<any> => {
+    const post = await prisma.posts.findFirst({
+        where: {
+            id: postId
+        },
+        include
+    })
+
+    return post;
+}
+
+export const getComments = async (postId:string):Promise<any> => {
+    const comments = await prisma.posts.findMany({
+        where: {
+            parentPostId:postId
+        },
+        include,
+        orderBy: {
+            createdAt: 'desc'
+        }
+    })
+
+    return comments;
+}
 
 export const savePost = async (postData:any) => {
     const {content, userId, postType, postFile, privatePost, parentPostId, edited} = postData
@@ -49,6 +118,23 @@ export const savePost = async (postData:any) => {
             postIds: [...userDetails.postIds, post.id]
         }
     })
+
+    if (postType === 'comment' && parentPostId) {
+        const parentPost = await prisma.posts.findFirst({
+            where: {
+                id: parentPostId
+            }
+        })
+        
+        await prisma.posts.update({
+            where: {
+                id: parentPostId
+            },
+            data: {
+                commentCount: ((parentPost?.commentCount) ? parentPost.commentCount : 0) + 1
+            }
+        })
+    }
     
     return post
 }
@@ -162,6 +248,7 @@ export const unlikePost = async (postId:string, userId:string) => {
 }
 
 export const deletePost = async (postId:string) => {
+
     const post = await prisma.posts.findFirst({
         where: {
             id: postId
@@ -192,6 +279,12 @@ export const deletePost = async (postId:string) => {
             })
         }
     })
+
+    await prisma.posts.deleteMany({
+        where: {
+            parentPostId: postId,
+        }
+    });
 
     const deletedPost = await prisma.posts.delete({
         where: {

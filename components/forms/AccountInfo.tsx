@@ -1,101 +1,106 @@
 'use client'
 
-import { useForm } from "react-hook-form";
-import { 
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "../ui/form";
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import * as z from 'zod'
-import { UserValidation } from "@/lib/validations/user";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { updateUser } from "@/lib/data/user.data";
 import { usePathname, useRouter } from "next/navigation";
-import { Router } from "next/router";
-import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from '@/components/ui/button';
+import * as z from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { updateUser } from "@/app/actions/user"
+import User from "@/lib/models/user";
+import { BiImageAdd } from "react-icons/bi";
+import { useState } from "react";
 
-interface Props {
-    user: {
-        id: string;
-        bio: string;
+const UserValidation = z.object({
+    displayName: z.string().min(1).max(100),
+    bio: z.string().max(4000).optional(),
+    avatarUrl: z.string().optional(),    
+    // postFile: z.string(), 
+    // privatePost: z.boolean(), 
+    // parentPostId: z.string()
+})
+
+const AccountInfo = (props:{user: User}) => {
+    const user = props.user;
+
+    if (!user) {
+        return (
+            <h1 className="text-2xl font-bold text-light-1">You shall not pass!</h1>
+        )
     }
-}
 
-const AccountInfo = ({user}: Props) => {
-    const pathname = usePathname()
-    const router = useRouter()
-    const [showBio, setShowBio] = useState<boolean>(false)
+    const [userOnboarded, setUserOnboarded] = useState(user.userDetails && user.userDetails.displayName && user.userDetails.displayName !== '')
 
-    useEffect(() => {
-        setTimeout(() => {
-            setShowBio(true)
-        }, 1000)
-    })
+    const pathname = usePathname();
+    const router = useRouter();
 
-    const form = useForm<z.infer<typeof UserValidation>>({
+    const { register, handleSubmit, reset, formState: { errors } } = useForm<z.infer<typeof UserValidation>>({
         resolver: zodResolver(UserValidation),
         defaultValues: {
-            bio: user?.bio || '',
+            displayName: user.userDetails?.displayName || undefined,
+            bio: user.userDetails?.bio || undefined,
+            avatarUrl: undefined
         }
     })
 
     const onSubmit = async (values: z.infer<typeof UserValidation>) => {
-        console.log(values)
+        const id = user.userDetails?.id || undefined
         await updateUser({
+            id,
             userId: user.id,
             bio: values.bio,
-            path: pathname
+            displayName: values.displayName,
         })
 
-        if (pathname === '/profile/edit') {
-            router.back()
-        } else {
-            router.push('/')
+        if (values.displayName && values.displayName !== '' && !userOnboarded) {
+            setUserOnboarded(true)
         }
     }
 
-    if (!showBio) {
-        return (
-            <h1 className="text-2xl font-bold text-light-1">Loading...</h1>
-        )
-    }
-    
     return (
         <div>
-            <section className="mt-9 bg-dark-2 p-10">
-                <Form {...form}>
-                    <form 
-                        className="space-y-4"
-                        onSubmit={form.handleSubmit(onSubmit)}
-                    >
-                        <FormField
-                            control={form.control}
-                            name="bio"
-                            render={({ field }) => (
-                                <FormItem className="flex w-full flex-xol gap-3">
-                                    <FormLabel className="text-base-semibold text-light-2">Bio</FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            rows={10}
-                                            className="account-form_input no-focus"
-                                            placeholder="Tell us about yourself"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
+            <section className="">
+                <form 
+                    className=""
+                    onSubmit={handleSubmit(onSubmit)}
+                >
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-medium mb-2" htmlFor="name">
+                            Avatar
+                        </label>
+                        <input type="file" name="avatar" id="avatar" className="hidden" />
+                        <label htmlFor="avatar" className="cursor-pointer">
+                            <BiImageAdd size={40} title="upload an image" />
+                        </label>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-medium mb-2" htmlFor="name">
+                            Display Name
+                        </label>
+                        <input
+                            className="border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
+                            id="displayName"
+                            {...register('displayName', { required: true })}
                         />
-                        <Button type='submit' className="bg-primary-500">
-                            Save
-                        </Button>
-                    </form>
-                </Form>
+                        {
+                        (!userOnboarded || errors.displayName) && 
+                            <div className="text-red-500 text-xs italic mt-2">Please enter a name to get started. You can always change it later.</div>
+                        }
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-medium mb-2" htmlFor="name">
+                            Bio
+                        </label>
+                        <textarea
+                            className="border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500 h-30"
+                            id="bio"
+                            {...register('bio', { required: true })}
+                        />
+                    </div>
+
+                    <Button type='submit' className="bg-primary-500">
+                        Save
+                    </Button>
+                </form>
             </section>
         </div>
     )

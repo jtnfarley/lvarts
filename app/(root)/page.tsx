@@ -1,18 +1,23 @@
-import { auth } from '@/auth';
+import { currentUser } from '@/app/actions/currentUser';
 import LandingPage from '@/components/shared/LandingPage';
 import AddPostForm from "@/components/forms/AddPostForm"
 import Feed from "@/components/shared/Feed";
+import { redirect } from 'next/navigation';
 
 export default async function Home() {
-	const session = await auth();
+	const user = await currentUser()
 
-	if (!session?.user || !session?.user?.id) {
+	if (!user || !user?.id) {
 		return (
 			<LandingPage/>
 		)
 	}
 
-	const userId = session?.user?.id
+	if (!user.userDetails || !user.userDetails.displayName || user.userDetails.displayName === '') {
+		return redirect('/profile')
+	}
+
+	const userId = user?.id
 
 	return (
 		<>

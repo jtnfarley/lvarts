@@ -9,4 +9,5 @@ export default interface User {
     name: string
     updatedAt: Date
     userDetails?: UserDetails
+    following?: string[]
 }

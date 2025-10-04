@@ -1,14 +1,14 @@
 import { sidebarLinks } from "@/constants"
 // import { usePathname } from "next/navigation"
-import { auth } from '@/auth';
+import { currentUser } from '@/app/actions/currentUser';
 import Link from "next/link"
 import Image from "next/image"
 
 export default async function BottomBar() {
 	// const pathname = usePathname()
-	const session = await auth()
+	const user = await currentUser()
 
-	const userId = session?.user?.id
+	const userId = user?.id
 
 	return (
 		<section className="bottombar">
