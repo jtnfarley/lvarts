@@ -1,29 +1,22 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { dark } from '@clerk/themes'
 
 const TopBar = () => {
     return (
-        <>
-            <nav className="topbar">
-                <Link
-                    href='/'
-                    className="flex items-center gap-4"
-                >
-                    <Image
-                        src='/assets/logo.svg'
-                        alt="logo"
-                        width={75}
-                        height={75}
-                    />
-                </Link>
-
-                <div className="flex items-center gap-3">
-
-                </div>
-            </nav>
-        </>
+        <nav className="block topbar lg:hidden">
+            <Link
+                href='/home'
+                className="flex items-center gap-4"
+            >
+                <Image
+                    src='/logos/lvarts-paths.svg'
+                    alt="Lehigh Valley Arts & Music"
+                    width={500}
+                    height={195}
+                />
+            </Link>
+        </nav>
     )
 }
 

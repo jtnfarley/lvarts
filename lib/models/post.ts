@@ -3,6 +3,7 @@ import UserDetails from "./userDetails"
 export default interface Post {
     id: string
 	content: string
+	lexical?: string
     userId: string 
 	userDetailsId?: string
 	userDetails: UserDetails

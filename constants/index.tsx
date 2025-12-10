@@ -1,11 +1,13 @@
+import { BiSolidHomeAlt2, BiSolidSearch, BiSolidUser } from "react-icons/bi";
+
 export const sidebarLinks = [
     // {
-    //   imgURL: "/assets/home.svg",
-    //   route: "/",
+    //   icon: <BiSolidHomeAlt2 className="leftIcon"/>,
+    //   route: "/home",
     //   label: "Home",
     // },
     // {
-    //   imgURL: "/assets/search.svg",
+    //   icon: <BiSolidSearch className="leftIcon"/>,
     //   route: "/search",
     //   label: "Search",
     // },
@@ -25,7 +27,7 @@ export const sidebarLinks = [
     //   label: "Groups",
     // },
     {
-      imgURL: "/assets/profile.svg",
+      icon: <BiSolidUser className="leftIcon"/>,
       route: "/profile",
       label: "Profile",
     },

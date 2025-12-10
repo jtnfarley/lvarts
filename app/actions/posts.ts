@@ -31,19 +31,36 @@ export const getFeed = async (user:User):Promise<Array<Post>> => {
         }
     })
 
-    return posts.map(post => ({
-        ...post,
-        parentPostId: post.parentPostId || undefined,
-        postFile: post.postFile || undefined,
-        postType: post.postType || undefined,
-        privatePost: post.privatePost || undefined,
-        tempFile: post.tempFile || undefined,
-        userDir: post.userDir || undefined,
-        chatId: post.chatId || undefined,
-        userDetailsId: post.userDetailsId || undefined,
-        likes: post.likes || 0,
-        commentCount: post.commentCount || 0
-    }))
+    return posts
+    // .map(post => ({
+    //     ...post,
+    //     parentPostId: post.parentPostId || undefined,
+    //     postFile: post.postFile || undefined,
+    //     postType: post.postType || undefined,
+    //     privatePost: post.privatePost || undefined,
+    //     tempFile: post.tempFile || undefined,
+    //     userDir: post.userDir || undefined,
+    //     chatId: post.chatId || undefined,
+    //     userDetailsId: post.userDetailsId || undefined,
+    //     likes: post.likes || 0,
+    //     commentCount: post.commentCount || 0
+    // }))
+}
+
+export const getPosts = async (queryString:string):Promise<Array<Post>> => {
+    const posts:Array<Post> = await prisma.posts.findMany({
+        where: {
+            content: {
+                contains: queryString
+            }
+        },
+        include,
+        orderBy: {
+            createdAt: 'desc'
+        }
+    })
+console.log(posts)
+    return posts
 }
 
 export const getPost = async (postId:string):Promise<any> => {
@@ -72,7 +89,7 @@ export const getComments = async (postId:string):Promise<any> => {
 }
 
 export const savePost = async (postData:any) => {
-    const {content, userId, postType, postFile, privatePost, parentPostId, edited} = postData
+    const {content, lexical, userId, postType, postFile, privatePost, parentPostId, edited} = postData
 
     const date = new Date()
     const createdAt = date
@@ -97,6 +114,7 @@ export const savePost = async (postData:any) => {
     const post = await prisma.posts.create({
         data: {
             content, 
+            lexical,
             userId,
             userDetailsId: userDetails.id,
             postType,
@@ -140,7 +158,7 @@ export const savePost = async (postData:any) => {
 }
 
 export const editPost = async (postData:any) => {
-    const {content, postId} = postData
+    const {content, lexical, postId} = postData
 
     const date = new Date()
     const updatedAt = date
@@ -151,6 +169,7 @@ export const editPost = async (postData:any) => {
         },
         data: {
             content,
+            lexical,
             edited: true,
             updatedAt
         }

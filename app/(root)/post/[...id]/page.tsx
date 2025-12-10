@@ -36,7 +36,7 @@ export default function SinglePost() {
             getCurrentUser()
             getSinglePost()
         }      
-    },[])
+    },[session])
 
 	return (
 		<>

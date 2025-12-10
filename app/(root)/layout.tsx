@@ -1,15 +1,16 @@
 import { Inter } from "next/font/google";
 import { Metadata } from "next";
-import '../globals.css'
-import { auth } from '@/auth';
-import SessionWrapper from "../../components/auth/SessionWrapper";
+import { cookies } from 'next/headers'
+import { currentUser } from '@/app/actions/currentUser';
 import TopBar from "@/components/shared/TopBar";
 import LeftSidebar from "@/components/shared/LeftSidebar";
 import RightSidebar from "@/components/shared/RightSidebar";
 import BottomBar from "@/components/shared/BottomBar";
+import User from "@/lib/models/user";
+// import { UserStoreProvider } from "./stores/userStoreProvider";
 
 export const metadata: Metadata = {
-  title: "The 610",
+  title: "Lehigh Valley Arts & Music",
   description: "Lehigh Valley Arts Community Social Media",
 };
 
@@ -21,41 +22,52 @@ export default async function RootLayout({
   	children: React.ReactNode;
 }>) {
 
-	const session = await auth()
-	
-	const user = session?.user
+// 	const cookieStore = await cookies()
+// 	const inviteVerified = cookieStore.get('invited')
+// console.log(inviteVerified)
+// 	if (!inviteVerified || atob(inviteVerified.value) !== 'invitationVerified=true') {
+// 		return (
+// 			<SessionWrapper>
+// 				<html lang="en">
+// 					<body className={`${inter.className}`}>
+// 						<div className="w-full flex justify-center items-center min-h-screen">
+// 							<LandingPage/>
+// 						</div>
+// 					</body>
+// 				</html>
+// 			</SessionWrapper>
+// 		)
+// 	}
 
-	if (!user) {
-		return (
-			<html lang="en">
-				<body className={`${inter.className}`}>
-					<div className="w-full flex justify-center items-center min-h-screen">
-						{children}
-					</div>
-				</body>
-			</html>
-		)
-	}
+	const user = await currentUser() as User
+
+	// if (!user) {
+	// 	return (
+	// 		<SessionWrapper>
+	// 			<html lang="en">
+	// 				<body className={`${inter.className}`}>
+	// 					<div className="w-full flex justify-center items-center min-h-screen">
+	// 						<SigninPage/>
+	// 					</div>
+	// 				</body>
+	// 			</html>
+	// 		</SessionWrapper>
+	// 	)
+	// }
 
 	return (
-		<SessionWrapper>
-			<html lang="en">
-				<body>
-					<main className={`${inter.className}`}>
-						<TopBar/>
-						<main className="flex flex-row">
-							<LeftSidebar/>
-							<section className="main-container">
-								<div className="flex flex-col w-full md:w-lg min-h-screen">
-									{children}
-								</div>
-							</section>
-							<RightSidebar/>
-						</main>
-						<BottomBar/>
-					</main>
-				</body>
-			</html>
-		</SessionWrapper>
+		<>
+			<TopBar/>
+			<main className="flex flex-row">
+				<LeftSidebar/>
+				<section className="main-container">
+					<div className="flex flex-col w-full md:w-lg min-h-screen">
+						{children}
+					</div>
+				</section>
+				<RightSidebar/>
+			</main>
+			<BottomBar/>
+		</>	
 	);
 }

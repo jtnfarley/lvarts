@@ -1,18 +1,19 @@
 import { currentUser } from '@/app/actions/currentUser';
-import LandingPage from '@/components/shared/LandingPage';
 import AddPostForm from "@/components/forms/AddPostForm"
 import Feed from "@/components/shared/Feed";
+import RecUsers from '@/components/shared/RecUsers';
 import { redirect } from 'next/navigation';
 
 export default async function Home() {
-	const user = await currentUser()
-
-	if (!user || !user?.id) {
-		return (
-			<LandingPage/>
-		)
+	const getUser = async () => {
+		'use server'
+		return await currentUser()
 	}
 
+	const user = await getUser();
+
+	if (!user) return redirect('/signin');
+	
 	if (!user.userDetails || !user.userDetails.displayName || user.userDetails.displayName === '') {
 		return redirect('/profile')
 	}
@@ -21,11 +22,14 @@ export default async function Home() {
 
 	return (
 		<>
+			<div className='lg:hidden sm:block'>
+				<RecUsers/>	
+			</div>
 			<div>
 				<AddPostForm userId={userId} postType='post' edited={false}/>
 			</div>
 			<div>
-				<Feed/>
+				<Feed user={user} getUser={getUser}/>
 			</div>
 		</>
 	);

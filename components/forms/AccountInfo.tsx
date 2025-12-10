@@ -97,7 +97,7 @@ const AccountInfo = (props:{user: User}) => {
                         />
                     </div>
 
-                    <Button type='submit' className="bg-primary-500">
+                    <Button type='submit' className="bg-primary">
                         Save
                     </Button>
                 </form>

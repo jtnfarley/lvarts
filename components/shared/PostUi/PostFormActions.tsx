@@ -12,7 +12,7 @@ const PostFormActions = () => {
                 </label>
             </div>
             <div className="w-[50%] flex justify-end">
-                <button type='submit' className="bg-primary-500 px-2 py-2 rounded">
+                <button type='submit' className="bg-orange px-2 py-2 rounded text-white">
                     Post
                 </button>
             </div>

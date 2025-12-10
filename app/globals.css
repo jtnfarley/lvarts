@@ -2,42 +2,27 @@
 /*   ---break---    */
 @custom-variant dark (&:is(.dark *));
 
-@theme {
-    --color-primary-500: #877eff;
-    --color-secondary-500: #ffb620;
-    --color-blue: #0095f6;
-    --color-logout-btn: #ff5a5a;
-    --color-navbar-menu: rgba(16,16,18,0.6);
 
-    --color-dark-1: #000;
-    --color-dark-2: #121417;
-    --color-dark-3: #101012;
-    --color-dark-4: #1f1f22;
 
-    --color-light-1: #fff;
-    --color-light-2: #efefef;
-    --color-light-3: #7878a3;
-    --color-light-4: #5c5c7b;
-
-    --color-gray-1: #697c89;
-    --color-glassmorphism: rgba(16,16,18,0.6);
+body {
+    background: rgba(0,0,0,0.05);
 }
 
 @layer components {
     .main-container {
-        @apply flex min-h-screen flex-1 flex-col items-center px-6 pb-10 pt-28 max-md:pb-32 sm:px-10 overflow-auto ;
+        @apply flex min-h-screen lg:bg-primary flex-1 flex-col items-center px-6 pt-3 max-md:pb-32 sm:px-10 overflow-auto ;
     }
 
     .leftsidebar {
-        @apply sticky left-0 top-0 z-20 flex h-screen w-fit flex-col justify-between overflow-auto border-r border-r-dark-4 bg-dark-2 pb-5 pt-28 max-md:hidden;
+        @apply sticky left-0 top-0 z-20 flex h-screen flex-col justify-between overflow-auto border-r-1 border-r-lightgray bg-white pb-5 max-md:hidden;
     }
 
-    .leftsidebar_link {
-        @apply relative flex justify-start gap-4 rounded-lg p-4;
+    .leftIcon {
+        @apply text-3xl fill-secondary-500 stroke-secondary-500 stroke-1;
     }
 
     .bottombar {
-        @apply fixed bottom-0 z-10 w-full rounded-t-3xl bg-glassmorphism p-4 backdrop-blur-lg sm:px-7 md:hidden;
+        @apply fixed bottom-0 z-10 w-full rounded-t-3xl bg-transparent p-4 backdrop-blur-sm sm:px-7 md:hidden;
     }
 
     .bottombar_container {
@@ -49,7 +34,7 @@
     }
 
     .topbar {
-        @apply fixed top-0 z-30 flex w-full items-center justify-between bg-dark-2 px-6 py-3;
+        @apply flex w-full items-center;
     }
 
     .head-text {
@@ -57,11 +42,11 @@
     }
 
       .rightsidebar {
-            @apply sticky right-0 top-0 z-20 flex h-screen w-fit flex-col justify-between gap-12 overflow-auto border-l border-l-dark-4 bg-dark-2 px-10 pb-6 pt-28 max-xl:hidden;
+            @apply sticky right-0 top-0 z-20 flex h-screen w-fit flex-col justify-between gap-12 overflow-auto bg-gray-200 px-10 py-10 max-xl:hidden;
         }
 
         .user-card {
-            @apply flex flex-col justify-between gap-4 max-sm:rounded-xl max-sm:bg-dark-3 max-sm:p-4 sm:flex-row sm:items-center;
+            @apply flex flex-col justify-between gap-4 max-sm:rounded-xl max-sm:p-4;
         }
 
         .user-card_avatar {
@@ -69,7 +54,7 @@
         }
 
         .user-card_btn {
-            @apply h-auto min-w-[74px] rounded-lg bg-primary-500 text-[12px] text-light-1;
+            @apply h-auto min-w-[74px] rounded-lg bg-primary text-[12px];
         }
 
     /*       .account-form_input {
@@ -271,4 +256,30 @@
   body {
     @apply bg-background text-foreground;
     }
+}
+
+@theme {
+    --color-primary: #3126FF;
+    --color-primary-500: #9dcfff;
+    --color-secondary: #600C00;
+    --color-secondary-500: #BE4F00;
+    --color-orange: #ff7f25;
+    --color-purple: #9422B4;
+    --color-green: #2CFF00;
+    --color-lightgray: #ddd;
+    --color-logout-btn: #ff5a5a;
+    --color-navbar-menu: rgba(16,16,18,0.6);
+
+    --color-dark-1: #000;
+    --color-dark-2: #121417;
+    --color-dark-3: #101012;
+    --color-dark-4: #1f1f22;
+
+    --color-light-1: #fff;
+    --color-light-2: #efefef;
+    --color-light-3: #7878a3;
+    --color-light-4: #5c5c7b;
+
+    --color-gray-1: #697c89;
+    --color-glassmorphism: rgba(16,16,18,0.6);
 }

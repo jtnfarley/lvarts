@@ -11,23 +11,24 @@ import EditPost from './EditPost';
 import CommentButton from './CommentButton';
 import { useState } from 'react';
 
-export default function PostActions(props:{postData:Post, user:User}) {
+export default function PostActions(props:{postData:Post, user:User, currentUserPost:boolean}) {
 	const post = props.postData;
 	const user = props.user;
+	const currentUserPost = props.currentUserPost;
 	const [isHovered, setIsHovered] = useState(false);
 
     return (
 		<div className='flex flex-row'>
 			<div className='w-1/2 flex flex-row'>
 				<div className='w-1/4'>
-					<LikePost postData={post} user={props.user}/>
+					<LikePost postData={post} user={props.user} currentUserPost={currentUserPost}/>
 				</div>
 				<div className='w-1/4'>
 					<CommentButton postData={post}/>
 				</div>
 			</div>
 			{
-				post.userId === props.user.id && 
+				currentUserPost && 
 					<div className='w-1/2 flex flex-row justify-end'>
 						<div className='w-1/4 flex justify-end'>
 							<EditPost postData={post} user={props.user}/>

@@ -37,9 +37,9 @@ export default function EditPost(props:{postData:Post, user:User}) {
 			{
 				showEditModal &&
 				<EditPostModal
-					title="Delete Post"
-					message="Are you sure you want to delete this post?"
-					postContent={post.content}
+					title="Edit Post"
+					message=""
+					postContent={post.lexical!}
 					postId={post.id}
 					isOpen={showEditModal}
 					onClose={() => setShowEditModal(false)}

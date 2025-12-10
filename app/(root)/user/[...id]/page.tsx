@@ -24,7 +24,7 @@ export default function UserProfile() {
 		if (status === 'authenticated') {
 			getUser()
 		}
-	}, [])
+	}, [session])
 
 	return (
 		<div>

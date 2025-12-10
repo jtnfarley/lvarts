@@ -9,7 +9,7 @@ export default function PostModal(props:{
     isOpen:boolean, 
     onClose:() => void, 
 }) {
-    const { title, message, postContent, postId, isOpen, onClose } = props;
+    const { postContent, postId, isOpen, onClose } = props;
 
     const truncateText = (text:string) => {
         return text.length > 100 ? text.slice(0, 100) + '...' : text;

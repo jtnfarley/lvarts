@@ -66,6 +66,7 @@ model VerificationToken {
 model Posts {
   id            String       @id @default(auto()) @map("_id") @db.ObjectId
   content       String
+  lexical       String?
   userId        String       @db.ObjectId
   user          User         @relation(fields: [userId], references: [id])
   userDetailsId String?      @db.ObjectId
@@ -74,7 +75,7 @@ model Posts {
   updatedAt     DateTime     @db.Date
   edited        Boolean
   parentPostId  String?      @db.ObjectId
-  parentPost    Posts?       @relation("Comments", fields: [parentPostId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  parentPost    Posts?       @relation("Comments", fields: [parentPostId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   comments      Posts[]      @relation("Comments")
   postFile      String?
   postType      String?

@@ -8,8 +8,8 @@ import { BiSolidUserCheck, BiUserPlus, BiSolidUserX } from "react-icons/bi";
 import { useEffect, useState } from 'react';
 import { followUser, unfollowUser } from '@/app/actions/user';
 
-export default function Follow(props:{postData:Post, user:User}) {
-	const post = props.postData;
+export default function Follow(props:{followUserId:string, user:User}) {
+	const followUserId = props.followUserId;
 	const user = props.user;
 	const [isHovered, setIsHovered] = useState(false);
 	const [following, setFollowing] = useState(false);
@@ -17,16 +17,16 @@ export default function Follow(props:{postData:Post, user:User}) {
 	const toggleFollow = async () => {
 		console.log(following)
 		if (following) {
-			await unfollowUser({userId:user.id, toFollowId:post.userId})
+			await unfollowUser({userId:user.id, toFollowId:followUserId})
 			setFollowing(false)
 			return
 		}   
-		await followUser({userId:user.id, toFollowId:post.userId})
+		await followUser({userId:user.id, toFollowId:followUserId})
 		setFollowing(true)
 	}
 
 	useEffect(() => {
-		if (user.userDetails?.following.includes(post.userId)) {
+		if (user.userDetails?.following.includes(followUserId)) {
 			setFollowing(true)
 		}
 	}, [])
@@ -39,7 +39,7 @@ export default function Follow(props:{postData:Post, user:User}) {
 					onMouseLeave={() => setIsHovered(false)}
 					onClick={toggleFollow}
 				>
-					{isHovered ? <BiSolidUserX color='red' /> : <BiSolidUserCheck color='green' />}
+					{isHovered ? <BiSolidUserX color='red' /> : <BiSolidUserCheck color='#3126FF' />}
 				</div>
 			) : (
 				<div className='text-2xl' title='follow'
