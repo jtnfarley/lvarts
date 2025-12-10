@@ -8,7 +8,7 @@ export default interface UserDetails {
 	displayName: string
 	followers: string[]
 	following: string[]
-	avatar: string
+	// avatar: string
 	likedPosts: string[]
 	postIds: string[]
 	suspended: Boolean
