@@ -26,7 +26,7 @@ export default async function SigninPage() {
         <div className="gap-5 p-5">
             <div className="flex justify-center">
                 <Image
-                    src='/logos/lvarts.svg'
+                    src='/logos/lvarts-paths.svg'
                     alt="Lehigh Valley Arts & Music"
                     width={500}
                     height={195}
