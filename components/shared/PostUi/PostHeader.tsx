@@ -17,7 +17,7 @@ export default function PostHeader(props:{postData:Post, user:User, currentUserP
     return (
 		<div className='flex flex-row px-3 py-3 shadow-md rounded-2xl'>
 			<div className='flex flex-row gap-3'>
-				<div><img src='https://static01.nyt.com/images/2021/09/30/fashion/29melting-face-emoji/29melting-face-emoji-mediumSquareAt3X-v2.jpg' style={{width:'50px', height:'50px'}}/></div>
+				<div><img src='/images/melty-man.png' style={{width:'50px', height:'50px'}}/></div>
 				<div>
 					<div className='text-sm font-bold'>{post.userDetails?.displayName}</div>
 					<div className='text-[10px]'>{post.createdAt.toDateString()}</div>
