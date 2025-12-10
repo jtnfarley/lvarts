@@ -34,7 +34,7 @@ export default function UserProfile() {
 						<label className="block text-gray-700 font-medium mb-2" htmlFor="name">
 							Avatar
 						</label>
-						{user.avatar}
+						{/* {user.avatar} */}
 					</div>
 					<div className="mb-4">
 						<label className="block text-gray-700 font-medium mb-2" htmlFor="name">

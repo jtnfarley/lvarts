@@ -1,14 +1,14 @@
 export default interface UserDetails {
     id: string
     userId: string
-	bio: string | null
+	bio: string
 	chats: string[]
 	comments: string[]
 	createdAt: Date
 	displayName: string
 	followers: string[]
 	following: string[]
-	avatar: string | null
+	// avatar: string
 	likedPosts: string[]
 	postIds: string[]
 	suspended: Boolean
