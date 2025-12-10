@@ -91,7 +91,7 @@ model UserDetails {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   userId      String   @db.ObjectId
   user        User?    @relation(fields: [userId], references: [id])
-  displayName String
+  displayName String?
   createdAt   DateTime @db.Date
   updatedAt   DateTime @db.Date
   bio         String?

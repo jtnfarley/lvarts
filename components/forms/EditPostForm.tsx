@@ -2,9 +2,10 @@
 
 import { editPost } from "@/app/actions/posts";
 import PostForm from "./PostForm";
+import { InitialEditorStateType } from "lexical";
 
 interface Props {
-    content:{},
+    content:InitialEditorStateType,
     postId:string
 }
 

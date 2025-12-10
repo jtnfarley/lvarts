@@ -43,7 +43,7 @@ const AccountInfo = (props:{user: User}) => {
     })
 
     const onSubmit = async (values: z.infer<typeof UserValidation>) => {
-        const id = user.userDetails?.id || undefined
+        const id = user.userDetails?.id!
         await updateUser({
             id,
             userId: user.id,

@@ -2,6 +2,7 @@
 
 import {prisma} from '@/lib/db/prisma'
 import User from '@/lib/models/user'
+import UserDetails from '@/lib/models/userDetails'
 
 interface UpdateUserParams {
     id: string,
@@ -26,7 +27,7 @@ export const getUserDetails = async (userId:string) => {
     return userDetails
 }
 
-export const getRandoUsers = async (userId:string):Promise<Array<User>> => {
+export const getRandoUsers = async (userId:string):Promise<UserDetails[]> => {
     const userDetailsCount = await prisma.userDetails.count();
     const skip = Math.floor(Math.random() * (userDetailsCount - 1)); //remove logged-in user
     const userDetails = await prisma.userDetails.findMany({
@@ -45,12 +46,10 @@ export const getRandoUsers = async (userId:string):Promise<Array<User>> => {
 export const updateUser = async ({
     id,
     userId,
-    avatarUrl,
     bio,
     displayName
 }:UpdateUserParams): Promise<void> => {
 console.log(id, userId,
-    avatarUrl,
     bio,
     displayName)
     const date = new Date()
@@ -64,7 +63,6 @@ console.log(id, userId,
                     id: id
                 },
                 data: {
-                    avatarUrl,
                     bio,
                     displayName,
                     updatedAt
@@ -74,7 +72,6 @@ console.log(id, userId,
             await prisma.userDetails.create({
                 data: {
                     userId,
-                    avatarUrl,
                     bio,
                     displayName,
                     createdAt,

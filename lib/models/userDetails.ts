@@ -5,7 +5,7 @@ export default interface UserDetails {
 	chats: string[]
 	comments: string[]
 	createdAt: Date
-	displayName: string
+	displayName?: string | null
 	followers: string[]
 	following: string[]
 	image?: string | null

@@ -105,6 +105,7 @@ export const savePost = async (postData:any) => {
         userDetails = await prisma.userDetails.create({
             data: {
                 userId,
+                displayName: '',
                 createdAt,
                 updatedAt
             }

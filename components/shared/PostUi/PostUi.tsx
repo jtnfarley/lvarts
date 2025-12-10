@@ -10,7 +10,7 @@ import PostContent from './PostContent';
 import PostActions from './PostActions';
 import PostMedia from './PostMedia';
 
-export default function PostUi(props:{postData:Post, user:User | null}) {
+export default function PostUi(props:{postData:Post, user:User}) {
 	const [post, setPost] = useState<Post>(props.postData)
 	const user = props.user
 

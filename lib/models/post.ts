@@ -6,20 +6,20 @@ export default interface Post {
 	content: string
 	lexical?: string | null
     userId: string 
-	userDetailsId?: string
+	userDetailsId?: string | null
 	userDetails?: UserDetails | null
 	user?: User
 	createdAt: Date
     updatedAt: Date
     edited: boolean
-	parentPostId?: string
+	parentPostId?: string | null
 	parentPost?: Post | null
-	postFile?: string
-	postType?: string
-	privatePost?: boolean
-	tempFile?: string
-	userDir?: string
-    chatId?: string
-	likes?: number
-	commentCount?: number
+	postFile?: string | null
+	postType?: string | null
+	privatePost?: boolean | null
+	tempFile?: string | null
+	userDir?: string | null
+    chatId?: string | null
+	likes?: number | null
+	commentCount?: number | null
 }

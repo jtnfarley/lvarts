@@ -2,18 +2,19 @@ import { getRandoUsers } from "@/app/actions/user"
 import { currentUser } from '@/app/actions/currentUser';
 import UserCard from "./Cards/UserCard"
 import User from "@/lib/models/user";
+import UserDetails from "@/lib/models/userDetails";
 
 export default async function RecUsers() {
 	const user = await currentUser()
 
 	if (!user) return null
 
-	const getRecUsers = async ():Promise<Array<User>> => {
+	const getRecUsers = async ():Promise<Array<UserDetails>> => {
 		'use server'
 		return await getRandoUsers(user.id)
 	}
 	
-	let recUsers:Array<User> = await getRecUsers()
+	let recUsers:Array<UserDetails> = await getRecUsers()
 
 	return (
 		<section className="lg:bg-white lg:rounded-3xl lg:p-5 sm:bg-none sm:p-0">

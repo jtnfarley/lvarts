@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import RTEditor from "../shared/Fields/RichTextEditor/RTEditor";
 import PostFormActions from '@/components/shared/PostUi/PostFormActions'
+import { InitialEditorStateType } from "lexical";
 
 interface Props {
     savePost:Function,
@@ -13,7 +14,7 @@ interface Props {
     postType?: string,
     edited?: boolean,
     parentPostId?:string,
-    content?:{},
+    content?:InitialEditorStateType,
     postId?:string
 }
 

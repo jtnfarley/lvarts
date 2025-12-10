@@ -76,7 +76,7 @@ function PostMediaEmbed(props:{post:Post}) {
     },[]);
 
     return (
-        <div id='iframeContainer' ref={(el) => iframeContainer = el}>
+        <div id='iframeContainer' ref={(el) => { iframeContainer = el; }}>
             {(props.post) ? extractMedia(props.post) : ""}
         </div>
     )

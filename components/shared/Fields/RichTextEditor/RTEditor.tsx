@@ -23,6 +23,7 @@ import ExampleTheme from './ExampleTheme';
 import RandoPlaceholder from "./RandoPlaceholder";
 // import TreeViewPlugin from "./plugins/TreeViewPlugin";
 import "./styles.css";
+import { InitialEditorStateType, LexicalEditor } from "lexical";
 
 const EditorCapturePlugin = React.forwardRef((props: any, ref: any) => {
 	const [editor] = useLexicalComposerContext();
@@ -44,15 +45,23 @@ function onError(error:Error) {
 	console.error(error)
 }
 
-const initialConfig = {
+interface InitialConfigType {
+	namespace: string,
+	theme: {},
+	onError:(error: Error, editor: LexicalEditor) => void,
+	nodes:Array<any>,
+	editorState:InitialEditorStateType | undefined
+}
+
+const initialConfig:InitialConfigType = {
 	namespace: 'MyEditor',
 	theme: ExampleTheme,
 	onError,
 	nodes:[HashtagNode, ListNode, ListItemNode, AutoLinkNode],
-	editorState:null
+	editorState:undefined
 };
 
-export default function RTEditor(props:{ref:any, onChange: (html:object) => void, clearEditor:boolean, content?:string}) {
+export default function RTEditor(props:{ref:any, onChange: (html:object) => void, clearEditor:boolean, content?:InitialEditorStateType | undefined}) {
 
 	if (props.content) initialConfig.editorState = props.content;
 	
