@@ -1,17 +1,19 @@
 import UserDetails from "./userDetails"
+import User from "./user"
 
 export default interface Post {
     id: string
 	content: string
-	lexical?: string
+	lexical?: string | null
     userId: string 
 	userDetailsId?: string
-	userDetails: UserDetails
+	userDetails?: UserDetails | null
+	user?: User
 	createdAt: Date
     updatedAt: Date
     edited: boolean
 	parentPostId?: string
-	parentPost?: Post
+	parentPost?: Post | null
 	postFile?: string
 	postType?: string
 	privatePost?: boolean
