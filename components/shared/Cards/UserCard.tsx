@@ -43,7 +43,7 @@ const UserCard = ({currentUser, recUserId, displayName, avatar}: Props) => {
         <article className="user-card lg:w-full">
             <div className="flex items-center lg:bg-orange rounded-full text-white p-2 text-lg gap-3 justify-between">
                 <button className="flex gap-3" onClick={viewProfile}>
-                    <div><img src='/images/melty-man.png' className='rounded-full border-dark-2 w-[50px] h-[50px] lg:w-[35px] lg:h-[35px] lg:border-0'/></div>
+                    <div><img src={avatar} className='rounded-full border-dark-2 w-[50px] h-[50px] lg:w-[35px] lg:h-[35px] lg:border-0'/></div>
                     
                     <div className='hidden lg:block font-semibold'>{displayName}</div>
                 </button>

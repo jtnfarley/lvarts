@@ -5,7 +5,7 @@ import User from '@/lib/models/user'
 import UserDetails from '@/lib/models/userDetails'
 
 interface UpdateUserParams {
-    id?: string,
+    id: string,
     userId: string,
     bio?: string,
     displayName?: string,
@@ -53,51 +53,39 @@ export const updateUser = async ({
     userId,
     bio,
     displayName,
-    avatar,
     userDir
-}:UpdateUserParams): Promise<UserDetails> => {
+}:UpdateUserParams): Promise<void> => {
+console.log(id, userId,
+    bio,
+    displayName, userDir)
     const date = new Date()
     const createdAt = date
     const updatedAt = date
 
-    let userDetails;
     try {
         if (id) {
-            userDetails = await prisma.userDetails.update({
+            await prisma.userDetails.update({
                 where: {
                     id: id
                 },
                 data: {
                     bio,
                     displayName,
-                    updatedAt,
-                    ...(avatar !== undefined ? { avatar } : {}),
-                    ...(userDir ? { userDir } : {})
+                    updatedAt
                 }
             })
         } else {
-            userDetails = await prisma.userDetails.create({
+            await prisma.userDetails.create({
                 data: {
-                    user: {
-                        connect: { id: userId }
-                    },
+                    userId,
                     bio,
                     displayName,
-                    avatar,
                     userDir,
                     createdAt,
-                    updatedAt,
-                    chats: [],
-                    comments: [],
-                    followers: [],
-                    following: [],
-                    likedPosts: [],
-                    postIds: []
+                    updatedAt
                 }
             })
         }
-
-        return userDetails;
 
         // if (path === '/profile/edit') revalidatePath(path)
     } catch (error:any) {

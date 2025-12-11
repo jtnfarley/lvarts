@@ -107,7 +107,13 @@ export const savePost = async (postData:any) => {
                 userId,
                 displayName: '',
                 createdAt,
-                updatedAt
+                updatedAt,
+                chats: [],
+                comments: [],
+                followers: [],
+                following: [],
+                likedPosts: [],
+                postIds: []
             }
         })
     }

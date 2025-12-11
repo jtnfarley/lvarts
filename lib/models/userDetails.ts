@@ -6,9 +6,10 @@ export default interface UserDetails {
 	comments: string[]
 	createdAt: Date
 	displayName?: string | null
+	userDir?: string | null
 	followers: string[]
 	following: string[]
-	image?: string | null
+	avatar?: string | null
 	likedPosts: string[]
 	postIds: string[]
 	suspended?: boolean | null

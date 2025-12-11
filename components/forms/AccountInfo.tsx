@@ -9,18 +9,39 @@ import { updateUser } from "@/app/actions/user"
 import User from "@/lib/models/user";
 import { BiImageAdd } from "react-icons/bi";
 import { useState } from "react";
+import uploadFile from "@/app/actions/fileUploader";
+
+const getRandomString = (length:number) => {
+    const alphaNumeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let dirName = '';
+
+    for (let i = 0; i < length; i++) {
+        const index = Math.floor(Math.random() * alphaNumeric.length);
+        dirName += alphaNumeric.substring(index, index + 1)
+    }
+
+    return dirName;
+}
+
+const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 const UserValidation = z.object({
     displayName: z.string().min(1).max(100),
     bio: z.string().max(4000).optional(),
-    avatarUrl: z.string().optional(),    
+    avatar: z.instanceof(File, { message: 'Please upload an image.' })
+        .refine((file) => file.size <= MAX_UPLOAD_SIZE, 'Max image size is 5MB.')
+        .refine(
+            (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
+            'Only .jpg, .png, and .webp formats are supported.'
+    ).optional(),    
     // postFile: z.string(), 
     // privatePost: z.boolean(), 
     // parentPostId: z.string()
 })
 
 const AccountInfo = (props:{user: User}) => {
-    const user = props.user;
+    const [user, setUser] = useState<User>(props.user);
 
     if (!user) {
         return (
@@ -29,30 +50,72 @@ const AccountInfo = (props:{user: User}) => {
     }
 
     const [userOnboarded, setUserOnboarded] = useState(user.userDetails && user.userDetails.displayName && user.userDetails.displayName !== '')
-
+    const [avatarUrl, setAvatarUrl] = useState<string | undefined>();
     const pathname = usePathname();
     const router = useRouter();
 
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<z.infer<typeof UserValidation>>({
+    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<z.infer<typeof UserValidation>>({
         resolver: zodResolver(UserValidation),
         defaultValues: {
             displayName: user.userDetails?.displayName || undefined,
             bio: user.userDetails?.bio || undefined,
-            avatarUrl: undefined
         }
     })
 
-    const onSubmit = async (values: z.infer<typeof UserValidation>) => {
-        const id = user.userDetails?.id!
-        await updateUser({
-            id,
-            userId: user.id,
-            bio: values.bio,
-            displayName: values.displayName,
-        })
+    const avatarRegister = register('avatar')
 
-        if (values.displayName && values.displayName !== '' && !userOnboarded) {
-            setUserOnboarded(true)
+    const sendFile = async (filedata:{file:File, userDir:string}) => {
+        const {file, userDir} = filedata;
+        await uploadFile({file, userDir});
+        setAvatarUrl(`https://lvartsmusic-ny.b-cdn.net/${userDir}/${file.name}`);
+    }
+
+    const onSubmit = async (values: z.infer<typeof UserValidation>) => {
+        let id = user.userDetails?.id;
+        let userDir = user.userDetails?.userDir || getRandomString(10);
+        let avatarUrl = user.userDetails?.avatar || undefined;
+
+        try {
+            if (values.avatar) {
+                const file = values.avatar;
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('userDir', userDir);
+
+                sendFile({file, userDir});
+
+                // const uploadResponse = await fetch('/api/upload', {
+                //     method: 'POST',
+                //     body: formData
+                // });
+
+                // if (!uploadResponse.ok) {
+                //     console.error('Failed to upload avatar');
+                //     return;
+                // }
+
+                // const data = await uploadResponse.json();
+                avatarUrl = file.name;
+            }
+            
+            const userDetails = await updateUser({
+                id,
+                userId: user.id,
+                bio: values.bio,
+                displayName: values.displayName,
+                userDir,
+                avatar: avatarUrl
+            })
+
+            if (values.displayName && values.displayName !== '' && !userOnboarded) {
+                setUserOnboarded(true)
+            }
+
+            user.userDetails = userDetails;
+
+            setUser({...user})
+        } catch (error) {
+            console.error(error);
         }
     }
 
@@ -62,14 +125,30 @@ const AccountInfo = (props:{user: User}) => {
                 <form 
                     className=""
                     onSubmit={handleSubmit(onSubmit)}
+                    encType="multipart/form-data"
                 >
                     <div className="mb-4">
                         <label className="block text-gray-700 font-medium mb-2" htmlFor="name">
                             Avatar
                         </label>
-                        <input type="file" name="avatar" id="avatar" className="hidden" />
+                        <input 
+                            {...avatarRegister}
+                            type="file"
+                            id="avatar"
+                            className="hidden"
+                            accept={ACCEPTED_IMAGE_TYPES.join(',')}
+                            onChange={(event) => {
+                                const file = event.target.files?.[0];
+                                avatarRegister.onChange(event);
+                                setValue('avatar', file, { shouldValidate: true });
+                            }}
+                        />
                         <label htmlFor="avatar" className="cursor-pointer">
+                            {avatarUrl ?
+                            <img src={avatarUrl} className='w-[40] h-[40]'/>
+                            :
                             <BiImageAdd size={40} title="upload an image" />
+                            }
                         </label>
                     </div>
                     <div className="mb-4">

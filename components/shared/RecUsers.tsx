@@ -30,7 +30,10 @@ export default async function RecUsers() {
 										currentUser={ user }
 										recUserId={ userDetails.userId }
 										displayName={ userDetails.displayName }
-										avatar={ userDetails.avatar }
+										avatar={ (userDetails && userDetails.userDir && userDetails.avatar) ?
+											`https://lvartsmusic-ny.b-cdn.net/${userDetails.userDir}/${userDetails.avatar}` :
+											'/images/melty-man.png'
+									}
 										// userType = 'User'
 									/>
 								))

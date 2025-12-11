@@ -7,7 +7,7 @@ export default async function Profile() {
 	if (!user) return
 
 	return (
-		<div>
+		<div className="lg:bg-white lg:rounded-3xl lg:p-5 sm:bg-none sm:p-0">
 			<div className="flex flex-col items-center justify-center">
 				<h1 className="text-2xl font-bold">Profile</h1>
 			</div>
