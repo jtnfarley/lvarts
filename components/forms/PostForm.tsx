@@ -94,7 +94,8 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
         await savePost(values);
         dispatchEvent(new Event('postsUpdated'));
         // const textarea = document.querySelector('.contentEditable') as HTMLDivElement;
-        setClearEditor(true)
+        setClearEditor(true);
+        setTempImage(undefined);
         // if (textarea) textarea?.innerHTML = '';
     }
 

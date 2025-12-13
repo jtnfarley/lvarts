@@ -7,7 +7,6 @@ function PostMediaImage(props:{post:Post}) {
     const [imageLoaded, setImageLoaded] = useState(false);
 
     const imageFile = "https://lvartsmusic-ny.b-cdn.net/"+post.userDetails!.userDir+"/"+post.postFile;
-console.log(imageFile)
 
     const imageLoad = () => {
         setImageLoaded(true)
