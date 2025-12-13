@@ -47,7 +47,7 @@ export default function SinglePost() {
                     <PostUi postData={post} user={user} />
                 </div>
                 <div className='mt-2'>
-                    <AddPostForm userId={user!.id} postType='comment' edited={false} parentPostId={params.id.toString()}/>
+                    <AddPostForm user={user} postType='comment' edited={false} parentPostId={params.id.toString()}/>
                 </div>
                 <div>
                     <CommentFeed parentPostId={params.id.toString()} user={user}/>
