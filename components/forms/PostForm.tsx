@@ -31,7 +31,7 @@ const PostValidation = z.object({
     postId: z.string().optional(),
     postFile: z.string().optional(),
     postFileType: z.string().optional(),
-    postFileObj: z.instanceof(File).optional(),
+    postFileObj: z.any().optional(),
     // privatePost: z.boolean(), 
 })
 
@@ -55,7 +55,6 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
     const sendFile = async (filedata:{file:File, userDir:string}) => {
         const {file, userDir} = filedata;
         await uploadFile({file, userDir});
-        // setAvatarUrl(`${avatarUrlBase}/${userDir}/${file.name}`);
     }
 
     const onSubmit = async (values: z.infer<typeof PostValidation>) => {
@@ -78,7 +77,7 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
         if (user && user.userDetails)
             userDir = user.userDetails.userDir;
 
-        if (values.postFileObj && userDir) {
+        if (values.postFileObj.name && userDir) {
             const file = values.postFileObj;
             const formData = new FormData();
             formData.append('file', file);
