@@ -41,6 +41,7 @@ export default function EditPost(props:{postData:Post, user:User}) {
 					message=""
 					postContent={post.lexical!}
 					postId={post.id}
+					user={user}
 					isOpen={showEditModal}
 					onClose={() => setShowEditModal(false)}
 				/>
