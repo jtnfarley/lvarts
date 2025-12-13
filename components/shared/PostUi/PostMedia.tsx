@@ -1,12 +1,19 @@
 import Post from '@/lib/models/post';
-// import PostMediaImage from "./PostMediaImage";
+import PostMediaImage from "./PostMediaImage";
 // import PostMediaAudio from "./PostMediaAudio";
 import PostMediaEmbed from "./PostMediaEmbed";
 
 function PostMedia(props:{post:Post}) {
+    const postFileType = props.post.postFileType;
 
     return (
-        <PostMediaEmbed post={props.post} />
+        <>
+            {postFileType?.match('image') ?
+                <PostMediaImage post={props.post} />
+                :
+                <PostMediaEmbed post={props.post} />
+            }
+        </>
     )
 }
 

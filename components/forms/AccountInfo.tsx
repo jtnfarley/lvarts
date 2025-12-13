@@ -35,9 +35,6 @@ const UserValidation = z.object({
             (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
             'Only .jpg, .png, and .webp formats are supported.'
     ).optional(),    
-    // postFile: z.string(), 
-    // privatePost: z.boolean(), 
-    // parentPostId: z.string()
 })
 
 const AccountInfo = (props:{user: User}) => {
@@ -49,10 +46,11 @@ const AccountInfo = (props:{user: User}) => {
         )
     }
 
+    const avatarUrlBase = `https://lvartsmusic-ny.b-cdn.net/`
+    const avatarUrlInit = user.userDetails && user.userDetails.avatar && user.userDetails.userDir ? `${avatarUrlBase}/${user.userDetails.userDir}/${user.userDetails.avatar}` : undefined
+
     const [userOnboarded, setUserOnboarded] = useState(user.userDetails && user.userDetails.displayName && user.userDetails.displayName !== '')
-    const [avatarUrl, setAvatarUrl] = useState<string | undefined>();
-    const pathname = usePathname();
-    const router = useRouter();
+    const [avatarUrl, setAvatarUrl] = useState<string | undefined>(avatarUrlInit);
 
     const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<z.infer<typeof UserValidation>>({
         resolver: zodResolver(UserValidation),
@@ -67,7 +65,7 @@ const AccountInfo = (props:{user: User}) => {
     const sendFile = async (filedata:{file:File, userDir:string}) => {
         const {file, userDir} = filedata;
         await uploadFile({file, userDir});
-        setAvatarUrl(`https://lvartsmusic-ny.b-cdn.net/${userDir}/${file.name}`);
+        setAvatarUrl(`${avatarUrlBase}/${userDir}/${file.name}`);
     }
 
     const onSubmit = async (values: z.infer<typeof UserValidation>) => {
@@ -84,17 +82,6 @@ const AccountInfo = (props:{user: User}) => {
 
                 sendFile({file, userDir});
 
-                // const uploadResponse = await fetch('/api/upload', {
-                //     method: 'POST',
-                //     body: formData
-                // });
-
-                // if (!uploadResponse.ok) {
-                //     console.error('Failed to upload avatar');
-                //     return;
-                // }
-
-                // const data = await uploadResponse.json();
                 avatarUrl = file.name;
             }
             

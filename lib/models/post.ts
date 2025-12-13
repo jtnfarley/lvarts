@@ -15,6 +15,7 @@ export default interface Post {
 	parentPostId?: string | null
 	parentPost?: Post | null
 	postFile?: string | null
+	postFileType?: string | null
 	postType?: string | null
 	privatePost?: boolean | null
 	tempFile?: string | null

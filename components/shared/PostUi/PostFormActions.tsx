@@ -1,18 +1,15 @@
 'use client'
 
-import { BiImageAdd } from "react-icons/bi";
+import ImageUpload from "./ImageUpload"
 
-const PostFormActions = () => {
+const PostFormActions = (props:{register:Function, setValue:Function, setTempImage:Function}) => {
     return (
         <div className="mt-2 flex flex-row">
             <div className="w-[50%]">
-                <input type="file" name="postFile" id="postFile" className="hidden" />
-                <label htmlFor="postFile" className="cursor-pointer">
-                    <BiImageAdd size={40} title="upload an image" />
-                </label>
+                <ImageUpload register={props.register} setValue={props.setValue} setTempImage={props.setTempImage}/>
             </div>
             <div className="w-[50%] flex justify-end">
-                <button type='submit' className="bg-orange px-2 py-2 rounded text-white">
+                <button type='submit' className="bg-orange px-2 py-2 rounded text-white uppercase font-semibold">
                     Post
                 </button>
             </div>

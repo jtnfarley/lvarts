@@ -26,7 +26,7 @@ export default async function Home() {
 				<RecUsers/>	
 			</div>
 			<div>
-				<AddPostForm userId={userId} postType='post' edited={false}/>
+				<AddPostForm user={user} postType='post' edited={false}/>
 			</div>
 			<div>
 				<Feed user={user} getUser={getUser}/>

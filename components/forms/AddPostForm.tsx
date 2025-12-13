@@ -2,18 +2,19 @@
 
 import { savePost } from "@/app/actions/posts";
 import PostForm from "./PostForm";
+import User from "@/lib/models/user";
 
 interface Props {
-    userId: string,
+    user: User,
     postType: string,
     edited: boolean,
     parentPostId?:string
 }
 
-const AddPostForm = ({userId, postType, edited, parentPostId}: Props) => {
+const AddPostForm = ({user, postType, edited, parentPostId}: Props) => {
 
     return (
-        <PostForm userId={userId} postType={postType} edited={edited} parentPostId={parentPostId} savePost={savePost}/>
+        <PostForm user={user} postType={postType} edited={edited} parentPostId={parentPostId} savePost={savePost}/>
     )
 }
 

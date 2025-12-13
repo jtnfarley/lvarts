@@ -77,8 +77,9 @@ model Posts {
   parentPostId  String?      @db.ObjectId
   parentPost    Posts?       @relation("Comments", fields: [parentPostId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   comments      Posts[]      @relation("Comments")
-  postFile      String?
   postType      String?
+  postFile      String?
+  postFileType  String?
   privatePost   Boolean?
   tempFile      String?
   userDir       String?

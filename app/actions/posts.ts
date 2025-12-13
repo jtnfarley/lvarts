@@ -3,7 +3,7 @@
 import {prisma} from '@/lib/db/prisma'
 import User from '@/lib/models/user'
 import Post from '@/lib/models/post';
-import { cp } from 'fs';
+import { Prisma } from '@prisma/client';
 
 const include = {
     user:true,
@@ -89,7 +89,7 @@ export const getComments = async (postId:string):Promise<any> => {
 }
 
 export const savePost = async (postData:any) => {
-    const {content, lexical, userId, postType, postFile, privatePost, parentPostId, edited} = postData
+    const {content, lexical, userId, postType, postFile, postFileType, privatePost, parentPostId, edited} = postData
 
     const date = new Date()
     const createdAt = date
@@ -113,25 +113,28 @@ export const savePost = async (postData:any) => {
                 followers: [],
                 following: [],
                 likedPosts: [],
-                postIds: []
+                postIds: [],
             }
         })
     }
 
+    const postDataCreate: Prisma.PostsUncheckedCreateInput = {
+        content,
+        lexical: lexical ?? null,
+        userId,
+        userDetailsId: userDetails.id,
+        postType: postType ?? null,
+        edited,
+        postFile: postFile ?? null,
+        privatePost: privatePost ?? null,
+        parentPostId: parentPostId ?? null,
+        createdAt,
+        updatedAt,
+        ...(postFileType !== undefined ? { postFileType } : {}),
+    }
+
     const post = await prisma.posts.create({
-        data: {
-            content, 
-            lexical,
-            userId,
-            userDetailsId: userDetails.id,
-            postType,
-            edited,
-            postFile,
-            privatePost,
-            parentPostId,
-            createdAt,
-            updatedAt
-        },
+        data: postDataCreate,
     })
 
     await prisma.userDetails.update({
