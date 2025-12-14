@@ -3,13 +3,15 @@
 import Image from "next/image";
 import { redirect } from 'next/navigation';
 import { useEffect } from "react";
+import { verifyCode } from "@/app/actions/invitationCodes";
 
 export default function LandingPage() {
-    const verification = '4t93u4gf9erg95t95wefsdv';
-
-    const checkCode = (ev:any) => {
+    const checkCode = async (ev:any) => {
         ev.preventDefault()
-        if (ev.target.code.value === verification) {
+        const code = ev.target.code.value;
+        const verified = await verifyCode(code)
+
+        if (verified) {
             document.cookie = `chortle=${btoa('invitationVerified=true')}`;
             redirect('/signin');
         }

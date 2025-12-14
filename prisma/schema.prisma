@@ -63,6 +63,11 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model InvitationCodes {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  code       String
+}
+
 model Posts {
   id            String       @id @default(auto()) @map("_id") @db.ObjectId
   content       String

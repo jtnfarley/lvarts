@@ -10,18 +10,9 @@ import User from "@/lib/models/user";
 import { BiImageAdd } from "react-icons/bi";
 import { useState } from "react";
 import uploadFile from "@/app/actions/fileUploader";
+import { getRandomString } from "@/lib/utils";
+// import { generateCodes } from '@/app/actions/invitationCodes';
 
-const getRandomString = (length:number) => {
-    const alphaNumeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let dirName = '';
-
-    for (let i = 0; i < length; i++) {
-        const index = Math.floor(Math.random() * alphaNumeric.length);
-        dirName += alphaNumeric.substring(index, index + 1)
-    }
-
-    return dirName;
-}
 
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -106,6 +97,11 @@ const AccountInfo = (props:{user: User}) => {
         }
     }
 
+    // const generateInviteCodes = async () => {
+    //     const codes = await generateCodes(10)
+    //     console.log(codes)
+    // }
+
     return (
         <div>
             <section className="">
@@ -168,6 +164,7 @@ const AccountInfo = (props:{user: User}) => {
                     </Button>
                 </form>
             </section>
+            {/* <button onClick={() => generateInviteCodes()}>Generate Invite Codes</button> */}
         </div>
     )
 }

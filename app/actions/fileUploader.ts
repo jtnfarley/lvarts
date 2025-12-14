@@ -1,8 +1,5 @@
 'use server'
 
-import https from 'https';
-import fs, { read } from 'fs';
-
 export default async function uploadFile(params:{file:File, userDir:string}) {
     const {file, userDir} = params;
     const REGION = 'ny'; // If German region, set this to an empty string: ''
@@ -18,18 +15,6 @@ export default async function uploadFile(params:{file:File, userDir:string}) {
     }
 
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-
-    // const options = {
-    //     method: 'PUT',
-    //     host: HOSTNAME,
-    //     path: `/${STORAGE_ZONE_NAME}/${FILENAME_TO_UPLOAD}`,
-    //     headers: {
-    //     AccessKey: ACCESS_KEY,
-    //     'Content-Type': 'application/octet-stream',
-    //     },
-    //     body: readStream
-    // };
-
 
     try {
     const response = await fetch(url, {

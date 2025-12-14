@@ -1,9 +1,9 @@
 'use server'
 
-import {prisma} from '@/lib/db/prisma'
-import User from '@/lib/models/user'
-import Post from '@/lib/models/post';
+import {prisma} from '@/lib/db/prisma';
 import { Prisma } from '@prisma/client';
+import User from '@/lib/models/user';
+import Post from '@/lib/models/post';
 
 const include = {
     user:true,
