@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 import SessionWrapper from "../components/auth/SessionWrapper";
 import User from "@/lib/models/user";
@@ -20,6 +21,9 @@ export default async function RootLayout({
 		<SessionWrapper>
 			{/* <UserStoreProvider> */}
 				<html lang="en">
+					<head>
+						<GoogleAnalytics gaId="G-J6PQBNCBKC" />
+					</head>
 					<body>
 						<main className='lg:flex lg:justify-center'>
 							<div className="lg:max-w-1300">

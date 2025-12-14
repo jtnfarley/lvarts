@@ -4,6 +4,7 @@ import Image from "next/image";
 import { redirect } from 'next/navigation';
 import { useEffect } from "react";
 import { verifyCode } from "@/app/actions/invitationCodes";
+import { Button } from '@/components/ui/button';
 
 export default function LandingPage() {
     const checkCode = async (ev:any) => {
@@ -45,8 +46,8 @@ export default function LandingPage() {
             </div>
             <div className='flex justify-center'>
                 <form onSubmit={checkCode}>
-                    <input placeholder='Invitation code' name='code'/>
-                    <button type='submit'>Verify</button>
+                    <input placeholder='Invitation code' name='code' className="border-2 px-2 py-2 me-2 rounded-md"/>
+                    <Button type='submit'>Verify</Button>
                 </form>
             </div>
         </div>
