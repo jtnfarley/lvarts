@@ -42,7 +42,10 @@ export default function Search() {
 		<>
         {user && 
             posts &&
-            <div>
+            <div className="flex flex-col gap-5 py-3">
+                <div className='bg-white rounded-md text-2xl font-bold px-3 py-3 flex justify-center'>
+                    {params.query.toString()}
+                </div>
                 {
                     (user && posts && posts.length) &&
                         posts.map((post:Post, index:number) => {

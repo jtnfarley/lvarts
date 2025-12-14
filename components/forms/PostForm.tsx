@@ -26,7 +26,7 @@ const PostValidation = z.object({
     postType: z.string().optional(),
     edited: z.boolean().optional(),
     parentPostId: z.string().optional(),
-    content: z.any(),
+    content: z.any().optional(),
     lexical: z.string().optional(),
     postId: z.string().optional(),
     postFile: z.string().optional(),

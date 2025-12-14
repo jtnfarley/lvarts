@@ -1,11 +1,11 @@
 import { BiSolidHomeAlt2, BiSolidSearch, BiSolidUser } from "react-icons/bi";
 
 export const sidebarLinks = [
-    // {
-    //   icon: <BiSolidHomeAlt2 className="leftIcon"/>,
-    //   route: "/home",
-    //   label: "Home",
-    // },
+    {
+      icon: <BiSolidHomeAlt2 className="leftIcon"/>,
+      route: "/home",
+      label: "Home",
+    },
     // {
     //   icon: <BiSolidSearch className="leftIcon"/>,
     //   route: "/search",

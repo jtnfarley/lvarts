@@ -11,10 +11,11 @@ export default function Feed(props:{user:User, getUser:Function}) {
 	const [renderKey, setRenderKey] = useState(0);
 	const [user, setUser] = useState<User|null>();
 
-	let updating = false;
+	let updating = false, tempFeed:Post[] | undefined, 
+	lastChecked:Date;
 
 	const getFeedArr = async (user:User):Promise<Array<Post> | undefined> => {
-        return await getFeed(user!)
+        return await getFeed(user!, lastChecked)
     }
 
 	const handlePostsUpdated = async () => {
@@ -22,11 +23,16 @@ export default function Feed(props:{user:User, getUser:Function}) {
 		updating = true
 		const userfromServer = await props.getUser()
 		setUser(userfromServer)
-		const feedArr = await getFeedArr(userfromServer)
-		setFeed(feedArr)
+		const feedArr = await getFeedArr(userfromServer);
+		lastChecked = new Date();
+		const newFeed = (feedArr && feedArr.length && tempFeed && tempFeed.length) ? [...feedArr, ...tempFeed] : (feedArr && feedArr.length) ? feedArr : tempFeed;
+		setFeed(newFeed)
+		tempFeed = newFeed
 		setRenderKey(prev => prev + 1)
 		updating = false
 	}
+
+
 
 	useEffect(() => {
 		window.addEventListener("postsUpdated", handlePostsUpdated)
@@ -59,7 +65,7 @@ export default function Feed(props:{user:User, getUser:Function}) {
 	// }, [,props.user])
 
     return (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 pb-5">
             {
 				(user && feed && feed.length) &&
                 	feed.map((post:Post, index:number) => {

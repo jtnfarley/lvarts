@@ -15,7 +15,7 @@ const include = {
     }
 }
 
-export const getFeed = async (user:User):Promise<Array<Post>> => {
+export const getFeed = async (user:User, lastChecked:Date):Promise<Array<Post>> => {
     const posts:Array<Post> = await prisma.posts.findMany({
         where: {
             OR: [
@@ -23,28 +23,19 @@ export const getFeed = async (user:User):Promise<Array<Post>> => {
                 { userId: {
                     in: user?.userDetails?.following
                 }},
-            ]
+            ],
+            createdAt: {
+                gt: lastChecked
+            }
         },
         include,
         orderBy: {
             createdAt: 'desc'
-        }
+        },
+        take: 20
     })
 
     return posts
-    // .map(post => ({
-    //     ...post,
-    //     parentPostId: post.parentPostId || undefined,
-    //     postFile: post.postFile || undefined,
-    //     postType: post.postType || undefined,
-    //     privatePost: post.privatePost || undefined,
-    //     tempFile: post.tempFile || undefined,
-    //     userDir: post.userDir || undefined,
-    //     chatId: post.chatId || undefined,
-    //     userDetailsId: post.userDetailsId || undefined,
-    //     likes: post.likes || 0,
-    //     commentCount: post.commentCount || 0
-    // }))
 }
 
 export const getPosts = async (queryString:string):Promise<Array<Post>> => {
