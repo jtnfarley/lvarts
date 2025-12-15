@@ -12,7 +12,7 @@ export default async function Home() {
 
 	const user = await getUser();
 
-	if (!user) return redirect('/api/auth/signin?callbackUrl=https%3A%2F%2Fwww.lvartsandmusic.com%2Fsignin');
+	if (!user) return redirect('/signin');
 	
 	if (!user.userDetails || !user.userDetails.displayName || user.userDetails.displayName === '') {
 		return redirect('/profile')

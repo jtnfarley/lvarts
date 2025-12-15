@@ -1,27 +1,25 @@
-'use server'
-
+"use client"
+import { signIn } from "next-auth/react"
 import Image from "next/image";
-import { cookies } from "next/headers";
-import { redirect } from 'next/navigation';
-
-import GoogleSignIn from "../../components/auth/buttons/GoogleSignIn";
-import EmailSignIn from "../../components/auth/buttons/EmailSignIn";
-import { currentUser } from '@/app/actions/currentUser';
-
-export default async function SigninPage() {
-    const cookieStore = await cookies();
-    const invited = cookieStore.get('chortle');
-    if (!invited || atob(invited.value) !== 'invitationVerified=true') return redirect('/');
-
-    const getUser = async () => {
-            'use server'
-            return await currentUser()
+import { useState } from "react";
+ 
+export default function SignIn() {
+    const [error, setError] = useState<string | undefined>()
+    const signInUser = (provider:string) => {
+        const options = {redirectTo: '/home', email:''}
+        if (provider === 'nodemailer') {
+            const email = document.getElementById('email') as HTMLInputElement;
+            
+            if (email.value !== '')
+                options.email = email.value;
+            else {
+                setError('Email required')
+                return;
+            }
         }
-    
-    const user = await getUser();
 
-    if (user) return redirect('/home');
-
+        signIn(provider, options);
+    }
     return (
         <div className="gap-5 p-5">
             <div className="flex justify-center">
@@ -34,10 +32,61 @@ export default async function SigninPage() {
                 />
             </div>
 
-            <div className="flex items-center lg:items-start mt-5 justify-between">
-                <div><GoogleSignIn/></div>
-                <div><EmailSignIn/></div>
+            <div className="flex flex-col mt-5 justify-center">
+                <button onClick={() => signInUser('google')}>Sign In with Google</button>
+                <div className="flex justify-center my-3">OR</div>
+                <div>
+                <input type='text' name='email' id='email' placeholder='Email' className="border-2 px-2 py-2 me-2 rounded-md w-80"/>
+                <button onClick={() => signInUser('nodemailer')}>Sign In with Email</button>
+                {error && 
+                    <div className='text-red-500'>Please enter a valid email address</div>
+                }
+                </div>
             </div>
         </div>
     )
 }
+
+// 'use server'
+
+// import Image from "next/image";
+// import { cookies } from "next/headers";
+// import { redirect } from 'next/navigation';
+
+// import GoogleSignIn from "../../components/auth/buttons/GoogleSignIn";
+// import EmailSignIn from "../../components/auth/buttons/EmailSignIn";
+// import { currentUser } from '@/app/actions/currentUser';
+
+// export default async function SigninPage() {
+//     const cookieStore = await cookies();
+//     const invited = cookieStore.get('chortle');
+//     if (!invited || atob(invited.value) !== 'invitationVerified=true') return redirect('/');
+
+//     const getUser = async () => {
+//             'use server'
+//             return await currentUser()
+//         }
+    
+//     const user = await getUser();
+
+//     if (user) return redirect('/home');
+
+//     return (
+//         <div className="gap-5 p-5">
+//             <div className="flex justify-center">
+//                 <Image
+//                     src='/logos/lvarts-paths.svg'
+//                     alt="Lehigh Valley Arts & Music"
+//                     width={500}
+//                     height={195}
+//                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+//                 />
+//             </div>
+
+//             <div className="flex items-center lg:items-start mt-5 justify-between">
+//                 <div><GoogleSignIn/></div>
+//                 <div><EmailSignIn/></div>
+//             </div>
+//         </div>
+//     )
+// }
