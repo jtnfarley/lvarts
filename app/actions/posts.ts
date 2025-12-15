@@ -15,7 +15,7 @@ const include = {
     }
 }
 
-export const getFeed = async (user:User, lastChecked:Date):Promise<Array<Post>> => {
+export const getFeed = async (user:User, lastChecked:Date | undefined):Promise<Array<Post>> => {
     const posts:Array<Post> = await prisma.posts.findMany({
         where: {
             OR: [

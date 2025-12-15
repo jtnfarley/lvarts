@@ -19,7 +19,12 @@ export default function DeletePost(props:{postData:Post, user:User}) {
 		const response = await deletePost(post.id)
 		if (response) {
 			setShowDeleteModal(false)
-			window.dispatchEvent(new Event("postsUpdated"))
+			window.dispatchEvent(new CustomEvent("postsUpdated", {
+				detail: {
+					action: `delete`,
+					postId: post.id
+				}
+			}))
 		}
 	}
 

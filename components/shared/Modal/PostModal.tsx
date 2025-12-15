@@ -1,4 +1,5 @@
-import { text } from "stream/consumers";
+import parse from 'html-react-parser';
+import DOMPurify from 'dompurify';
 import ConfirmationModal from "./ConfirmationModal";
 
 export default function PostModal(props:{
@@ -24,7 +25,7 @@ export default function PostModal(props:{
             onClose={onClose}
         >
             <div className='bg-black/5 my-3 px-3 py-3 text-base rounded-lg'>
-                {truncateText(postContent)}
+                {parse(DOMPurify.sanitize(truncateText(postContent)))}
             </div>
         </ConfirmationModal>
     );

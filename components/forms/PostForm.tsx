@@ -91,7 +91,16 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
         }
 
         await savePost(values);
-        dispatchEvent(new Event('postsUpdated'));
+        if (postId) {
+            dispatchEvent(new CustomEvent("postsUpdated", {
+				detail: {
+					action: `edit`,
+					postId
+				}
+			}));
+        } else {
+            dispatchEvent(new Event('postsUpdated'));
+        }
         // const textarea = document.querySelector('.contentEditable') as HTMLDivElement;
         setClearEditor(true);
         setTempImage(undefined);

@@ -12,20 +12,27 @@ export default function Feed(props:{user:User, getUser:Function}) {
 	const [user, setUser] = useState<User|null>();
 
 	let updating = false, tempFeed:Post[] | undefined, 
-	lastChecked:Date;
+	lastChecked:Date | undefined;
 
 	const getFeedArr = async (user:User):Promise<Array<Post> | undefined> => {
         return await getFeed(user!, lastChecked)
     }
 
-	const handlePostsUpdated = async () => {
+	const handlePostsUpdated = async (ev:Event) => {
 		if (updating) return //in case postsUpdated and the interval collide
 		updating = true
+		if (ev instanceof CustomEvent && ev.detail) {
+			tempFeed = undefined;
+			lastChecked = undefined;
+		}
 		const userfromServer = await props.getUser()
 		setUser(userfromServer)
+		
 		const feedArr = await getFeedArr(userfromServer);
 		lastChecked = new Date();
+
 		const newFeed = (feedArr && feedArr.length && tempFeed && tempFeed.length) ? [...feedArr, ...tempFeed] : (feedArr && feedArr.length) ? feedArr : tempFeed;
+
 		setFeed(newFeed)
 		tempFeed = newFeed
 		setRenderKey(prev => prev + 1)
@@ -37,10 +44,10 @@ export default function Feed(props:{user:User, getUser:Function}) {
 	useEffect(() => {
 		window.addEventListener("postsUpdated", handlePostsUpdated)
 
-		handlePostsUpdated()
+		handlePostsUpdated(new Event('postsUpdated'))
 
 		const feedInterval = setInterval(() => {
-			handlePostsUpdated()
+			handlePostsUpdated(new Event('postsUpdated'))
 		}, 60000)
 
 		return () => {

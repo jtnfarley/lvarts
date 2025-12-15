@@ -11,20 +11,22 @@ export default function LandingPage() {
         ev.preventDefault()
         const code = ev.target.code.value;
         const verified = await verifyCode(code)
+        const url = '/api/auth/signin?callbackUrl=https%3A%2F%2Fwww.lvartsandmusic.com%2Fsignin';
 
         if (verified) {
             document.cookie = `chortle=${btoa('invitationVerified=true')}`;
-            redirect('/signin');
+            redirect(url);
         }
     }
 
     useEffect(() => {
         const cookies = document.cookie.split(';');
+        const url = '/api/auth/signin?callbackUrl=https%3A%2F%2Fwww.lvartsandmusic.com%2Fsignin';
         cookies.forEach((cookie) => {
             if (cookie.match('chortle=')) {
                 const invite = cookie.split('=');
                 if (atob(invite[1]) === 'invitationVerified=true') {
-                    redirect('/signin');
+                    redirect(url);
                 }
             }
         })
