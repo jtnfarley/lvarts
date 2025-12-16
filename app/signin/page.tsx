@@ -1,4 +1,5 @@
 "use client"
+import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react"
 import Image from "next/image";
 import { useState } from "react";
@@ -32,15 +33,19 @@ export default function SignIn() {
                 />
             </div>
 
-            <div className="flex flex-col mt-5 justify-center">
-                <button onClick={() => signInUser('google')}>Sign In with Google</button>
-                <div className="flex justify-center my-3">OR</div>
+            <div className="flex flex-col mt-5 justify-center items-center">
+                <button onClick={() => signInUser('google')} className='bg-white w-72 flex justify-center px-3 py-3 rounded-full'>
+                    Sign In with Google 
+                    <div className='ms-3'><img src='/images/goog.png' alt='Google Icon' className='w-[30px] h-[30px]'/></div>
+                </button>
+                <div className="flex justify-center my-3 border-b-2 border-gray-200 w-100"></div>
+                <div className="mb-2">Sign In with Email</div>
                 <div>
-                <input type='text' name='email' id='email' placeholder='Email' className="border-2 px-2 py-2 me-2 rounded-md w-80"/>
-                <button onClick={() => signInUser('nodemailer')}>Sign In with Email</button>
-                {error && 
-                    <div className='text-red-500'>Please enter a valid email address</div>
-                }
+                    <input type='text' name='email' id='email' placeholder='Email' className="border-2 px-2 py-2 me-2 rounded-md w-80 bg-white"/>
+                    <Button onClick={() => signInUser('nodemailer')}>Send Link</Button>
+                    {error && 
+                        <div className='text-red-500'>Please enter a valid email address</div>
+                    }
                 </div>
             </div>
         </div>

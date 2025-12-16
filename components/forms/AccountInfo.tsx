@@ -1,6 +1,5 @@
 'use client'
 
-import { usePathname, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Button } from '@/components/ui/button';
 import * as z from 'zod';
@@ -20,12 +19,7 @@ const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const UserValidation = z.object({
     displayName: z.string().min(1).max(100),
     bio: z.string().max(4000).optional(),
-    avatar: z.instanceof(File, { message: 'Please upload an image.' })
-        .refine((file) => file.size <= MAX_UPLOAD_SIZE, 'Max image size is 5MB.')
-        .refine(
-            (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
-            'Only .jpg, .png, and .webp formats are supported.'
-    ).optional(),    
+    avatar: z.any().optional(),    
 })
 
 const AccountInfo = (props:{user: User}) => {
@@ -65,7 +59,7 @@ const AccountInfo = (props:{user: User}) => {
         let avatarUrl = user.userDetails?.avatar || undefined;
 
         try {
-            if (values.avatar) {
+            if (values.avatar.name) {
                 const file = values.avatar;
                 const formData = new FormData();
                 formData.append('file', file);
@@ -124,11 +118,13 @@ const AccountInfo = (props:{user: User}) => {
                                 const file = event.target.files?.[0];
                                 avatarRegister.onChange(event);
                                 setValue('avatar', file, { shouldValidate: true });
+                                if (file)
+                                    setAvatarUrl(URL.createObjectURL(file))
                             }}
                         />
                         <label htmlFor="avatar" className="cursor-pointer">
                             {avatarUrl ?
-                            <img src={avatarUrl} className='w-[40] h-[40]'/>
+                            <img src={avatarUrl} className='w-[40px] h-[40px]'/>
                             :
                             <BiImageAdd size={40} title="upload an image" />
                             }
@@ -155,7 +151,7 @@ const AccountInfo = (props:{user: User}) => {
                         <textarea
                             className="border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500 h-30"
                             id="bio"
-                            {...register('bio', { required: true })}
+                            {...register('bio')}
                         />
                     </div>
 
