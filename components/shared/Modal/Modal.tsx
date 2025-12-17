@@ -6,7 +6,7 @@ export default function Modal(props:{isOpen:boolean, onClose:() => void, childre
     return (
         <div className="fixed inset-0 flex
                         items-center justify-center
-                        bg-black/50">
+                        bg-black/50 z-21">
             <div className="bg-white rounded-lg
                             shadow-lg p-6 max-w-md
                             w-full relative">
