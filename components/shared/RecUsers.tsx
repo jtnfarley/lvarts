@@ -1,7 +1,6 @@
 import { getRandoUsers } from "@/app/actions/user"
 import { currentUser } from '@/app/actions/currentUser';
 import UserCard from "./Cards/UserCard"
-import User from "@/lib/models/user";
 import UserDetails from "@/lib/models/userDetails";
 
 export default async function RecUsers() {

@@ -18,7 +18,7 @@ body {
     }
 
     .leftIcon {
-        @apply text-3xl fill-secondary-500 stroke-secondary-500 stroke-1;
+        @apply text-2xl fill-primary-dark stroke-primary-dark stroke-1;
     }
 
     .bottombar {
@@ -261,6 +261,7 @@ body {
 @theme {
     --color-primary: #3126FF;
     --color-primary-500: #9dcfff;
+    --color-primary-dark:#000d73;
     --color-secondary: #600C00;
     --color-secondary-500: #BE4F00;
     --color-orange: #ff7f25;

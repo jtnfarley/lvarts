@@ -135,7 +135,7 @@ const AccountInfo = (props:{user: User}) => {
                             Display Name
                         </label>
                         <input
-                            className="border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
+                            className="bg-white border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
                             id="displayName"
                             {...register('displayName', { required: true })}
                         />
@@ -149,7 +149,7 @@ const AccountInfo = (props:{user: User}) => {
                             Bio
                         </label>
                         <textarea
-                            className="border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500 h-30"
+                            className="bg-white border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500 h-30"
                             id="bio"
                             {...register('bio')}
                         />

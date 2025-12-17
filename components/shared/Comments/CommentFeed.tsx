@@ -34,7 +34,7 @@ export default function CommentFeed(props:{parentPostId:string, user:User}) {
                         )
                     })
                     :
-                    <div>No comments yet</div>
+                    <div className='bg-white rounded-lg px-3 py-3'>No comments yet</div>
             }
         </div>
     )
