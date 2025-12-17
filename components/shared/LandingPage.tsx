@@ -14,7 +14,10 @@ export default function LandingPage() {
         // const url = '/api/auth/signin?callbackUrl=https%3A%2F%2Fwww.lvartsandmusic.com%2Fsignin';
 
         if (verified) {
-            document.cookie = `chortle=${btoa('invitationVerified=true')}`;
+            const futureDate = new Date();
+            futureDate.setDate(futureDate.getDate() + 400); 
+            const expires = "expires=" + futureDate.toUTCString();
+            document.cookie = `chortle=${btoa('invitationVerified=true')};expires=${expires}`;
             redirect('/signin');
         }
     }

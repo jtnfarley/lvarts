@@ -21,39 +21,7 @@ export default async function RootLayout({
 }: Readonly<{
   	children: React.ReactNode;
 }>) {
-
-// 	const cookieStore = await cookies()
-// 	const inviteVerified = cookieStore.get('invited')
-// console.log(inviteVerified)
-// 	if (!inviteVerified || atob(inviteVerified.value) !== 'invitationVerified=true') {
-// 		return (
-// 			<SessionWrapper>
-// 				<html lang="en">
-// 					<body className={`${inter.className}`}>
-// 						<div className="w-full flex justify-center items-center min-h-screen">
-// 							<LandingPage/>
-// 						</div>
-// 					</body>
-// 				</html>
-// 			</SessionWrapper>
-// 		)
-// 	}
-
 	const user = await currentUser() as User
-
-	// if (!user) {
-	// 	return (
-	// 		<SessionWrapper>
-	// 			<html lang="en">
-	// 				<body className={`${inter.className}`}>
-	// 					<div className="w-full flex justify-center items-center min-h-screen">
-	// 						<SigninPage/>
-	// 					</div>
-	// 				</body>
-	// 			</html>
-	// 		</SessionWrapper>
-	// 	)
-	// }
 
 	return (
 		<>

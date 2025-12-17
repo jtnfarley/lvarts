@@ -9,9 +9,9 @@ export default async function SignOut() {
                 await signOut({ redirectTo: '/', redirect:true })
             }}
         >
-            <button type="submit" className='text-primary-dark text-lg flex flex-row items-center'>
+            <button type="submit" className='text-gray-500 text-lg flex flex-row items-center'>
                 <BiSolidArrowToLeft className='leftIcon'/>
-                <div className='hidden lg:block ms-4'>Log Out</div>
+                <div className='hidden lg:block'>Log Out</div>
             </button>
         </form>
     )

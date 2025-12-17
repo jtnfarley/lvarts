@@ -2,6 +2,7 @@ import { currentUser } from '@/app/actions/currentUser';
 import Link from "next/link"
 import Image from "next/image"
 
+import SignOut from '@/components/auth/buttons/SignOut';
 import Nav from "./Nav";
 
 export default async function LeftSidebar() {
@@ -11,7 +12,7 @@ export default async function LeftSidebar() {
 	const userId = user?.id
 
 	return (
-		<section className="leftsidebar custom-scrollbar">
+		<section className="leftsidebar custom-scrollbar justify-between">
 			<div className="flex w-full flex-1 flex-col gap-6">
 				<Link
                     href='/home'
@@ -28,6 +29,10 @@ export default async function LeftSidebar() {
 				<div className='mt-4'>
 					<Nav/>
 				</div>
+			</div>
+			<div className='flex flex-col items-end pe-10'>
+				<SignOut/>
+				<div className='mt-3 text-md text-gray-400'><Link href='/code-of-conduct'>Code of Conduct</Link></div>
 			</div>
 		</section>
 	)

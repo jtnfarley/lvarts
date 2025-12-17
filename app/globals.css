@@ -18,11 +18,11 @@ body {
     }
 
     .leftIcon {
-        @apply text-2xl fill-primary-dark stroke-primary-dark stroke-1;
+        @apply text-2xl fill-gray-300 stroke-gray-400 stroke-1;
     }
 
     .bottombar {
-        @apply fixed bottom-0 z-10 w-full rounded-t-3xl bg-transparent p-4 backdrop-blur-sm sm:px-7 md:hidden;
+        @apply fixed flex bottom-0 z-10 w-full rounded-t-3xl bg-transparent p-4 backdrop-blur-sm sm:px-7 md:hidden justify-center;
     }
 
     .bottombar_container {
