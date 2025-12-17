@@ -18,7 +18,7 @@ export default async function RecUsers() {
 	return (
 		<section className="lg:bg-white lg:rounded-3xl lg:p-5 sm:bg-none sm:p-0">
 			<div className='hidden text-primary text-md uppercase lg:block'>Your Next Best Friend</div>
-			<div className="flex lg:mt-7 lg:w-[350] lg:flex-col lg:gap-10">
+			<div className="flex lg:mt-7 lg:w-[250] lg:flex-col lg:gap-10">
 				{
 					recUsers.length > 0 ? (
 						<>
