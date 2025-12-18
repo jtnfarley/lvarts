@@ -101,10 +101,9 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
         } else {
             dispatchEvent(new Event('postsUpdated'));
         }
-        // const textarea = document.querySelector('.contentEditable') as HTMLDivElement;
+
         setClearEditor(true);
         setTempImage(undefined);
-        // if (textarea) textarea?.innerHTML = '';
     }
 
     useEffect(() => {
@@ -121,6 +120,7 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
         window.addEventListener('editorUpdated', handleEditorUpdated);
 
         return () => {
+            console.log('cleanup')
             window.removeEventListener('editorUpdated', handleEditorUpdated);
         }
     }, [])

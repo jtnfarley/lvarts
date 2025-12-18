@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
-import { $getRoot, $insertNodes } from "lexical";
+import { $getRoot } from "lexical";
 
 export default function CustomClearEditorPlugin(props:{clearEditor:boolean}) {
   const [editor] = useLexicalComposerContext();

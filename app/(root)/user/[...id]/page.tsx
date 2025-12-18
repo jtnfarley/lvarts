@@ -11,6 +11,7 @@ export default function UserProfile() {
 	const params = useParams<{id:string}>();
 	const { data: session, status } = useSession();
 	const [user, setUser] = useState<UserDetails>();
+	const [avatarUrl, setAvatarUrl] = useState<string | undefined>()
 
 	const getUser = async () => {
 		console.log(params.id.toString())
@@ -18,6 +19,10 @@ export default function UserProfile() {
 		if (!singleUser) return
 
 		setUser(singleUser);
+
+		const avatarUrlBase = `https://lvartsmusic-ny.b-cdn.net/`
+    	const avatarUrlInit = singleUser && singleUser.avatar && singleUser.userDir ? `${avatarUrlBase}/${singleUser.userDir}/${singleUser.avatar}` : undefined;
+		setAvatarUrl(avatarUrlInit)
 	}
 
 	useEffect(() => {
@@ -27,25 +32,14 @@ export default function UserProfile() {
 	}, [session])
 
 	return (
-		<div>
+		<div className="lg:bg-white lg:rounded-xl lg:p-5 sm:bg-none sm:p-0 mt-5 min-h-100">
 			{user && 
 				<section className="">
-					<div className="mb-4">
-						<label className="block text-gray-700 font-medium mb-2" htmlFor="name">
-							Avatar
-						</label>
-						{/* {user.avatar} */}
+					<div className="mb-4 flex">
+						<img src={avatarUrl || '/images/melty-man.png'} className='w-[50px] h-[50px] me-3'/>
+						<div className='font-bold text-2xl'>{user.displayName}</div>
 					</div>
 					<div className="mb-4">
-						<label className="block text-gray-700 font-medium mb-2" htmlFor="name">
-							Display Name
-						</label>
-						{user.displayName}
-					</div>
-					<div className="mb-4">
-						<label className="block text-gray-700 font-medium mb-2" htmlFor="name">
-							Bio
-						</label>
 						{user.bio}
 					</div>
 				</section>

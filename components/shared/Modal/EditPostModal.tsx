@@ -2,7 +2,7 @@ import User from "@/lib/models/user";
 import GenericModal from "./GenericModal";
 import EditPostForm from "@/components/forms/EditPostForm";
 
-export default function PostModal(props:{
+export default function EditPostModal(props:{
     title:string,
     message:string,
     postContent:string,
@@ -12,10 +12,6 @@ export default function PostModal(props:{
     onClose:() => void, 
 }) {
     const { postContent, postId, user, isOpen, onClose } = props;
-
-    const truncateText = (text:string) => {
-        return text.length > 100 ? text.slice(0, 100) + '...' : text;
-    }
 
     return (
         <GenericModal
