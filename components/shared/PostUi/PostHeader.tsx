@@ -13,8 +13,8 @@ export default function PostHeader(props:{postData:Post, user:User, currentUserP
 	const post = props.postData
 	const user = props.user
 	const currentUserPost = props.currentUserPost;
-	const avatar = (user && user.userDetails && user.userDetails.userDir && user.userDetails.avatar) ?
-		`https://lvartsmusic-ny.b-cdn.net/${user.userDetails.userDir}/${user.userDetails.avatar}` :
+	const avatar = (post && post.userDetails && post.userDetails.userDir && post.userDetails.avatar) ?
+		`https://lvartsmusic-ny.b-cdn.net/${post.userDetails.userDir}/${post.userDetails.avatar}` :
 		'/images/melty-man.png';
 
     return (

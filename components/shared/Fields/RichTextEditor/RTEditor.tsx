@@ -15,13 +15,11 @@ import {ListPlugin} from '@lexical/react/LexicalListPlugin';
 import AutoLinkPlugin from './plugins/AutoLinkPlugin';
 // import {CharacterLimitPlugin} from '@lexical/react/LexicalCharacterLimitPlugin';
 import {HashtagNode} from '@lexical/hashtag';
-// import {OverflowNode} from '@lexical/overflow';
 import {ListNode, ListItemNode} from '@lexical/list';
 import {AutoLinkNode} from '@lexical/link';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
 import ExampleTheme from './ExampleTheme';
 import RandoPlaceholder from "./RandoPlaceholder";
-// import TreeViewPlugin from "./plugins/TreeViewPlugin";
 import "./styles.css";
 import { InitialEditorStateType, LexicalEditor } from "lexical";
 
