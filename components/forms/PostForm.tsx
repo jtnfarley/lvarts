@@ -120,7 +120,6 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
         window.addEventListener('editorUpdated', handleEditorUpdated);
 
         return () => {
-            console.log('cleanup')
             window.removeEventListener('editorUpdated', handleEditorUpdated);
         }
     }, [])
