@@ -75,7 +75,7 @@ export default function RTEditor(props:{ref:any, onChange: (html:object) => void
 								placeholder={
 									<RandoPlaceholder/>
 								}
-								className="contentEditable w-full py-2 px-3 text-gray-700 focus:outline-none h-50"
+								className="contentEditable w-full py-2 px-3 text-gray-700 focus:outline-none min-h-50 field-sizing-content"
 							/>
 						}
 						ErrorBoundary={LexicalErrorBoundary}
