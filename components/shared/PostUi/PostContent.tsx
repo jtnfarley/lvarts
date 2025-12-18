@@ -12,7 +12,13 @@ export default function PostContent(props:{postData:Post}) {
 
 		if (editorLinks && editorLinks.length) {
 			for(let i = 0; i < editorLinks.length; i++) {
-				placeholder = placeholder.slice(0, placeholder.indexOf('>',editorLinks[i].index)) + " target='_blank'" + placeholder.slice(placeholder.indexOf('>',editorLinks[i].index)) 
+				const indexA = placeholder.indexOf('<a');
+				const fullLink = placeholder.substring(indexA, placeholder.indexOf('</a>', indexA) + 4)
+				if (fullLink.match(/giphy/)) {
+					placeholder = placeholder.slice(0, indexA)
+				} else {
+					placeholder = placeholder.slice(0, placeholder.indexOf('>',editorLinks[i].index)) + " target='_blank'" + placeholder.slice(placeholder.indexOf('>',editorLinks[i].index)) 
+				}
 			}
 
 			post = placeholder;

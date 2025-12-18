@@ -47,16 +47,6 @@ function PostMediaEmbed(props:{post:Post}) {
 
                 return <iframe src={"https://open.spotify.com/embed/" + type + "/" + vidId}></iframe>
             }
-
-            // if (link.match(/bandcamp/)) {
-            //   vidId = link.substring(link.lastIndexOf("/")+1)
-            //   if (link.match(/album/))
-
-            //   https://sophisticatedape.bandcamp.com/track/shanklish-the-war-orphans
-            //   https://sophisticatedape.bandcamp.com/album/sophisticated-tapes-vol-1
-            //   return <iframe style="border: 0; width: 350px; height: 786px;" src="https://bandcamp.com/EmbeddedPlayer/album=1288355294/size=large/bgcol=ffffff/linkcol=0687f5/transparent=true/" seamless></iframe>
-            //   <iframe style="border: 0; width: 350px; height: 470px;" src="https://bandcamp.com/EmbeddedPlayer/album=1288355294/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/track=636893643/transparent=true/" seamless><a href="https://sophisticatedape.bandcamp.com/album/sophisticated-tapes-vol-1">Sophisticated tApes Vol. 1 by The War Orphans</a></iframe>
-            // }
         }
         return false
     }
