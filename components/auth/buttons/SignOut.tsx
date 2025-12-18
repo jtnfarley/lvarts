@@ -11,7 +11,7 @@ export default async function SignOut() {
         >
             <button type="submit" className='text-gray-500 text-lg flex flex-row items-center'>
                 <BiSolidArrowToLeft className='leftIcon'/>
-                <div className='hidden lg:block'>Log Out</div>
+                <div className='hidden md:block'>Log Out</div>
             </button>
         </form>
     )

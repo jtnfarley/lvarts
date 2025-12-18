@@ -22,7 +22,7 @@ export default async function Home() {
 
 	return (
 		<>
-			<div className='lg:hidden sm:block'>
+			<div className='xl:hidden'>
 				<RecUsers/>	
 			</div>
 			<div>

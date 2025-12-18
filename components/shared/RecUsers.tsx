@@ -16,9 +16,9 @@ export default async function RecUsers() {
 	let recUsers:Array<UserDetails> = await getRecUsers()
 
 	return (
-		<section className="lg:bg-white lg:rounded-3xl lg:p-5 sm:bg-none sm:p-0">
-			<div className='hidden text-primary text-md uppercase lg:block'>Your Next Best Friend</div>
-			<div className="flex lg:mt-7 lg:w-[250] lg:flex-col lg:gap-10">
+		<section className="xl:bg-white xl:rounded-3xl xl:p-5 lg:bg-none lg:p-0">
+			<div className='hidden text-primary text-md uppercase xl:block'>Your Next Best Friend</div>
+			<div className="flex xl:mt-7 xl:w-[250] xl:flex-col xl:gap-10">
 				{
 					recUsers.length > 0 ? (
 						<>

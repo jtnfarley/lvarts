@@ -4,16 +4,15 @@ import Link from "next/link"
 
 const TopBar = () => {
     return (
-        <nav className="block topbar lg:hidden">
+        <nav className="block topbar md:hidden">
             <Link
                 href='/home'
                 className="flex items-center gap-4"
             >
-                <Image
+                <img
                     src='/logos/lvarts-paths.svg'
                     alt="Lehigh Valley Arts & Music"
-                    width={500}
-                    height={195}
+                    className="max-w-762 w-full"
                 />
             </Link>
         </nav>

@@ -20,7 +20,7 @@ export default function PostUi(props:{postData:Post, user:User}) {
     return (
 		<div>
 			{post.postType === 'comment' && 
-				<div className='text-sm pb-2 italic lg:text-white'><Link href={`/post/${post.parentPostId}`}>commenting on {(currentUserParentPost) ? 'your' : `${post.parentPost?.userDetails?.displayName}'s`} post</Link></div>
+				<div className='text-sm pb-2 italic md:text-white'><Link href={`/post/${post.parentPostId}`}>commenting on {(currentUserParentPost) ? 'your' : `${post.parentPost?.userDetails?.displayName}'s`} post</Link></div>
 			}
 
 			<div key={post.id} className="flex flex-col gap-2 border-1 border-gray-4 rounded-2xl bg-white">
