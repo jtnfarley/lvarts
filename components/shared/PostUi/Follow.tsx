@@ -1,6 +1,5 @@
 'use client'
 
-import Post from '@/lib/models/post';
 import User from '@/lib/models/user';
 
 import { BiSolidUserCheck, BiUserPlus, BiSolidUserX } from "react-icons/bi";
