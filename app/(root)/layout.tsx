@@ -2,10 +2,10 @@ import { Inter } from "next/font/google";
 import { Metadata } from "next";
 import { cookies } from 'next/headers'
 import { currentUser } from '@/app/actions/currentUser';
-import TopBar from "@/components/shared/TopBar";
-import LeftSidebar from "@/components/shared/LeftSidebar";
-import RightSidebar from "@/components/shared/RightSidebar";
-import BottomBar from "@/components/shared/BottomBar";
+import TopBar from "@/components/layout/TopBar";
+import LeftSidebar from "@/components/layout/LeftSidebar";
+import RightSidebar from "@/components/layout/RightSidebar";
+import BottomBar from "@/components/layout/BottomBar";
 import User from "@/lib/models/user";
 // import { UserStoreProvider } from "./stores/userStoreProvider";
 

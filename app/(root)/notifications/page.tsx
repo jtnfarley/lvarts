@@ -1,10 +1,8 @@
 import { currentUser } from '@/app/actions/currentUser';
-import AddPostForm from "@/components/forms/AddPostForm"
-import Feed from "@/components/Feed";
-import RecUsers from '@/components/RecUsers';
+import NotificationsFeed from "@/components/NotificationsFeed";
 import { redirect } from 'next/navigation';
 
-export default async function Home() {
+export default async function Notifications() {
 	const getUser = async () => {
 		'use server'
 		return await currentUser()
@@ -22,15 +20,7 @@ export default async function Home() {
 
 	return (
 		<div>
-			<div className='xl:hidden'>
-				<RecUsers/>	
-			</div>
-			<div>
-				<AddPostForm user={user} postType='post' edited={false}/>
-			</div>
-			<div>
-				<Feed user={user} getUser={getUser}/>
-			</div>
+			<NotificationsFeed user={user} getUser={getUser}/>
 		</div>
 	);
 }

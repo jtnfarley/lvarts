@@ -128,6 +128,16 @@ export const followUser = async ({userId, toFollowId}:FollowUserParams) => {
             following
         }
     })
+
+    const noti = await prisma.notifications.create({
+        data: {
+            createdAt: new Date(),
+            type: 'follow',
+            read: false,
+            userId: toFollowId, 
+            notiUserId: userId
+        },
+    })
 }
 
 export const unfollowUser = async ({userId, toFollowId}:FollowUserParams) => {

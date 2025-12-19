@@ -16,7 +16,7 @@ export default function CommentButton(props:{postData:Post}) {
     return (
 		<div className='grid grid-flow-col grid-rows-1 w-3'>
 			<div className='text-2xl'>
-				<Link href={`/post/${post.id}`}>
+				<Link href={`/post/${post.id}`} className='comment-link'>
 					<BiComment/>
 				</Link>
 			</div>

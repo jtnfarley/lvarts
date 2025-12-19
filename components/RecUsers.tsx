@@ -2,6 +2,7 @@ import { getRandoUsers } from "@/app/actions/user"
 import { currentUser } from '@/app/actions/currentUser';
 import UserCard from "./Cards/UserCard"
 import UserDetails from "@/lib/models/userDetails";
+import imageUrl from '@/constants/imageUrl';
 
 export default async function RecUsers() {
 	const user = await currentUser()
@@ -30,7 +31,7 @@ export default async function RecUsers() {
 										recUserId={ userDetails.userId }
 										displayName={ userDetails.displayName }
 										avatar={ (userDetails && userDetails.userDir && userDetails.avatar) ?
-											`https://lvartsmusic-ny.b-cdn.net/${userDetails.userDir}/${userDetails.avatar}` :
+											`${imageUrl}/${userDetails.userDir}/${userDetails.avatar}` :
 											'/images/melty-man.png'
 									}
 										// userType = 'User'

@@ -1,5 +1,5 @@
 import { currentUser } from '@/app/actions/currentUser';
-import LandingPage from '@/components/shared/LandingPage';
+import LandingPage from '@/components/LandingPage';
 import { redirect } from 'next/navigation';
 
 export default async function RootPage() {

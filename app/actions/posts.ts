@@ -153,6 +153,20 @@ export const savePost = async (postData:any) => {
                 commentCount: ((parentPost?.commentCount) ? parentPost.commentCount : 0) + 1
             }
         })
+
+        if (parentPost && parentPost.userId) {
+            const noti = await prisma.notifications.create({
+                data: {
+                    createdAt: new Date(),
+                    type: 'comment',
+                    read: false,
+                    userId: parentPost?.userId, 
+                    notiUserId: userId,
+                    notiUserDetailsId: userDetails.id,
+                    postId: parentPost.id
+                },
+            })
+        }
     }
     
     return post
@@ -217,6 +231,20 @@ export const likePost = async (postId:string, userId:string) => {
             likedPosts: [...userDetails.likedPosts, postId]
         }
     })
+
+    if (userDetails) {
+        const noti = await prisma.notifications.create({
+            data: {
+                createdAt: new Date(),
+                type: 'like',
+                read: false,
+                userId: post?.userId, 
+                notiUserId: userId,
+                notiUserDetailsId: userDetails.id,
+                postId
+            },
+        })
+    }
 
     return updatedPost
 }

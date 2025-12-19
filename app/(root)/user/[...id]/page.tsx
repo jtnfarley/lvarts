@@ -7,8 +7,9 @@ import { useSession } from "next-auth/react";
 import { redirect } from 'next/navigation';
 import { getUserDetails } from '@/app/actions/user';
 import UserDetails from '@/lib/models/userDetails';
-import Follow from '@/components/shared/PostUi/Follow';
+import Follow from '@/components/PostUi/Follow';
 import User from '@/lib/models/user';
+import imageUrl from '@/constants/imageUrl';
 
 export default function UserProfile() {
 
@@ -33,7 +34,7 @@ export default function UserProfile() {
 
 		setSingleUser(singleUser);
 
-		const avatarUrlBase = `https://lvartsmusic-ny.b-cdn.net/`
+		const avatarUrlBase = imageUrl;
     	const avatarUrlInit = singleUser && singleUser.avatar && singleUser.userDir ? `${avatarUrlBase}/${singleUser.userDir}/${singleUser.avatar}` : undefined;
 		setAvatarUrl(avatarUrlInit)
 	}

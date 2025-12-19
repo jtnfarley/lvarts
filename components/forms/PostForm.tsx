@@ -4,12 +4,11 @@ import { useForm,Controller } from "react-hook-form";
 import * as z from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
-import RTEditor from "../shared/Fields/RichTextEditor/RTEditor";
-import PostFormActions from '@/components/shared/PostUi/PostFormActions'
+import RTEditor from "./Fields/RichTextEditor/RTEditor";
 import { InitialEditorStateType } from "lexical";
 import uploadFile from "@/app/actions/fileUploader";
 import User from "@/lib/models/user";
-import ImageUpload from "@/components/shared/PostUi/ImageUpload"
+import ImageUpload from "@/components/PostUi/ImageUpload"
 
 interface Props {
     savePost:Function,

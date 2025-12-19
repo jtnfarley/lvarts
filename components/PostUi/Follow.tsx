@@ -14,7 +14,6 @@ export default function Follow(props:{followUserId:string, user:User}) {
 	const [following, setFollowing] = useState(false);
 
 	const toggleFollow = async () => {
-		console.log(following)
 		if (following) {
 			await unfollowUser({userId:user.id, toFollowId:followUserId})
 			setFollowing(false)

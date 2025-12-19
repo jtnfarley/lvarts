@@ -1,0 +1,1 @@
+export default 'https://lvartsmusic-ny.b-cdn.net/';

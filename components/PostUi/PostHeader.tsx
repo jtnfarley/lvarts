@@ -1,9 +1,8 @@
 'use client'
 
-import { useState } from 'react';
-import Link from 'next/link';
 import Post from '@/lib/models/post';
 import User from '@/lib/models/user';
+import imageUrl from '@/constants/imageUrl';
 
 import { BiEdit, BiComment } from "react-icons/bi";
 
@@ -14,7 +13,7 @@ export default function PostHeader(props:{postData:Post, user:User, currentUserP
 	const user = props.user
 	const currentUserPost = props.currentUserPost;
 	const avatar = (post && post.userDetails && post.userDetails.userDir && post.userDetails.avatar) ?
-		`https://lvartsmusic-ny.b-cdn.net/${post.userDetails.userDir}/${post.userDetails.avatar}` :
+		`${imageUrl}/${post.userDetails.userDir}/${post.userDetails.avatar}` :
 		'/images/melty-man.png';
 
     return (

@@ -8,17 +8,19 @@ generator client {
 }
 
 model User {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?
-  email         String?       @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  Posts         Posts[]
-  UserDetails   UserDetails[]
+  id                    String          @id @default(auto()) @map("_id") @db.ObjectId
+  name                  String?
+  email                 String?         @unique
+  emailVerified         DateTime?
+  image                 String?
+  accounts              Account[]
+  sessions              Session[]
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  Posts                 Posts[]
+  UserDetails           UserDetails[]
+  notifications         Notifications[] @relation("User")
+  notiUserNotifications Notifications[] @relation("NotiUser")
 }
 
 model Account {
@@ -64,24 +66,39 @@ model VerificationToken {
 }
 
 model InvitationCodes {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  code       String
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  code String
+}
+
+model Notifications {
+  id                String       @id @default(auto()) @map("_id") @db.ObjectId
+  type              String
+  read              Boolean
+  userId            String       @db.ObjectId
+  user              User         @relation("User", fields: [userId], references: [id])
+  notiUserId        String       @db.ObjectId
+  notiUser          User         @relation("NotiUser", fields: [notiUserId], references: [id])
+  notiUserDetailsId String?      @db.ObjectId
+  notiUserDetails   UserDetails? @relation(fields: [notiUserDetailsId], references: [id])
+  createdAt         DateTime     @db.Date
+  postId            String?      @db.ObjectId
+  post              Posts?       @relation(fields: [postId], references: [id])
 }
 
 model Posts {
-  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
   content       String
   lexical       String?
-  userId        String       @db.ObjectId
-  user          User         @relation(fields: [userId], references: [id])
-  userDetailsId String?      @db.ObjectId
-  userDetails   UserDetails? @relation(fields: [userDetailsId], references: [id])
-  createdAt     DateTime     @db.Date
-  updatedAt     DateTime     @db.Date
+  userId        String          @db.ObjectId
+  user          User            @relation(fields: [userId], references: [id])
+  userDetailsId String?         @db.ObjectId
+  userDetails   UserDetails?    @relation(fields: [userDetailsId], references: [id])
+  createdAt     DateTime        @db.Date
+  updatedAt     DateTime        @db.Date
   edited        Boolean
-  parentPostId  String?      @db.ObjectId
-  parentPost    Posts?       @relation("Comments", fields: [parentPostId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  comments      Posts[]      @relation("Comments")
+  parentPostId  String?         @db.ObjectId
+  parentPost    Posts?          @relation("Comments", fields: [parentPostId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  comments      Posts[]         @relation("Comments")
   postType      String?
   postFile      String?
   postFileType  String?
@@ -91,25 +108,27 @@ model Posts {
   chatId        String?
   likes         Int?
   commentCount  Int?
+  notifications Notifications[]
 }
 
 model UserDetails {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
-  user        User?    @relation(fields: [userId], references: [id])
-  displayName String?
-  userDir     String?
-  createdAt   DateTime @db.Date
-  updatedAt   DateTime @db.Date
-  bio         String?
-  avatar      String?
-  chats       String[] @db.ObjectId
-  comments    String[] @db.ObjectId
-  followers   String[] @db.ObjectId
-  following   String[] @db.ObjectId
-  image       String?
-  likedPosts  String[] @db.ObjectId
-  postIds     String[] @db.ObjectId
-  suspended   Boolean?
-  Posts       Posts[]
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String          @db.ObjectId
+  user          User?           @relation(fields: [userId], references: [id])
+  displayName   String?
+  userDir       String?
+  createdAt     DateTime        @db.Date
+  updatedAt     DateTime        @db.Date
+  bio           String?
+  avatar        String?
+  chats         String[]        @db.ObjectId
+  comments      String[]        @db.ObjectId
+  followers     String[]        @db.ObjectId
+  following     String[]        @db.ObjectId
+  image         String?
+  likedPosts    String[]        @db.ObjectId
+  postIds       String[]        @db.ObjectId
+  suspended     Boolean?
+  Posts         Posts[]
+  notifications Notifications[]
 }

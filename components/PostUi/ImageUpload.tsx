@@ -1,15 +1,6 @@
 'use client'
 
-import { usePathname, useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { Button } from '@/components/ui/button';
-import * as z from 'zod';
-import { zodResolver } from "@hookform/resolvers/zod";
-import { updateUser } from "@/app/actions/user"
-import User from "@/lib/models/user";
 import { BiImageAdd } from "react-icons/bi";
-import { useState } from "react";
-import uploadFile from "@/app/actions/fileUploader";
 
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];

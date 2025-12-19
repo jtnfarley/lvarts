@@ -2,27 +2,49 @@
 
 import {prisma} from '@/lib/db/prisma';
 import User from '@/lib/models/user';
-import Post from '@/lib/models/post';
+import Notification from '@/lib/models/notification';
 
-export const getFeed = async (user:User, lastChecked:Date | undefined):Promise<Array<Post>> => {
-    const posts:Array<Post> = await prisma.posts.findMany({
+const include = {
+    user:true,
+    notiUser: true,
+    notiUserDetails: true,
+    post:true
+}
+
+export const getNotifications = async (user:User):Promise<Array<Notification>> => {
+    const notifications:Array<Notification> = await prisma.notifications.findMany({
         where: {
-            OR: [
-                { userId: user?.id },
-                { userId: {
-                    in: user?.userDetails?.following
-                }},
-            ],
-            createdAt: {
-                gt: lastChecked
-            }
+            userId: user?.id,
         },
-        // include,
-        orderBy: {
-            createdAt: 'desc'
-        },
-        take: 20
+        include
     })
 
-    return posts
+    return notifications
+}
+
+export const hasNewNotifications = async (user:User):Promise<boolean> => {
+    const notifications:Array<Notification> = await prisma.notifications.findMany({
+        where: {
+            userId: user?.id,
+            read: false
+        }
+    })
+
+    return (notifications.length) ? true : false
+}
+
+export const updateNotis = async (notis:Notification[] | undefined) => {
+    console.log(notis)
+    if (notis && notis.length) {
+        notis.forEach(async noti => {
+            await prisma.notifications.update({
+                where: {
+                    id: noti.id
+                },
+                data: {
+                    read: true
+                }
+            })
+        })
+    }
 }

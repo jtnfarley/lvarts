@@ -4,12 +4,12 @@ import { useParams } from 'next/navigation';
 import { useSession } from "next-auth/react";
 import { currentUser } from '@/app/actions/currentUser';
 import AddPostForm from "@/components/forms/AddPostForm"
-import CommentFeed from "@/components/shared/Comments/CommentFeed";
+import CommentFeed from "@/components/Comments/CommentFeed";
 import { getPost } from '@/app/actions/posts';
 import { useEffect, useState } from 'react';
 import User from '@/lib/models/user';
 import Post from '@/lib/models/post';
-import PostUi from '@/components/shared/PostUi/PostUi';
+import PostUi from '@/components/PostUi/PostUi';
 
 export default function SinglePost() {
     const [user, setUser] = useState<User | undefined>()

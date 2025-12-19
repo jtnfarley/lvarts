@@ -7,7 +7,7 @@ import { getPosts } from '@/app/actions/posts';
 import { useEffect, useState } from 'react';
 import User from '@/lib/models/user';
 import Post from '@/lib/models/post';
-import PostUi from '@/components/shared/PostUi/PostUi';
+import PostUi from '@/components/PostUi/PostUi';
 
 export default function Search() {
     const [user, setUser] = useState<User | undefined>()

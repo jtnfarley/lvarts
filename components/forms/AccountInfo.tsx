@@ -10,6 +10,7 @@ import { BiImageAdd } from "react-icons/bi";
 import { useState } from "react";
 import uploadFile from "@/app/actions/fileUploader";
 import { getRandomString } from "@/lib/utils";
+import imageUrl from '@/constants/imageUrl';
 // import { generateCodes } from '@/app/actions/invitationCodes';
 
 
@@ -31,7 +32,7 @@ const AccountInfo = (props:{user: User}) => {
         )
     }
 
-    const avatarUrlBase = `https://lvartsmusic-ny.b-cdn.net/`
+    const avatarUrlBase = imageUrl;
     const avatarUrlInit = user.userDetails && user.userDetails.avatar && user.userDetails.userDir ? `${avatarUrlBase}/${user.userDetails.userDir}/${user.userDetails.avatar}` : undefined
 
     const [userOnboarded, setUserOnboarded] = useState(user.userDetails && user.userDetails.displayName && user.userDetails.displayName !== '')

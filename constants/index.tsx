@@ -1,4 +1,4 @@
-import { BiSolidHomeAlt2, BiSolidSearch, BiSolidUser } from "react-icons/bi";
+import { BiSolidHomeAlt2, BiSolidSearch, BiSolidUser, BiSolidBell } from "react-icons/bi";
 
 export const sidebarLinks = [
     {
@@ -6,26 +6,11 @@ export const sidebarLinks = [
       route: "/home",
       label: "Home",
     },
-    // {
-    //   icon: <BiSolidSearch className="leftIcon"/>,
-    //   route: "/search",
-    //   label: "Search",
-    // },
-    // {
-    //   imgURL: "/assets/notifications.svg",
-    //   route: "/notifications",
-    //   label: "Notifications",
-    // },
-    // {
-    //   imgURL: "/assets/tweet.svg",
-    //   route: "/create-tweet",
-    //   label: "Tweet",
-    // },
-    // {
-    //   imgURL: "/assets/groups.svg",
-    //   route: "/groups",
-    //   label: "Groups",
-    // },
+    {
+      icon: <BiSolidBell className="leftIcon"/>,
+      route: "/notifications",
+      label: "Notifications",
+    },
     {
       icon: <BiSolidUser className="leftIcon"/>,
       route: "/profile",

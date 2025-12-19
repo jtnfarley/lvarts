@@ -1,5 +1,5 @@
 import { currentUser } from '@/app/actions/currentUser';
-import RecUsers from './RecUsers';
+import RecUsers from '../RecUsers';
 
 export default async function RightSidebar() {
 	const user = await currentUser()
