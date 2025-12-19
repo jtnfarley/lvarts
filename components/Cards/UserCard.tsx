@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from "next/navigation"
-import { Button } from "../../ui/button"
+import { Button } from "../ui/button"
 // import { followUser, unfollowUser } from "@/app/actions/user"
 import User from "@/lib/models/user"
 import { useEffect, useState } from "react"
