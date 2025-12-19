@@ -1,5 +1,3 @@
-import { sidebarLinks } from "@/constants"
-// import { usePathname } from "next/navigation"
 import { currentUser } from '@/app/actions/currentUser';
 import SignOut from '@/components/auth/buttons/SignOut';
 import Nav from "./Nav";
@@ -13,7 +11,9 @@ export default async function BottomBar() {
 	return (
 		<section className="bottombar">
 			<div className="bottombar_container">
-				<Nav/>
+				{user && 
+					<Nav user={user}/>
+				}
 				<div className='ms-3'><SignOut/></div>
 			</div>
 		</section>
