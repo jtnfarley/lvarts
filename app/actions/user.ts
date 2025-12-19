@@ -1,7 +1,6 @@
 'use server'
 
 import {prisma} from '@/lib/db/prisma'
-import User from '@/lib/models/user'
 import UserDetails from '@/lib/models/userDetails'
 
 interface UpdateUserParams {
@@ -60,7 +59,7 @@ export const updateUser = async ({
     const createdAt = date
     const updatedAt = date
 
-    let userDetails;
+    let userDetails: UserDetails;
     try {
         if (id) {
             userDetails = await prisma.userDetails.update({
@@ -129,13 +128,14 @@ export const followUser = async ({userId, toFollowId}:FollowUserParams) => {
         }
     })
 
-    const noti = await prisma.notifications.create({
+    await prisma.notifications.create({
         data: {
             createdAt: new Date(),
             type: 'follow',
             read: false,
-            userId: toFollowId, 
-            notiUserId: userId
+            userId: toFollowId,
+            notiUserId: userId,
+            notiUserDetailsId: user.id
         },
     })
 }
