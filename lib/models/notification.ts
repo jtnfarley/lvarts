@@ -13,6 +13,6 @@ export default interface Notification {
     notiUser?: User
     notiUserDetailsId?: string | null
     notiUserDetails?: UserDetails | null
-    postId?: string
-    post?: Post
+    postId?: string | null
+    post?: Post | null
 }
