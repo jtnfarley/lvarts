@@ -154,13 +154,13 @@ export const savePost = async (postData:any) => {
             }
         })
 
-        if (parentPost && parentPost.userId) {
+        if (parentPost && parentPost.userId && userId !== parentPost.userId) {
             const noti = await prisma.notifications.create({
                 data: {
                     createdAt: new Date(),
                     type: 'comment',
                     read: false,
-                    userId: parentPost?.userId, 
+                    userId: parentPost.userId, 
                     notiUserId: userId,
                     notiUserDetailsId: userDetails.id,
                     postId: parentPost.id
@@ -232,13 +232,13 @@ export const likePost = async (postId:string, userId:string) => {
         }
     })
 
-    if (userDetails) {
+    if (userDetails && userId !== post.userId) {
         const noti = await prisma.notifications.create({
             data: {
                 createdAt: new Date(),
                 type: 'like',
                 read: false,
-                userId: post?.userId, 
+                userId: post.userId, 
                 notiUserId: userId,
                 notiUserDetailsId: userDetails.id,
                 postId
@@ -317,7 +317,7 @@ export const deletePost = async (postId:string) => {
         return null
     }
 
-    const updatedUserDetails = await prisma.userDetails.update({
+    await prisma.userDetails.update({
         where: {
             id: userDetails.id
         },
@@ -339,6 +339,25 @@ export const deletePost = async (postId:string) => {
             id: postId
         }
     })
+
+    if (post.parentPostId) {
+        const parentPost = await prisma.posts.findFirst({
+            where: {
+                id: post.parentPostId
+            }
+        })
+
+        if (parentPost) {
+            await prisma.posts.update({
+                where: {
+                    id: parentPost.id
+                },
+                data: {
+                    commentCount: (parentPost.commentCount && parentPost.commentCount > 0) ? parentPost.commentCount - 1 : 0
+                }
+            })
+        }
+    }
 
     return deletedPost
 }

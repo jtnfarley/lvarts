@@ -16,7 +16,10 @@ export const getNotifications = async (user:User):Promise<Array<Notification>> =
         where: {
             userId: user?.id,
         },
-        include
+        include,
+        orderBy: {
+            createdAt: 'desc'
+        }
     })
 
     return notifications
