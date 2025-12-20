@@ -9,7 +9,7 @@ const MediaUpload = (props:{register:Function, setValue:Function, setTempImage:F
     const postFileRegister = props.register('postFileObj')
 
     return (
-        <div className=" bg-white rounded-sm w-[40px]">
+        <div className=" bg-white rounded-sm w-[25px]">
             <input 
                 {...postFileRegister}
                 type="file"
@@ -24,7 +24,7 @@ const MediaUpload = (props:{register:Function, setValue:Function, setTempImage:F
                 }}
             />
             <label htmlFor="postFileObj" className="cursor-pointer">
-                <BiSolidFilePlus size={40} title="upload an image" />
+                <BiSolidFilePlus size={25} title="upload an image" />
             </label>
         </div>
     )
