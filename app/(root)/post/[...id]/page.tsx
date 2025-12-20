@@ -42,7 +42,7 @@ export default function SinglePost() {
 		<>
         {user && 
             post &&
-            <div className='pt-5 flex flex-col'>
+            <div className='py-5 flex flex-col'>
                 <div className='mb-4'>
                     <PostUi postData={post} user={user} />
                 </div>
