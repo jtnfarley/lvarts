@@ -1,6 +1,13 @@
 import { currentUser } from '@/app/actions/currentUser';
 import AccountInfo from '@/components/forms/AccountInfo';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Profile - Lehigh Vally Arts & Music',
+  description: 'Create your personality',
+};
+
 export default async function Profile() {
 	const user = await currentUser()
 

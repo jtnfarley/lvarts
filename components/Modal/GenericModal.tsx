@@ -1,6 +1,6 @@
 import Modal from "./Modal";
 
-export default function ConfirmationModal(props:{
+export default function GenericModal(props:{
     title:string,
     message: string,
     isOpen:boolean, 

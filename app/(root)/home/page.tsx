@@ -4,6 +4,13 @@ import Feed from "@/components/Feed";
 import RecUsers from '@/components/RecUsers';
 import { redirect } from 'next/navigation';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Home - Lehigh Vally Arts & Music',
+  description: 'Where the good stuff is',
+};
+
 export default async function Home() {
 	const getUser = async () => {
 		'use server'

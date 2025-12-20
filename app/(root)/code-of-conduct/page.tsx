@@ -1,3 +1,10 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Code of Conduct - Lehigh Vally Arts & Music',
+  description: 'A code to live by',
+};
+
 export default async function Conduct() {
 	return (
 		<div className='center-box'>

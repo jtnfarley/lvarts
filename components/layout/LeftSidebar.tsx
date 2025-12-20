@@ -13,10 +13,10 @@ export default async function LeftSidebar() {
 
 	return (
 		<section className="leftsidebar custom-scrollbar justify-between">
-			<div className="flex w-full flex-1 flex-col gap-6">
+			<div className="flex w-full flex-1 flex-col">
 				<Link
                     href='/home'
-                    className="flex items-center gap-4"
+                    className="flex items-center"
                 >
                     <Image
                         src='/logos/lvarts-paths.svg'
@@ -26,6 +26,7 @@ export default async function LeftSidebar() {
                         className='w-70'
                     />
                 </Link>
+				<div className='ms-3 uppercase'>beta version 0.1.0</div>
 				<div className='mt-4'>
 					{user && 
 						<Nav user={user}/>
