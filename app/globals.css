@@ -58,7 +58,7 @@ body {
         }
 
         .user-card {
-            @apply flex flex-col justify-between gap-4 max-sm:rounded-xl max-sm:p-4;
+            @apply flex flex-col;
         }
 
         .user-card_avatar {
