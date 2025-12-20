@@ -1,6 +1,6 @@
 'use client'
 
-import ImageUpload from "./ImageUpload"
+import ImageUpload from "./MediaUpload"
 
 const PostFormActions = (props:{register:Function, setValue:Function, setTempImage:Function}) => {
     return (

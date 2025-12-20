@@ -1,3 +1,5 @@
+import Post from "./post"
+
 export default interface UserDetails {
     id: string
     userId: string
@@ -11,7 +13,8 @@ export default interface UserDetails {
 	following: string[]
 	avatar?: string | null
 	likedPosts: string[]
-	postIds: string[]
+	postIds?: string[]
+	posts?: Post[]
 	suspended?: boolean | null
 	updatedAt: Date
 }

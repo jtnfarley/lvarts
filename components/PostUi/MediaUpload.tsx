@@ -1,15 +1,15 @@
 'use client'
 
-import { BiImageAdd } from "react-icons/bi";
+import { BiSolidFilePlus } from "react-icons/bi";
 
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'audio/mpeg'];
 
-const ImageUpload = (props:{register:Function, setValue:Function, setTempImage:Function}) => {
+const MediaUpload = (props:{register:Function, setValue:Function, setTempImage:Function}) => {
     const postFileRegister = props.register('postFileObj')
 
     return (
-        <div className=" bg-gray-300 rounded-sm w-[40px]">
+        <div className=" bg-white rounded-sm w-[40px]">
             <input 
                 {...postFileRegister}
                 type="file"
@@ -24,10 +24,10 @@ const ImageUpload = (props:{register:Function, setValue:Function, setTempImage:F
                 }}
             />
             <label htmlFor="postFileObj" className="cursor-pointer">
-                <BiImageAdd size={40} title="upload an image" />
+                <BiSolidFilePlus size={40} title="upload an image" />
             </label>
         </div>
     )
 }
 
-export default ImageUpload
+export default MediaUpload

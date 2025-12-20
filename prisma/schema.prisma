@@ -129,6 +129,6 @@ model UserDetails {
   likedPosts    String[]        @db.ObjectId
   postIds       String[]        @db.ObjectId
   suspended     Boolean?
-  Posts         Posts[]
+  posts         Posts[]
   notifications Notifications[]
 }

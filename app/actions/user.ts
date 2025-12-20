@@ -21,6 +21,16 @@ export const getUserDetails = async (userId:string) => {
     const userDetails = await prisma.userDetails.findFirst({
         where: {
             userId
+        },
+        include: {
+            posts: {
+                include: {
+                    parentPost:true
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                },
+            }
         }
     })
 

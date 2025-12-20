@@ -8,7 +8,7 @@ import RTEditor from "./Fields/RichTextEditor/RTEditor";
 import { InitialEditorStateType } from "lexical";
 import uploadFile from "@/app/actions/fileUploader";
 import User from "@/lib/models/user";
-import ImageUpload from "@/components/PostUi/ImageUpload"
+import MediaUpload from "@/components/PostUi/MediaUpload"
 
 interface Props {
     savePost:Function,
@@ -36,7 +36,7 @@ const PostValidation = z.object({
 
 const PostForm = ({user, postType, edited, postId, parentPostId, savePost, content}: Props) => {
     const [clearEditor, setClearEditor] = useState(false);
-    const [tempImage, setTempImage] = useState();
+    const [tempImage, setTempImage] = useState<File | undefined>();
     const editorRef: any = useRef(null);
 
     const { register, handleSubmit, setValue, control, reset, formState: { errors, isSubmitSuccessful } } = useForm<z.infer<typeof PostValidation>>({
@@ -105,6 +105,12 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
         setTempImage(undefined);
     }
 
+    const setTempFile = (file:File) => {
+        if (file) {
+            setTempImage(file);
+        }
+    }
+
     useEffect(() => {
         if (isSubmitSuccessful) {
             reset();
@@ -133,13 +139,17 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
                         <RTEditor ref={editorRef} onChange={field.onChange} clearEditor={clearEditor} content={content}/>
                     )}
                 />
-                {tempImage && 
-                    <img src={URL.createObjectURL(tempImage)}/>
+                {tempImage && (
+                    (tempImage.type.match(/audio/)) ?
+                        <audio src={URL.createObjectURL(tempImage)} controls/>
+                        :
+                        <img src={URL.createObjectURL(tempImage)}/>
+                )
                 }
 
                 <div className="mt-2 flex flex-row">
                     <div className="w-[50%]">
-                        <ImageUpload register={register} setValue={setValue} setTempImage={setTempImage}/>
+                        <MediaUpload register={register} setValue={setValue} setTempImage={setTempFile}/>
                     </div>
                     <div className="w-[50%] flex justify-end">
                         <button type='submit' className="bg-orange px-2 py-2 rounded text-white uppercase font-semibold">
