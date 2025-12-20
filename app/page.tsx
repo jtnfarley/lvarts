@@ -27,23 +27,23 @@ export default function SignIn() {
         signIn(provider, options);
     }
 
-    useEffect(() => {
-        const cookie = document.cookie;
-        const url = '/';
-        if (!cookie.match('chortle=')) {
-            redirect(url);
-        } else {
-            const cookies = document.cookie.split(';');
-            cookies.forEach((cookie) => {
-                if (cookie.match('chortle=')) {
-                    const invite = cookie.split('=');
-                    if (atob(invite[1]) !== 'invitationVerified=true') {
-                        redirect(url);
-                    }
-                }
-            })
-        }
-    }, [])
+    // useEffect(() => {
+    //     const cookie = document.cookie;
+    //     const url = '/';
+    //     if (!cookie.match('chortle=')) {
+    //         redirect(url);
+    //     } else {
+    //         const cookies = document.cookie.split(';');
+    //         cookies.forEach((cookie) => {
+    //             if (cookie.match('chortle=')) {
+    //                 const invite = cookie.split('=');
+    //                 if (atob(invite[1]) !== 'invitationVerified=true') {
+    //                     redirect(url);
+    //                 }
+    //             }
+    //         })
+    //     }
+    // }, [])
     return (
         <div className="gap-5 p-5">
             <div className="flex justify-center">
