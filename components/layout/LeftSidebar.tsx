@@ -24,6 +24,7 @@ export default async function LeftSidebar() {
                         width={500}
                         height={195}
                         className='w-70'
+						priority
                     />
                 </Link>
 				<div className='ms-3 uppercase'>beta version 0.1.0</div>

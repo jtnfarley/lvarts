@@ -37,7 +37,6 @@ export const hasNewNotifications = async (user:User):Promise<boolean> => {
 }
 
 export const updateNotis = async (notis:Notification[] | undefined) => {
-    console.log(notis)
     if (notis && notis.length) {
         notis.forEach(async noti => {
             await prisma.notifications.update({

@@ -3,8 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react"
 import Image from "next/image";
-import { redirect } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import GenericModal from "@/components/Modal/GenericModal";
  
 export default function SignIn() {
@@ -36,6 +35,7 @@ export default function SignIn() {
                     width={500}
                     height={195}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority
                 />
             </div>
 

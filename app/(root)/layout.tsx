@@ -1,13 +1,9 @@
 import { Inter } from "next/font/google";
 import { Metadata } from "next";
-import { cookies } from 'next/headers'
-import { currentUser } from '@/app/actions/currentUser';
 import TopBar from "@/components/layout/TopBar";
 import LeftSidebar from "@/components/layout/LeftSidebar";
 import RightSidebar from "@/components/layout/RightSidebar";
 import BottomBar from "@/components/layout/BottomBar";
-import User from "@/lib/models/user";
-// import { UserStoreProvider } from "./stores/userStoreProvider";
 
 export const metadata: Metadata = {
   title: "Lehigh Valley Arts & Music",
@@ -21,10 +17,9 @@ export default async function RootLayout({
 }: Readonly<{
   	children: React.ReactNode;
 }>) {
-	const user = await currentUser() as User
 
 	return (
-		<>
+		<div>
 			<TopBar/>
 			<main className="flex flex-row">
 				<LeftSidebar/>
@@ -36,6 +31,6 @@ export default async function RootLayout({
 				<RightSidebar/>
 			</main>
 			<BottomBar/>
-		</>	
+		</div>	
 	);
 }
