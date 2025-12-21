@@ -32,7 +32,7 @@ export default function UserProfile() {
 		if (!singleUser) return
 
 		setSingleUser(singleUser);
-console.log(singleUser)
+
 		if (singleUser.posts) {
 			setPosts(singleUser.posts);
 		}
