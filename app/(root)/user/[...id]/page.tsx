@@ -14,10 +14,6 @@ import Post from '@/lib/models/post';
 
 export default function UserProfile() {
 
-	// const user = getUser();
-
-	// if (!user) return redirect('/signin');
-
 	const params = useParams<{id:string}>();
 	const { data: session, status } = useSession();
 	const [user, setUser] = useState<User>();

@@ -25,7 +25,8 @@ export const getUserDetails = async (userId:string) => {
         include: {
             posts: {
                 include: {
-                    parentPost:true
+                    parentPost:true,
+                    userDetails: true
                 },
                 orderBy: {
                     createdAt: 'desc'

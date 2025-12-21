@@ -6,7 +6,7 @@ function PostMediaImage(props:{post:Post}) {
     const post = props.post;
 
     const [imageLoaded, setImageLoaded] = useState(false);
-
+console.log(post)
     const imageFile = imageUrl+"/"+post.userDetails!.userDir+"/"+post.postFile;
 
     const imageLoad = () => {

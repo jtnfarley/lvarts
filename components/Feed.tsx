@@ -56,21 +56,6 @@ export default function Feed(props:{user:User, getUser:Function}) {
 		}
 	}, [])
 
-	// useEffect(() => {
-        
-
-	// 	handlePostsUpdated()
-	// 	// const init = async () => {
-	// 	// 	const feedArr = await getFeedArr()
-	// 	// 	if (!feedArr) return
-			
-	// 	// 	setFeed(feedArr)
-	// 	// }
-
-	// 	// init();
-
-	// }, [,props.user])
-
     return (
         <div className="flex flex-col gap-5 pb-5">
             {
