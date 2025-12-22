@@ -36,4 +36,5 @@ export default {
     underline: 'editor-text-underline',
     underlineStrikethrough: 'editor-text-underlineStrikethrough',
   },
+  map: 'google-map'
 };

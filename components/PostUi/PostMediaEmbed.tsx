@@ -18,13 +18,13 @@ function PostMediaEmbed(props:{post:Post}) {
                 vidId = link.substring(link.lastIndexOf("v=") + 2);
                 const trimmedId = (vidId.match('&')) ? vidId.substring(0, vidId.indexOf('&')) : (vidId.match('<')) ? vidId.substring(0, vidId.indexOf('<')) : vidId
                 return (
-                    <iframe src={"https://www.youtube.com/embed/" + trimmedId} title="Youtube"></iframe>
+                    <iframe src={"https://www.youtube-nocookie.com/embed/" + trimmedId} title="Youtube"></iframe>
                 )
             }
             // if (link.match(/maps.app.goo/)) {
             //     vidId = link.substring(link.lastIndexOf("/") + 1);
             //     console.log(vidId)
-            //     // AIzaSyAMghvVzVnIbd9T_9AtLwxwEFpfdaLE9ok
+            //     // 
             //     // const trimmedId = (vidId.match('&')) ? vidId.substring(0, vidId.indexOf('&')) : (vidId.match('<')) ? vidId.substring(0, vidId.indexOf('<')) : vidId
             //     // <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3028.8654375669344!2d-75.38216262487963!3d40.61079244380673!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c43f007c8e360f%3A0x99d72d2d044afe98!2sRailroad%20Records!5e0!3m2!1sen!2sus!4v1766344052314!5m2!1sen!2sus" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             //     return (

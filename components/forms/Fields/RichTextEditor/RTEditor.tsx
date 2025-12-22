@@ -22,6 +22,9 @@ import ExampleTheme from './ExampleTheme';
 import RandoPlaceholder from "./RandoPlaceholder";
 import "./styles.css";
 import { InitialEditorStateType, LexicalEditor } from "lexical";
+import { MapNode } from "./nodes/MapNode";
+import { MapPlugin } from "./plugins/MapPlugin";
+import TreeViewPlugin from "./plugins/TreeViewPlugin";
 
 const EditorCapturePlugin = React.forwardRef((props: any, ref: any) => {
 	const [editor] = useLexicalComposerContext();
@@ -55,7 +58,7 @@ const initialConfig:InitialConfigType = {
 	namespace: 'MyEditor',
 	theme: ExampleTheme,
 	onError,
-	nodes:[HashtagNode, ListNode, ListItemNode, AutoLinkNode],
+	nodes:[HashtagNode, ListNode, ListItemNode, AutoLinkNode, MapNode],
 	editorState:undefined
 };
 
@@ -87,8 +90,9 @@ export default function RTEditor(props:{ref:any, onChange: (html:object) => void
 			<ListPlugin/>
 			<HashtagPlugin/>
 			<AutoLinkPlugin/>
+			<MapPlugin/>
 			{/* <CharacterLimitPlugin charset='UTF-16' maxLength={250}/> */}
-			{/* <TreeViewPlugin/> */}
+			<TreeViewPlugin/>
 			<CustomOnChangePlugin value={''} onChange={props.onChange}/>
 			<CustomClearEditorPlugin clearEditor={props.clearEditor}/>
 		</LexicalComposer>
