@@ -24,7 +24,7 @@ import "./styles.css";
 import { InitialEditorStateType, LexicalEditor } from "lexical";
 import { MapNode } from "./nodes/MapNode";
 import { MapPlugin } from "./plugins/MapPlugin";
-import TreeViewPlugin from "./plugins/TreeViewPlugin";
+// import TreeViewPlugin from "./plugins/TreeViewPlugin";
 
 const EditorCapturePlugin = React.forwardRef((props: any, ref: any) => {
 	const [editor] = useLexicalComposerContext();
@@ -92,7 +92,7 @@ export default function RTEditor(props:{ref:any, onChange: (html:object) => void
 			<AutoLinkPlugin/>
 			<MapPlugin/>
 			{/* <CharacterLimitPlugin charset='UTF-16' maxLength={250}/> */}
-			<TreeViewPlugin/>
+			{/* <TreeViewPlugin/> */}
 			<CustomOnChangePlugin value={''} onChange={props.onChange}/>
 			<CustomClearEditorPlugin clearEditor={props.clearEditor}/>
 		</LexicalComposer>
