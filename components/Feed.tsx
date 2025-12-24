@@ -1,12 +1,13 @@
 'use client'
 
+import {APIProvider} from '@vis.gl/react-google-maps';
 import Post from '@/lib/models/post';
 import User from '@/lib/models/user';
 import { useEffect, useState } from 'react';
 import PostUi from './PostUi/PostUi';
 import { getFeed } from '@/app/actions/posts';
 
-export default function Feed(props:{user:User, getUser:Function}) {
+export default function Feed(props:{user:User, getUser:Function, googleMapsApiKey:string | undefined}) {
 	const [feed, setFeed] = useState<Array<Post>>();
 	const [renderKey, setRenderKey] = useState(0);
 	const [user, setUser] = useState<User|null>();
@@ -58,14 +59,16 @@ export default function Feed(props:{user:User, getUser:Function}) {
 
     return (
         <div className="flex flex-col gap-5 pb-5">
+			<APIProvider apiKey={props.googleMapsApiKey || ''} onLoad={() => console.log('Maps API has loaded.')}>
             {
 				(user && feed && feed.length) &&
                 	feed.map((post:Post, index:number) => {
 						return (
-							<PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={user} />
+							<PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={user} googleMapsApiKey={props.googleMapsApiKey} />
 						)
 					})
 				}
+			</APIProvider>
         </div>
     )
 }

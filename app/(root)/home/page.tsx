@@ -25,6 +25,8 @@ export default async function Home() {
 		return redirect('/profile')
 	}
 
+	const googleMapsApiKey = process.env.GOOGLE_MAPS; //has to be handled on the server
+
 	const userId = user?.id
 
 	return (
@@ -36,7 +38,7 @@ export default async function Home() {
 				<AddPostForm user={user} postType='post' edited={false}/>
 			</div>
 			<div>
-				<Feed user={user} getUser={getUser}/>
+				<Feed user={user} getUser={getUser} googleMapsApiKey={googleMapsApiKey}/>
 			</div>
 		</div>
 	);

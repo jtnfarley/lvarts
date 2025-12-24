@@ -99,7 +99,8 @@ export default function ToolbarPlugin() {
                     </button>
                 ))
             }
-            {/* <MapToolbarPlugin/> */}
+            <Divider key={'mapDiv'}/>
+            <MapToolbarPlugin/>
         </div>
     )
 }

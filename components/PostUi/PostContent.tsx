@@ -3,10 +3,48 @@
 import parse from 'html-react-parser';
 import DOMPurify from 'dompurify';
 import Post from '@/lib/models/post';
+import PostMedia from './PostMedia';
+import PostTemplateTags from './PostTemplateTags';
+import { useEffect, useState } from 'react';
 
-export default function PostContent(props:{postData:Post}) {
+export default function PostContent(props:{post:Post, googleMapsApiKey:string | undefined}) {
+	const post = props.post;
+	const [cleanContent, setCleanContent] = useState<string>(post.content);
+	const [templateTagArr, setTemplateTagArr] = useState<Array<{
+				tag: string,
+				index: number,
+				tagText: string
+			}>>();
 
-	const parseLinks = (post:string):string => {
+	const parseTemplateTags = (post:string) => {
+		let placeholder = post;
+
+		if (post.match(/\[(.*?)\]/g)) {
+			const results = Array.from(placeholder.matchAll(/\[(.*?)\]/g), match => {
+				if (match[1].includes('/')) return;
+				const open = match.index + match[0].length + 7; //7 for the following </span>
+				const close = placeholder.indexOf('[/', match.index) - 6;
+				const tagText = placeholder.slice(open, close)
+				placeholder = placeholder.slice(0, match.index) + tagText + placeholder.slice(placeholder.indexOf('[/', match.index) + 3 + match[1].length)
+
+				return {
+					tag: match[1],
+					index: match.index,
+					tagText
+				}
+			});
+
+			const templateTags = results.filter((element) => {
+				return element !== undefined;
+			})
+
+			setTemplateTagArr(templateTags)
+		}
+
+		return placeholder
+	}
+
+	const parseLinks = (post:string) => {
 		let placeholder = post;
 		const editorLinks = [...post.matchAll(/editor-link/g)];
 
@@ -24,9 +62,13 @@ export default function PostContent(props:{postData:Post}) {
 			post = placeholder;
 		}
 
+		if (post.match(/\[(.*?)\]/g)) {
+			post = parseTemplateTags(post);
+		}
+
 		post = parseTags(post);
 
-		return post;
+		setCleanContent(post);
 	}
 
 	const parseTags = (post:string):string => {
@@ -50,11 +92,20 @@ export default function PostContent(props:{postData:Post}) {
 		return post;
 	}
 
+	useEffect(() => {
+		parseLinks(post.content);
+	},[])
+
     return (
-		<div className='px-4 pb-4 pt-3'>
-			<div>{parse(parseLinks(DOMPurify.sanitize(props.postData.content)))}</div>
-			<div className='text-sm pt-2 italic text-gray-1'>{(props.postData.edited) ? 'edited' : ''}</div>
+		<div>
+			<div className='px-4 pb-4 pt-3'>
+				<div>{parse(DOMPurify.sanitize(cleanContent))}</div>
+				<div className='text-sm pt-2 italic text-gray-1'>{(post.edited) ? 'edited' : ''}</div>
+			</div>
+			<PostMedia post={post}/>
+			{templateTagArr && templateTagArr.length &&
+				<PostTemplateTags templateTags={templateTagArr} googleMapsApiKey={props.googleMapsApiKey}/>
+			}
 		</div>
-		
     )
 }
