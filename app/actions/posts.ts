@@ -50,7 +50,7 @@ export const getPosts = async (queryString:string):Promise<Array<Post>> => {
             createdAt: 'desc'
         }
     })
-console.log(posts)
+
     return posts
 }
 
