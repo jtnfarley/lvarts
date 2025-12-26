@@ -1,9 +1,11 @@
 'use client'
 
-import { currentUser } from '@/app/actions/currentUser';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useSession } from "next-auth/react";
+import { currentUser } from '@/app/actions/currentUser';
+import {APIProvider} from '@vis.gl/react-google-maps';
+import { getEnv } from '@/app/actions/getEnv';
 import { getUserDetails } from '@/app/actions/user';
 import UserDetails from '@/lib/models/userDetails';
 import Follow from '@/components/PostUi/Follow';
@@ -21,6 +23,7 @@ export default function UserProfile() {
 	const [avatarUrl, setAvatarUrl] = useState<string | undefined>();
 	const [posts, setPosts] = useState<Post[] | undefined>();
 	const [renderKey, setRenderKey] = useState(0);
+	const [googleMapsApiKey, setGoogleMapsApiKey] = useState<string | undefined>()
 
 	const getUser = async () => {
 		const user = await currentUser();
@@ -28,6 +31,9 @@ export default function UserProfile() {
 	}
 
 	const getSingleUser = async () => {
+		const gmk = await getEnv('GOOGLE_MAPS');
+        setGoogleMapsApiKey(gmk);
+
 		const singleUser = await getUserDetails(params.id.toString())
 		if (!singleUser) return
 
@@ -51,31 +57,37 @@ export default function UserProfile() {
 	}, [session])
 
 	return (
-		<div className='pb-5'>
-			<div className="lg:bg-white lg:rounded-xl lg:p-5 sm:bg-none sm:p-0 mt-5 min-h-50 mb-5">
-				{singleUser && user && 
-					<section className="">
-						<div className="mb-4 flex">
-							<img src={avatarUrl || '/images/melty-man.png'} className='w-[50px] h-[50px] me-3'/>
-							<div className='font-bold text-2xl'>{singleUser.displayName}</div>
-							<Follow followUserId={singleUser.userId} user={user}/>
+		<>
+            {googleMapsApiKey &&
+                <APIProvider apiKey={googleMapsApiKey || ''} onLoad={() => console.log('Maps API has loaded.')}>
+					<div className='pb-5'>
+						<div className="lg:bg-white lg:rounded-xl lg:p-5 sm:bg-none sm:p-0 mt-5 min-h-50 mb-5">
+							{singleUser && user && 
+								<section className="">
+									<div className="mb-4 flex">
+										<img src={avatarUrl || '/images/melty-man.png'} className='w-[50px] h-[50px] me-3'/>
+										<div className='font-bold text-2xl'>{singleUser.displayName}</div>
+										<Follow followUserId={singleUser.userId} user={user}/>
+									</div>
+									<div className="mb-4">
+										{singleUser.bio}
+									</div>
+								</section>
+							}
 						</div>
-						<div className="mb-4">
-							{singleUser.bio}
-						</div>
-					</section>
-				}
-			</div>
 
-			{singleUser && user && posts &&
-				<div className='flex flex-col gap-5'>
-					{posts.map((post:Post, index:number) => {
-						return (
-							<PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={user} />
-						)
-					})}
-				</div>
+						{singleUser && user && posts &&
+							<div className='flex flex-col gap-5'>
+								{posts.map((post:Post, index:number) => {
+									return (
+										<PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={user} googleMapsApiKey={googleMapsApiKey} />
+									)
+								})}
+							</div>
+						}
+					</div>
+				</APIProvider>
 			}
-		</div>
+		</>
 	);
 }

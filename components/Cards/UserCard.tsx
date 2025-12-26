@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from "next/navigation"
-// import { followUser, unfollowUser } from "@/app/actions/user"
 import User from "@/lib/models/user"
 import { useEffect, useState } from "react"
 import Follow from '../PostUi/Follow';
@@ -21,16 +20,6 @@ const UserCard = ({currentUser, recUserId, displayName, avatar}: Props) => {
     const viewProfile = () => {
         router.push(`/user/${recUserId}`)
     }
-
-    // const toggleFollow = async () => {
-    //     if (following) {
-    //         await unfollowUser({userId:currentUser.id, toFollowId:recUserId})
-    //         setFollowing(false)
-    //         return
-    //     }   
-    //     await followUser({userId:currentUser.id, toFollowId:recUserId})
-    //     setFollowing(true)
-    // }
 
     useEffect(() => {
         if (currentUser.userDetails?.following?.includes(recUserId)) {

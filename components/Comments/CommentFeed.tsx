@@ -4,7 +4,7 @@ import User from '@/lib/models/user';
 import { getComments } from '@/app/actions/posts';
 import PostUi from '../PostUi/PostUi';
 
-export default function CommentFeed(props:{parentPostId:string, user:User}) {
+export default function CommentFeed(props:{parentPostId:string, user:User, googleMapsApiKey:string | undefined}) {
     const {parentPostId, user} = props;
     const [feed, setFeed] = useState<Array<Post>>();
     const [renderKey, setRenderKey] = useState(0)
@@ -30,7 +30,7 @@ export default function CommentFeed(props:{parentPostId:string, user:User}) {
                 (feed && feed.length) ?
                     feed.map((post:Post, index:number) => {
                         return (
-                            <PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={props.user} />
+                            <PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={props.user} googleMapsApiKey={props.googleMapsApiKey} />
                         )
                     })
                     :
