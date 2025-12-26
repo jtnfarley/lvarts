@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Post from '@/lib/models/post';
 import {useState} from 'react'
 import imageUrl from '@/constants/imageUrl';
@@ -5,22 +6,15 @@ import imageUrl from '@/constants/imageUrl';
 function PostMediaImage(props:{post:Post}) {
     const post = props.post;
 
-    const [imageLoaded, setImageLoaded] = useState(false);
-
     const imageFile = imageUrl+"/"+post.userDetails!.userDir+"/"+post.postFile;
 
-    const imageLoad = () => {
-        setImageLoaded(true)
-    }
-
     return (
-        <div className='flex justify-center'> 
-            {/* {(!imageLoaded) ?
-            <CircularProgress sx={{}}/>
-            :
-            ""
-            }    */}
-            <img src={imageFile} onLoad={() => imageLoad()}/>
+        <div className='flex justify-center post-img relative'> 
+            <Image
+                src={imageFile}
+                alt={`Image associated with ${post.userDetails?.displayName}'s post`}
+                fill={true}
+            />
         </div>
     )
 }

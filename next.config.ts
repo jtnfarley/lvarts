@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '5mb',
     },
   },
+  images: {
+    remotePatterns: [new URL('https://lvartsmusic-ny.b-cdn.net/**')],
+  },
 };
 
 export default nextConfig;

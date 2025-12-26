@@ -12,6 +12,10 @@ body {
     color:var(--color-primary);
 }
 
+.post-img img {
+    position:relative!important;
+}
+
 @layer components {
     .main-container {
         @apply flex min-h-screen md:bg-primary flex-1 flex-col items-center px-6 pt-3 max-md:pb-32 sm:px-10 overflow-auto ;
