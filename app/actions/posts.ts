@@ -24,6 +24,9 @@ export const getFeed = async (user:User, lastChecked:Date | undefined):Promise<A
                     in: user?.userDetails?.following
                 }},
             ],
+            postType: {
+                not: 'chat'
+            },
             createdAt: {
                 gt: lastChecked
             }
