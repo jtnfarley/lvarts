@@ -61,9 +61,9 @@ export default function UserProfile() {
             {googleMapsApiKey &&
                 <APIProvider apiKey={googleMapsApiKey || ''} onLoad={() => console.log('Maps API has loaded.')}>
 					<div className='pb-5'>
-						<div className="lg:bg-white lg:rounded-xl lg:p-5 sm:bg-none sm:p-0 mt-5 min-h-50 mb-5">
+						<div className="lg:bg-white lg:rounded-xl lg:p-5 sm:bg-none sm:p-0 mt-5 mb-5">
 							{singleUser && user && 
-								<section className="">
+								<section className="flex flex-col justify-between min-h-50">
 									<div className="mb-4 flex">
 										<img src={avatarUrl || '/images/melty-man.png'} className='w-[50px] h-[50px] me-3'/>
 										<div className='font-bold text-2xl'>{singleUser.displayName}</div>
@@ -71,6 +71,10 @@ export default function UserProfile() {
 									</div>
 									<div className="mb-4">
 										{singleUser.bio}
+									</div>
+									<div className='flex justify-between text-sm uppercase'>
+										<div>Followers: <strong>{singleUser.followers.length || 0}</strong></div>
+										<div>Following: <strong>{singleUser.following.length || 0}</strong></div>
 									</div>
 								</section>
 							}
