@@ -59,7 +59,7 @@ export default function Feed(props:{user:User, getUser:Function, googleMapsApiKe
 
     return (
         <div className="flex flex-col gap-5 pb-5">
-			<APIProvider apiKey={props.googleMapsApiKey || ''} onLoad={() => console.log('Maps API has loaded.')}>
+			<APIProvider apiKey={props.googleMapsApiKey || ''}>
             {
 				(user && feed && feed.length) &&
                 	feed.map((post:Post, index:number) => {

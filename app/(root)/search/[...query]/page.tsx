@@ -47,7 +47,7 @@ export default function Search() {
 	return (
 		<>
             {googleMapsApiKey &&
-                <APIProvider apiKey={googleMapsApiKey || ''} onLoad={() => console.log('Maps API has loaded.')}>
+                <APIProvider apiKey={googleMapsApiKey || ''}>
                     {user && 
                         posts &&
                         <div className="flex flex-col gap-5 py-3">

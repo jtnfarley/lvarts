@@ -18,7 +18,6 @@ export default function NotificationsFeed(props:{user:User, getUser:Function}) {
 
 	const getFeedArr = async (user:User):Promise<Array<Notification> | undefined> => {
 		const notis = await getNotifications(user!);
-		console.log(notis)
         return notis;
     }
 

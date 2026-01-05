@@ -26,11 +26,11 @@ export default async function uploadFile(params:{file:File, userDir:string}) {
         body: fileBuffer
     });
 
-    if (response.ok) {
-      console.log('File uploaded successfully!');
-    } else {
-      console.error('File upload failed:', response.statusText);
-    }
+    // if (response.ok) {
+    //   console.log('File uploaded successfully!');
+    // } else {
+    //   console.error('File upload failed:', response.statusText);
+    // }
   } catch (error) {
     console.error('Error during file upload:', error);
   }

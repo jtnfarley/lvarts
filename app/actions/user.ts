@@ -111,7 +111,6 @@ export const updateUser = async ({
 
         // if (path === '/profile/edit') revalidatePath(path)
     } catch (error:any) {
-        console.log(error)
         throw new Error(`Failed to update user: ${error.message}`)
     }   
 }

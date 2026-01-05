@@ -47,7 +47,7 @@ export default function SinglePost() {
 	return (
         <>
             {googleMapsApiKey &&
-                <APIProvider apiKey={googleMapsApiKey || ''} onLoad={() => console.log('Maps API has loaded.')}>
+                <APIProvider apiKey={googleMapsApiKey || ''}>
                     {user && 
                         post &&
                         <div className='py-5 flex flex-col'>

@@ -24,9 +24,7 @@ export default function PostMap(props:{location:Location | undefined}) {
             defaultZoom={16}
             mapId='DEMO_MAP_ID'
             defaultCenter={ { lat: location.location?.latitude || 0, lng: location.location?.longitude || 0 } }
-            onCameraChanged={ (ev: MapCameraChangedEvent) =>
-                console.log('camera changed:', ev.detail.center, 'zoom:', ev.detail.zoom)
-        }>
+        >
             <AdvancedMarker position={{ lat: location.location?.latitude || 0, lng: location.location?.longitude || 0 }}>
                 <Pin background={'#FBBC04'} glyphColor={'#000'} borderColor={'#000'} />
             </AdvancedMarker>

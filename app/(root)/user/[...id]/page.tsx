@@ -59,7 +59,7 @@ export default function UserProfile() {
 	return (
 		<>
             {googleMapsApiKey &&
-                <APIProvider apiKey={googleMapsApiKey || ''} onLoad={() => console.log('Maps API has loaded.')}>
+                <APIProvider apiKey={googleMapsApiKey || ''}>
 					<div className='pb-5'>
 						<div className="lg:bg-white lg:rounded-xl lg:p-5 sm:bg-none sm:p-0 mt-5 mb-5">
 							{singleUser && user && 

@@ -30,7 +30,6 @@ export default async function RootLayout({
 
 	const getRandoImage = () => {
 		const randoIndex = Math.floor(Math.random() * bgs.length);
-		console.log(bgs[randoIndex])
 		return `/images/bgs/${bgs[randoIndex]}`;
 	}
 
@@ -41,7 +40,7 @@ export default async function RootLayout({
 					<GoogleAnalytics gaId="G-J6PQBNCBKC" />
 				</head>
 				<body>
-					<div className="relative"><div style={{background:`url(${getRandoImage()}) no-repeat`, height:'100vh', position:'fixed', width:'100vw', zIndex:-1}}></div></div>
+					<div className="relative"><div style={{background:`url(${getRandoImage()}) no-repeat`, backgroundSize: 'cover', height:'100vh', position:'fixed', width:'100vw', zIndex:-1}}></div></div>
 					
 					<main className='lg:flex lg:justify-center'>
 						<div className="lg:max-w-1300">
