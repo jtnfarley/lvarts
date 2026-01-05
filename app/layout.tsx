@@ -25,11 +25,13 @@ export default async function RootLayout({
 		'IMG_1419.png',
 		'IMG_1419-2.png',
 		'IMG_2563.png',
+		'IMG_0492.png'
 	]
 
 	const getRandoImage = () => {
 		const randoIndex = Math.floor(Math.random() * bgs.length);
-		return `/images/bgs/${bgs[randoIndex]}`;
+		const randoVersion = Math.floor(Math.random() * 100000);
+		return `/images/bgs/${bgs[randoIndex]}?v=${randoVersion}`;
 	}
 
 	return (
