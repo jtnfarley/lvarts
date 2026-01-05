@@ -4,6 +4,7 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 import SessionWrapper from "../components/auth/SessionWrapper";
 
 import './globals.css'
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Lehigh Valley Arts & Music",
@@ -30,8 +31,7 @@ export default async function RootLayout({
 
 	const getRandoImage = () => {
 		const randoIndex = Math.floor(Math.random() * bgs.length);
-		const randoVersion = Math.floor(Math.random() * 100000);
-		return `/images/bgs/${bgs[randoIndex]}?v=${randoVersion}`;
+		return `/images/bgs/${bgs[randoIndex]}`;
 	}
 
 	return (
@@ -41,7 +41,7 @@ export default async function RootLayout({
 					<GoogleAnalytics gaId="G-J6PQBNCBKC" />
 				</head>
 				<body>
-					<div className="relative"><div style={{background:`url(${getRandoImage()}) no-repeat`, backgroundSize: 'cover', height:'100vh', position:'fixed', width:'100vw', zIndex:-1}}></div></div>
+					<div className="relative"><Image src={getRandoImage()} alt='random background image' width={2000} height={1500} style={{height:'100vh', position:'fixed', width:'100vw', zIndex:-1}}/></div>
 					
 					<main className='lg:flex lg:justify-center'>
 						<div className="lg:max-w-1300">
