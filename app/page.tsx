@@ -58,7 +58,7 @@ export default function SignIn() {
                 </div>
                 <div className='flex justify-center mt-10'>
                     <button onClick={() => setOpen(true)} className="text-primary">What is this?</button>
-                    <GenericModal title="What this is:" message="Lehigh Valley Art & Music is a gathering place to promote and discover the vibrant arts scene in the Lehigh Valley. It is our little slice of the social media universe not controlled by sociopathic billionaires hellbent on sowing division and poisoning the social order. If you're not a troll bot, please join us. Promote your show or gallery opening. Display your artwork or post your videos. Find your new favorite band. Post your personal Musikfest schedule. Engage with the community. Meet up and collaborate." onClose={() => setOpen(false)} children="" isOpen={open}/>
+                    <GenericModal title="What this is:" message="Lehigh Valley Art & Music is a gathering place to promote and discover the thriving Lehigh Valley art scene. It is our little slice of the social media universe not controlled by sociopathic billionaires hellbent on sowing division and poisoning the social order. If you're not a troll bot, please join us. Promote your show. Display your work. Find your new favorite band. Post your Musikfest schedule. Engage and collaborate." onClose={() => setOpen(false)} children="" isOpen={open}/>
                 </div>
             </div>
         </div>
