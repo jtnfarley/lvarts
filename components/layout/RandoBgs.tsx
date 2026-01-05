@@ -35,10 +35,12 @@ export default function RandoBgs() {
 	}, [])
 
 	return (
-		<div className="relative overflow-hidden">
+		<div className="relative -z-1">
+		<div className="overflow-hidden bg-gray-200 h-screen w-full fixed">
 			{randoBg !== '' && 
-				<Image src={randoBg} alt='random background image' width={2000} height={1500} key={getRandoInt()} style={{height:'100vh', position:'fixed', width:'100%', minWidth:'1000px', zIndex:-1}}/>
+				<Image src={randoBg} alt='random background image' width={2000} height={1500} key={getRandoInt()} style={{height:'100vh', width:'100%', minWidth:'1000px'}} className="hidden md:block"/>
 			}
+		</div>
 		</div>
 	);
 }
