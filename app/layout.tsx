@@ -29,9 +29,14 @@ export default async function RootLayout({
 		'IMG_0492.png'
 	]
 
-	const getRandoImage = () => {
+	const getRandoImage = ():string => {
 		const randoIndex = Math.floor(Math.random() * bgs.length);
+		const randoVersion = Math.floor(Math.random() * 100000);
 		return `/images/bgs/${bgs[randoIndex]}`;
+	}
+
+	const getRandoInt = ():number => {
+		return Math.floor(Math.random() * 100000);
 	}
 
 	return (
@@ -41,7 +46,7 @@ export default async function RootLayout({
 					<GoogleAnalytics gaId="G-J6PQBNCBKC" />
 				</head>
 				<body>
-					<div className="relative"><Image src={getRandoImage()} alt='random background image' width={2000} height={1500} style={{height:'100vh', position:'fixed', width:'100vw', zIndex:-1}}/></div>
+					<div className="relative"><Image src={getRandoImage()} alt='random background image' width={2000} height={1500} key={getRandoInt()} style={{height:'100vh', position:'fixed', width:'100vw', zIndex:-1}}/></div>
 					
 					<main className='lg:flex lg:justify-center'>
 						<div className="lg:max-w-1300">
