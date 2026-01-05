@@ -15,7 +15,10 @@ export default function RandoBgs() {
 		'IMG_1419.png',
 		'IMG_1419-2.png',
 		'IMG_2563.png',
-		'IMG_0492.png'
+		'IMG_0492.png',
+		'IMG_1005.png',
+		'IMG_2685.png',
+		'IMG_2396.png'
 	]
 
 	const getRandoImage = () => {
