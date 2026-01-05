@@ -16,6 +16,24 @@ export default async function RootLayout({
   	children: React.ReactNode;
 }>) {
 
+	const bgs = [
+		'IMG_1705.png',
+		'IMG_2873.png',
+		'IMG_2873-2.png',
+		'IMG_0650.png',
+		'IMG_0935.png',
+		'IMG_1419.png',
+		'IMG_1419-2.png',
+		'IMG_0478.png',
+		'IMG_2563.png',
+	]
+
+	const getRandoImage = () => {
+		const randoIndex = Math.floor(Math.random() * bgs.length);
+		console.log(bgs[randoIndex])
+		return `/images/bgs/${bgs[randoIndex]}`;
+	}
+
 	return (
 		<SessionWrapper>
 			<html lang="en">
@@ -23,6 +41,8 @@ export default async function RootLayout({
 					<GoogleAnalytics gaId="G-J6PQBNCBKC" />
 				</head>
 				<body>
+					<div className="relative"><div style={{background:`url(${getRandoImage()}) no-repeat`, height:'100vh', position:'fixed', width:'100vw', zIndex:-1}}></div></div>
+					
 					<main className='lg:flex lg:justify-center'>
 						<div className="lg:max-w-1300">
 							{children}

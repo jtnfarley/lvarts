@@ -27,36 +27,39 @@ export default function SignIn() {
     }
 
     return (
-        <div className="gap-5 p-5">
-            <div className="flex justify-center">
-                <Image
-                    src='/logos/lvarts-paths.svg'
-                    alt="Lehigh Valley Arts & Music"
-                    width={500}
-                    height={195}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    priority
-                />
-            </div>
-
-            <div className="flex flex-col mt-5 justify-center items-center">
-                <button onClick={() => signInUser('google')} className='bg-white w-72 flex justify-center px-3 py-3 rounded-full'>
-                    Sign In with Google 
-                    <div className='ms-3'><img src='/images/goog.png' alt='Google Icon' className='w-[30px] h-[30px]'/></div>
-                </button>
-                <div className="flex justify-center my-3 border-b-2 border-gray-200 w-100"></div>
-                <div className="mb-2">Sign In with Email</div>
-                <div className="flex items-center">
-                    <input type='text' name='email' id='email' placeholder='Email' className="border-2 px-2 py-2 me-2 rounded-md bg-white"/>
-                    <Button onClick={() => signInUser('nodemailer')}>Send Link</Button>
+        <div className="flex items-center h-screen">
+            <div className="gap-5 p-5 bg-gray-50/50 backdrop-blur-sm rounded-2xl">
+                <div className="flex justify-center">
+                    <Image
+                        src='/logos/lvarts-paths.svg'
+                        alt="Lehigh Valley Arts & Music"
+                        width={500}
+                        height={195}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        priority
+                        className="rounded-xl"
+                    />
                 </div>
-                {error && 
-                    <div className='text-red-500'>Please enter a valid email address</div>
-                }
-            </div>
-            <div className='flex justify-center mt-10'>
-                <button onClick={() => setOpen(true)} className="text-primary">What is this?</button>
-                <GenericModal title="What this is:" message="Lehigh Valley Art & Music is a gathering place to promote and discover the vibrant arts scene in the Lehigh Valley. It is our little slice of the social media universe not controlled by sociopathic billionaires hellbent on sowing division and poisoning the social order. If you're not a troll bot, please join us. Promote your show or gallery opening. Display your artwork or post your videos. Find your new favorite band. Post your personal Musikfest schedule. Engage with the community. Meet up and collaborate." onClose={() => setOpen(false)} children="" isOpen={open}/>
+
+                <div className="flex flex-col mt-5 justify-center items-center">
+                    <button onClick={() => signInUser('google')} className='bg-white w-72 flex justify-center px-3 py-3 rounded-full'>
+                        Sign In with Google 
+                        <div className='ms-3'><img src='/images/goog.png' alt='Google Icon' className='w-[30px] h-[30px]'/></div>
+                    </button>
+                    <div className="flex justify-center my-3 border-b-2 border-gray-200 w-full"></div>
+                    <div className="mb-2">Sign In with Email</div>
+                    <div className="flex items-center">
+                        <input type='text' name='email' id='email' placeholder='Email' className="border-2 px-2 py-2 me-2 rounded-md bg-white"/>
+                        <Button onClick={() => signInUser('nodemailer')}>Send Link</Button>
+                    </div>
+                    {error && 
+                        <div className='text-red-800'>Please enter a valid email address</div>
+                    }
+                </div>
+                <div className='flex justify-center mt-10'>
+                    <button onClick={() => setOpen(true)} className="text-primary">What is this?</button>
+                    <GenericModal title="What this is:" message="Lehigh Valley Art & Music is a gathering place to promote and discover the vibrant arts scene in the Lehigh Valley. It is our little slice of the social media universe not controlled by sociopathic billionaires hellbent on sowing division and poisoning the social order. If you're not a troll bot, please join us. Promote your show or gallery opening. Display your artwork or post your videos. Find your new favorite band. Post your personal Musikfest schedule. Engage with the community. Meet up and collaborate." onClose={() => setOpen(false)} children="" isOpen={open}/>
+                </div>
             </div>
         </div>
     )

@@ -18,7 +18,7 @@ export default function PostUi(props:{postData:Post, user:User, googleMapsApiKey
 
     return (
 		<div>
-			<div className='text-sm pb-2 italic md:text-white'>
+			<div className='text-sm pb-2 italic md:text-fray-700'>
 				{post.postType === 'comment' && 
 					<Link href={`/post/${post.parentPostId}`}>commenting on {(currentUserParentPost) ? 'your' : `${post.parentPost?.userDetails?.displayName}'s`} post</Link>
 				}
