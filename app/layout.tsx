@@ -24,7 +24,6 @@ export default async function RootLayout({
 		'IMG_0935.png',
 		'IMG_1419.png',
 		'IMG_1419-2.png',
-		'IMG_0478.png',
 		'IMG_2563.png',
 	]
 
