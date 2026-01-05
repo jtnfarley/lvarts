@@ -19,7 +19,7 @@ export default async function Home() {
 
 	const user = await getUser();
 
-	if (!user) return redirect('/signin');
+	if (!user) return redirect('/');
 	
 	if (!user.userDetails || !user.userDetails.displayName || user.userDetails.displayName === '') {
 		return redirect('/profile')
