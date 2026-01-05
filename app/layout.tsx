@@ -4,7 +4,7 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 import SessionWrapper from "../components/auth/SessionWrapper";
 
 import './globals.css'
-import Image from "next/image";
+import RandoBgs from "@/components/layout/RandoBgs";
 
 export const metadata: Metadata = {
   title: "Lehigh Valley Arts & Music",
@@ -17,28 +17,6 @@ export default async function RootLayout({
   	children: React.ReactNode;
 }>) {
 
-	const bgs = [
-		'IMG_1705.png',
-		'IMG_2873.png',
-		'IMG_2873-2.png',
-		'IMG_0650.png',
-		'IMG_0935.png',
-		'IMG_1419.png',
-		'IMG_1419-2.png',
-		'IMG_2563.png',
-		'IMG_0492.png'
-	]
-
-	const getRandoImage = ():string => {
-		const randoIndex = Math.floor(Math.random() * bgs.length);
-		const randoVersion = Math.floor(Math.random() * 100000);
-		return `/images/bgs/${bgs[randoIndex]}?v=${getRandoInt()}`;
-	}
-
-	const getRandoInt = ():number => {
-		return Math.floor(Math.random() * 100000);
-	}
-
 	return (
 		<SessionWrapper>
 			<html lang="en">
@@ -46,7 +24,7 @@ export default async function RootLayout({
 					<GoogleAnalytics gaId="G-J6PQBNCBKC" />
 				</head>
 				<body>
-					<div className="relative overflow-hidden"><Image src={getRandoImage()} alt='random background image' width={2000} height={1500} key={getRandoInt()} style={{height:'100vh', position:'fixed', width:'100%', minWidth:'1000px', zIndex:-1}}/></div>
+					<RandoBgs/>
 					
 					<main className='lg:flex lg:justify-center'>
 						<div className="lg:max-w-1300">
