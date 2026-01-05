@@ -1,14 +1,17 @@
 "use client"
 
+import { redirect } from 'next/navigation';
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react"
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GenericModal from "@/components/Modal/GenericModal";
  
 export default function SignIn() {
     const [error, setError] = useState<string | undefined>();
     const [open, setOpen] = useState<boolean>(false);
+    const { data: session, status } = useSession();
 
     const signInUser = (provider:string) => {
         const options = {redirectTo: '/home', email:''}
@@ -25,6 +28,12 @@ export default function SignIn() {
 
         signIn(provider, options);
     }
+
+    useEffect(() => {
+        if (status === 'authenticated') {
+            redirect('/home')
+        }      
+    },[session])
 
     return (
         <div className="flex items-center h-screen">

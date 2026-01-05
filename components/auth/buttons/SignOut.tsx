@@ -1,18 +1,23 @@
-import { signOut } from "@/auth"
+'use client'
+
+import { signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation';
 import { BiSolidArrowToLeft } from "react-icons/bi";
  
-export default async function SignOut() {
+export default function SignOut() {
+    const router = useRouter();
+
+    const signOutUser = () => {
+        signOut();
+        setTimeout(() => {
+            router.push('/');
+        }, 1000)      
+    }
+
     return (
-        <form
-            action={async () => {
-                "use server"
-                await signOut({ redirectTo: '/', redirect:true })
-            }}
-        >
-            <button type="submit" className='text-gray-500 text-lg flex flex-row items-center'>
-                <BiSolidArrowToLeft className='leftIcon'/>
-                <div className='hidden md:block'>Log Out</div>
-            </button>
-        </form>
+        <button onClick={signOutUser} className='text-gray-500 text-lg flex flex-row items-center'>
+            <BiSolidArrowToLeft className='leftIcon'/>
+            <div className='hidden md:block'>Log Out</div>
+        </button>
     )
 }
