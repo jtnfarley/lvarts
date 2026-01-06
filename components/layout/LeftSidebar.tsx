@@ -35,8 +35,12 @@ export default async function LeftSidebar() {
 				</div>
 			</div>
 			<div className='flex flex-col items-end pe-10'>
-				<SignOut/>
-				<div className='mt-3 text-md text-gray-400'><Link href='/code-of-conduct' className='code-link'>Code of Conduct</Link></div>
+				{user &&
+					<div>
+						<SignOut/>
+						<div className='mt-3 text-md text-gray-400'><Link href='/code-of-conduct' className='code-link'>Code of Conduct</Link></div>
+					</div>
+				}
 			</div>
 		</section>
 	)

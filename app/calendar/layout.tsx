@@ -22,7 +22,7 @@ export default async function RootLayout({
 			<TopBar/>
 			<main className="flex flex-row">
 				<LeftSidebar/>
-				<section className="calendar-container w-full bg-white">
+				<section className="calendar-container">
 					<div className="flex flex-col w-full min-h-screen">
 						{children}
 					</div>

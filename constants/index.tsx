@@ -1,4 +1,4 @@
-import { BiSolidHomeAlt2, BiSolidSearch, BiSolidUser, BiSolidBell } from "react-icons/bi";
+import { BiSolidHomeAlt2, BiSolidSearch, BiSolidUser, BiSolidBell, BiSolidCalendar } from "react-icons/bi";
 
 export const sidebarLinks = [
     {
@@ -10,6 +10,11 @@ export const sidebarLinks = [
       icon: <BiSolidBell className="leftIcon"/>,
       route: "/notifications",
       label: "Notifications",
+    },
+    {
+      icon: <BiSolidCalendar className="leftIcon"/>,
+      route: "/calendar",
+      label: "Calendar",
     },
     {
       icon: <BiSolidUser className="leftIcon"/>,

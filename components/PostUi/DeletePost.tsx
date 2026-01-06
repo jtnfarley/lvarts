@@ -29,7 +29,7 @@ export default function DeletePost(props:{postData:Post, user:User}) {
 	}
 
     return (
-		<div className='text-2xl'>
+		<div className='text-2xl relative'>
 			<button onClick={() => setShowDeleteModal(true)}>
 				<div className='text-2xl'><BiTrash /></div>
 			</button>

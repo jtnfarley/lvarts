@@ -97,7 +97,7 @@ export const updateUser = async ({
                     userDir,
                     createdAt,
                     updatedAt,
-                    chats: [],
+                    chatIds: [],
                     comments: [],
                     followers: [],
                     following: [],

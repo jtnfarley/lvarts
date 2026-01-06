@@ -30,7 +30,7 @@ export default function EditPost(props:{postData:Post, user:User}) {
 	});
 
     return (
-		<div className='text-2xl'>
+		<div className='text-2xl relative'>
 			<button onClick={() => setShowEditModal(true)}>
 				<div className='text-2xl'><BiEdit /></div>
 			</button>

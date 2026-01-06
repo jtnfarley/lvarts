@@ -107,6 +107,8 @@ model Posts {
   userDir       String?
   chatId        String?
   likes         Int?
+  eventTitle    String?
+  eventDate     DateTime?        @db.Date
   commentCount  Int?
   notifications Notifications[]
 }

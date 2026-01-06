@@ -4,9 +4,9 @@ export default function Modal(props:{isOpen:boolean, onClose:() => void, childre
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 flex
+        <div className="absolute -left-60 -top-60 flex
                         items-center justify-center
-                        bg-black/50 z-21">
+                        z-21">
             <div className="bg-white rounded-lg
                             shadow-lg p-6 max-w-md
                             w-full relative">

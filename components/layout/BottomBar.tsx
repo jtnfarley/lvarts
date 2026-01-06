@@ -12,9 +12,12 @@ export default async function BottomBar() {
 		<section className="bottombar">
 			<div className="bottombar_container">
 				{user && 
-					<Nav user={user}/>
+					<>
+						<Nav user={user}/>
+						<div className='ms-3'><SignOut/></div>
+					</>
 				}
-				<div className='ms-3'><SignOut/></div>
+				
 			</div>
 		</section>
 	)

@@ -12,9 +12,21 @@
     position:relative!important;
 }
 
+.react-datepicker-ignore-onclickoutside {
+    margin-left: 5px;
+}
+
+.react-datepicker-popper {
+    left:10px !important;
+}
+
 @layer components {
     .main-container {
         @apply flex min-h-screen bg-gray-50/70 backdrop-blur-sm flex-1 flex-col items-center px-6 pt-3 max-md:pb-32 sm:px-10 overflow-auto ;
+    }
+
+    .calendar-container {
+        @apply flex min-h-screen flex-1 flex-col items-center px-6 pt-3 max-md:pb-32 sm:px-10 overflow-auto;
     }
 
     .center-box {

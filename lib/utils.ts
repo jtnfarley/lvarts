@@ -16,3 +16,23 @@ export const getRandomString = (length:number) => {
 
     return dirName;
 }
+
+export const formatDate = (date:Date | null | undefined):string => {
+  if (!date) return '';
+
+  const months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ]
+
+  const hours = (date.getHours() < 12 ) ? date.getHours() : date.getHours() - 12;
+  const amPm = (date.getHours() < 12 ) ? 'AM' : 'PM';
+  const minutes = (date.getMinutes().toString().length < 2 ) ? `${date.getMinutes().toString()}0` : date.getMinutes().toString();
+
+  return `
+    ${months[date.getMonth()]} 
+    ${date.getDate()}, 
+    ${date.getFullYear()} 
+    ${hours}:${minutes}
+    ${amPm}
+  `
+}

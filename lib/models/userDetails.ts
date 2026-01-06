@@ -4,7 +4,7 @@ export default interface UserDetails {
     id: string
     userId: string
 	bio?: string | null
-	chats: string[]
+	chatIds?: string[]
 	comments: string[]
 	createdAt: Date
 	displayName?: string | null

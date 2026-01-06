@@ -1,11 +1,12 @@
 'use client'
 
+import { useEffect, useState } from 'react';
 import parse from 'html-react-parser';
 import DOMPurify from 'dompurify';
 import Post from '@/lib/models/post';
 import PostMedia from './PostMedia';
 import PostTemplateTags from './PostTemplateTags';
-import { useEffect, useState } from 'react';
+import { formatDate } from '@/lib/utils';
 
 export default function PostContent(props:{post:Post, googleMapsApiKey:string | undefined}) {
 	const post = props.post;
@@ -99,6 +100,14 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
     return (
 		<div>
 			<div className='px-4 pb-4 pt-3'>
+				{
+					post.eventTitle &&
+						<div className='text-2xl font-bold'>{post.eventTitle}</div>
+				}
+				{
+					post.eventDate &&
+						<div className='mb-5 text-lg'>{formatDate(post.eventDate)}</div>
+				}
 				<div>{parse(DOMPurify.sanitize(cleanContent))}</div>
 				<div className='text-sm pt-2 italic text-gray-1'>{(post.edited) ? 'edited' : ''}</div>
 			</div>

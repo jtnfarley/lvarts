@@ -83,7 +83,19 @@ export const getComments = async (postId:string):Promise<any> => {
 }
 
 export const savePost = async (postData:any) => {
-    const {content, lexical, userId, postType, postFile, postFileType, privatePost, parentPostId, edited} = postData
+    const {
+        content, 
+        lexical, 
+        userId, 
+        postType, 
+        postFile, 
+        postFileType, 
+        privatePost, 
+        parentPostId, 
+        edited,
+        eventTitle,
+        eventDate
+    } = postData
 
     const date = new Date()
     const createdAt = date
@@ -124,6 +136,8 @@ export const savePost = async (postData:any) => {
         parentPostId: parentPostId ?? null,
         createdAt,
         updatedAt,
+        eventTitle,
+        eventDate,
         ...(postFileType !== undefined ? { postFileType } : {}),
     }
 
@@ -363,4 +377,18 @@ export const deletePost = async (postId:string) => {
     }
 
     return deletedPost
+}
+
+export const getEvents = async ():Promise<Array<Post>> => {
+    const posts:Array<Post> = await prisma.posts.findMany({
+        where: {
+            postType: 'event',
+        },
+        include,
+        orderBy: {
+            eventDate: 'asc'
+        },
+    })
+
+    return posts
 }

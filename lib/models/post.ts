@@ -23,4 +23,6 @@ export default interface Post {
     chatId?: string | null
 	likes?: number | null
 	commentCount?: number | null
+	eventTitle?: string | null
+	eventDate?: Date | null
 }
