@@ -36,7 +36,7 @@ export default function SignIn() {
     },[session])
 
     return (
-        <div className="flex items-center h-screen">
+        <div className="flex items-center justify-center h-screen">
             <div className="gap-5 p-5 bg-gray-50/50 backdrop-blur-sm rounded-2xl">
                 <div className="flex justify-center">
                     <Image
