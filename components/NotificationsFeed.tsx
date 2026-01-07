@@ -70,7 +70,7 @@ export default function NotificationsFeed(props:{user:User, getUser:Function}) {
 				(user && notis && notis.length) &&
                 	notis.map((noti:Notification, index:number) => {
 						return (
-							<div key={index} className={`noti-link flex items-center center-box text-md p-2 border-gray-400 rounded-lg ${(noti.read) ? 'bg-gray-200' : ''}`}>
+							<div key={index} className={`noti-link flex items-center text-md p-2 border-gray-400 rounded-lg ${(noti.read) ? 'bg-gray-200' : ''}`}>
 								<Link href={`/user/${noti.notiUser?.id}`}>
 									<img src={(noti.notiUserDetails?.userDir && noti.notiUserDetails?.avatar) ? `${imageUrl}/${noti.notiUserDetails?.userDir}/${noti.notiUserDetails?.avatar}` : '/images/melty-man.png'} alt={`${noti.notiUserDetails?.displayName} avatar`} className='avatar me-2 w-[30px] h-[30px]'/>
 								</Link>
