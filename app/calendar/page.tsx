@@ -24,7 +24,7 @@ export default async function Calendar() {
 	const userId = user?.id
 
 	return (
-		<div className='bg-gray-50/50 backdrop-blur-sm p-5 rounded-lg'>
+		<div className='bg-gray-50/50 backdrop-blur-sm p-5 rounded-lg mt-5'>
 			{user ?
 				<div className='flex justify-end'>
 					<Link href='/calendar/add-event' title='Add Event'>

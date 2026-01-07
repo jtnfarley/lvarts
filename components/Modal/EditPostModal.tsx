@@ -4,21 +4,18 @@ import EditPostForm from "@/components/forms/EditPostForm";
 
 export default function EditPostModal(props:{
     title:string,
-    message:string,
     postContent:string,
     postId:string,
     user:User,
     isOpen:boolean, 
-    onClose:() => void, 
 }) {
-    const { postContent, postId, user, isOpen, onClose } = props;
+    const { postContent, postId, user, isOpen } = props;
 
     return (
         <GenericModal
             title="Edit Post"
             message=""
             isOpen={isOpen}
-            onClose={onClose}
         >
             <div className='text-base rounded-lg'>
                 <EditPostForm content={postContent} postId={postId} user={user} />

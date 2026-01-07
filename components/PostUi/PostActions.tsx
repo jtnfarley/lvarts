@@ -21,7 +21,7 @@ export default function PostActions(props:{postData:Post, user:User, currentUser
 		<div className='flex flex-row'>
 			<div className='w-1/2 flex flex-row'>
 				<div className='w-1/4'>
-					<LikePost postData={post} user={props.user} currentUserPost={currentUserPost}/>
+					<LikePost postData={post} user={user} currentUserPost={currentUserPost}/>
 				</div>
 				<div className='w-1/4'>
 					<CommentButton postData={post}/>
@@ -31,10 +31,10 @@ export default function PostActions(props:{postData:Post, user:User, currentUser
 				currentUserPost && 
 					<div className='w-1/2 flex flex-row justify-end'>
 						<div className='w-1/4 flex justify-end'>
-							<EditPost postData={post} user={props.user}/>
+							<EditPost postData={post} user={user}/>
 						</div>
 						<div className='w-1/4 flex justify-end'>
-							<DeletePost postData={post} user={props.user}/>
+							<DeletePost postData={post}/>
 						</div>
 					</div>					
 			}

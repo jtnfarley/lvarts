@@ -7,10 +7,8 @@ export default function PostModal(props:{
     message:string,
     postContent:string,
     isOpen:boolean, 
-    onClose:() => void, 
-    onConfirm: () => void
 }) {
-    const { title, message, postContent, isOpen, onClose, onConfirm } = props;
+    const { title, message, postContent, isOpen } = props;
 
     const truncateText = (text:string) => {
         return text.length > 100 ? text.slice(0, 100) + '...' : text;
@@ -21,8 +19,6 @@ export default function PostModal(props:{
             title="Delete Post"
             message="Are you sure you want to delete this post?"
             isOpen={isOpen}
-            onConfirm={onConfirm}
-            onClose={onClose}
         >
             <div className='bg-black/5 my-3 px-3 py-3 text-base rounded-lg'>
                 {parse(DOMPurify.sanitize(truncateText(postContent)))}

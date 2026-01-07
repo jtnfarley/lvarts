@@ -6,12 +6,18 @@ import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react"
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import GenericModal from "@/components/Modal/GenericModal";
+import { useModal } from '@/app/contextProviders/modalProvider'
  
 export default function SignIn() {
     const [error, setError] = useState<string | undefined>();
     const [open, setOpen] = useState<boolean>(false);
     const { data: session, status } = useSession();
+    const {
+            setIsOpen, 
+            setTitle, 
+            setType,   
+            setMessage,
+        } = useModal()
 
     const signInUser = (provider:string) => {
         const options = {redirectTo: '/home', email:''}
@@ -28,6 +34,13 @@ export default function SignIn() {
 
         signIn(provider, options);
     }
+
+    const setUpModal = () => {
+		setIsOpen(true);
+        setTitle('What this is:');
+        setType('GenericModal');  
+        setMessage(`Lehigh Valley Art & Music is a gathering place to promote and discover the thriving Lehigh Valley art scene. It is our little slice of the social media universe not controlled by sociopathic billionaires hellbent on sowing division and poisoning the social order. If you're not a troll bot, please join us. Promote your show. Display your work. Find your new favorite band. Post your Musikfest schedule. Engage and collaborate.`);
+	}
 
     useEffect(() => {
         if (status === 'authenticated') {
@@ -66,8 +79,7 @@ export default function SignIn() {
                     }
                 </div>
                 <div className='flex justify-center mt-10'>
-                    <button onClick={() => setOpen(true)} className="text-primary">What is this?</button>
-                    <GenericModal title="What this is:" message="Lehigh Valley Art & Music is a gathering place to promote and discover the thriving Lehigh Valley art scene. It is our little slice of the social media universe not controlled by sociopathic billionaires hellbent on sowing division and poisoning the social order. If you're not a troll bot, please join us. Promote your show. Display your work. Find your new favorite band. Post your Musikfest schedule. Engage and collaborate." onClose={() => setOpen(false)} children="" isOpen={open}/>
+                    <button onClick={() => setUpModal()} className="text-primary">What is this?</button>
                 </div>
             </div>
         </div>

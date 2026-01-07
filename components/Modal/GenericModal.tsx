@@ -1,16 +1,17 @@
 import Modal from "./Modal";
+import { useModal } from '@/app/contextProviders/modalProvider'
 
 export default function GenericModal(props:{
     title:string,
     message: string,
     isOpen:boolean, 
-    onClose:() => void, 
     children:any
 }) {
-    const { title, message, isOpen, onClose, children } = props;
+    const { title, message, isOpen, children } = props;
+    const { setIsOpen } = useModal()
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen}>
             <h2 className="text-lg font-bold"> 
                 {title}
             </h2>
@@ -25,7 +26,7 @@ export default function GenericModal(props:{
                 <button
                     className="px-4 py-2 bg-gray-500
                                text-white rounded-lg text-base"
-                    onClick={onClose}
+                    onClick={() => setIsOpen(false)}
                 >
                     Cancel
                 </button>
