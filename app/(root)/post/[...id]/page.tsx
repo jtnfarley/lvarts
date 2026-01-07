@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useSession } from "next-auth/react";
 import {APIProvider} from '@vis.gl/react-google-maps';
@@ -32,7 +33,7 @@ export default function SinglePost() {
 
     const getCurrentUser = async () => {
         const currUser = await currentUser()
-        if (!currUser) return
+        // if (!currUser) return
 
         setUser(currUser);
     }
@@ -41,15 +42,14 @@ export default function SinglePost() {
         if (status === 'authenticated') {
             getCurrentUser()
             getSinglePost()
-        }      
+        }   
     },[session])
 
 	return (
         <>
-            {googleMapsApiKey &&
+        {(user && post) ?
+            googleMapsApiKey &&
                 <APIProvider apiKey={googleMapsApiKey || ''}>
-                    {user && 
-                        post &&
                         <div className='py-5 flex flex-col'>
                             <div className='mb-4'>
                                 <PostUi postData={post} user={user} googleMapsApiKey={googleMapsApiKey} />
@@ -61,8 +61,11 @@ export default function SinglePost() {
                                 <CommentFeed parentPostId={params.id.toString()} user={user} googleMapsApiKey={googleMapsApiKey}/>
                             </div>
                         </div>
-                    }        
                 </APIProvider>
+                :
+                <div className='rounded-box'>
+                    <Link href={'/'} className='text-primary'>Log in to view full post</Link>
+                </div>      
             }
         </>
 	);

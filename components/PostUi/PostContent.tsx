@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import parse from 'html-react-parser';
 import DOMPurify from 'dompurify';
@@ -94,7 +95,7 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 	}
 
 	useEffect(() => {
-		parseLinks(post.content);
+		parseLinks(DOMPurify.sanitize(post.content));
 	},[])
 
     return (
@@ -102,14 +103,18 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 			<div className='px-4 pb-4 pt-3'>
 				{
 					post.eventTitle &&
-						<div className='text-2xl font-bold'>{post.eventTitle}</div>
+						<div className='text-2xl font-bold'><Link href={`/post/${post.id}`} title={post.eventTitle}>{post.eventTitle}</Link></div>
 				}
 				{
 					post.eventDate &&
 						<div className='mb-5 text-lg'>{formatDate(post.eventDate)}</div>
 				}
-				<div>{parse(DOMPurify.sanitize(cleanContent))}</div>
-				<div className='text-sm pt-2 italic text-gray-1'>{(post.edited) ? 'edited' : ''}</div>
+				{ cleanContent && 
+					<>
+						<div>{parse(cleanContent)}</div>
+						<div className='text-sm pt-2 italic text-gray-1'>{(post.edited) ? 'edited' : ''}</div>
+					</>
+				}
 			</div>
 			<PostMedia post={post}/>
 			{templateTagArr && templateTagArr.length &&

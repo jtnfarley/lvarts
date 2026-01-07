@@ -24,7 +24,7 @@ export default function PostUi(props:{postData:Post, user:User, googleMapsApiKey
 				}
 			</div>
 
-			<div key={post.id} className="flex flex-col gap-2 border-1 border-gray-4 rounded-2xl bg-white">
+			<div key={post.id} className="rounded-box">
 				<PostHeader postData={post} user={user} currentUserPost={currentUserPost}/>
 				<PostContent post={post} googleMapsApiKey={props.googleMapsApiKey}/>
 				<div className='grid grid-flow-col grid-rows-1 px-4 py-4'>

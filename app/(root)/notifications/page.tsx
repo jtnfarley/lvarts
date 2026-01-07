@@ -26,7 +26,7 @@ export default async function Notifications() {
 	const userId = user?.id
 
 	return (
-		<div>
+		<div className='rounded-box'>
 			<NotificationsFeed user={user} getUser={getUser}/>
 		</div>
 	);
