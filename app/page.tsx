@@ -1,5 +1,6 @@
 "use client"
 
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -80,6 +81,9 @@ export default function SignIn() {
                 </div>
                 <div className='flex justify-center mt-10'>
                     <button onClick={() => setUpModal()} className="text-primary">What is this?</button>
+                </div>
+                <div className='flex justify-center mt-5'>
+                    <Link href='/calendar' className="text-primary">Lehigh Valley Events Calendar</Link>
                 </div>
             </div>
         </div>
