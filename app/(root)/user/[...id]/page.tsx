@@ -66,7 +66,10 @@ export default function UserProfile() {
 									<div className="mb-4 flex">
 										<img src={avatarUrl || '/images/melty-man.png'} className='w-[50px] h-[50px] me-3'/>
 										<div className='font-bold text-2xl'>{singleUser.displayName}</div>
-										<Follow followUserId={singleUser.userId} user={user}/>
+										{
+											user.id !== singleUser.userId &&
+												<Follow followUserId={singleUser.userId} user={user}/>
+										}
 									</div>
 									<div className="mb-4">
 										{singleUser.bio}
