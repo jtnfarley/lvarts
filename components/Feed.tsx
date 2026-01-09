@@ -59,7 +59,7 @@ export default function Feed(props:{user:User, getUser:Function, googleMapsApiKe
 		
 		const feedArr = await getFeedArr(userfromServer);
 		lastCheckedRef.current = new Date();
-console.log(feedArr)
+
 		if (feedArr && feedArr.length) {
 			queuedPostsRef.current = [...feedArr, ...queuedPostsRef.current]
 			setHasQueuedPosts(true)
