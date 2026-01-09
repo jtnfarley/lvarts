@@ -385,6 +385,9 @@ export const getEvents = async ():Promise<Array<Post>> => {
     const posts:Array<Post> = await prisma.posts.findMany({
         where: {
             postType: 'event',
+            eventDate: {
+                gt: new Date()
+            }
         },
         include,
         orderBy: {
