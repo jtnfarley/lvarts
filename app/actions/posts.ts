@@ -394,3 +394,23 @@ export const getEvents = async ():Promise<Array<Post>> => {
 
     return posts
 }
+
+export const getUserPosts = async (userId:string):Promise<Array<Post>> => {
+    const posts:Array<Post> = await prisma.posts.findMany({
+        where: {
+            userId: userId,
+            postType: {
+                not: 'chat'
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        },
+        include: {
+            userDetails: true
+        },
+        take: 40
+    })
+
+    return posts
+}

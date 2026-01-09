@@ -15,7 +15,6 @@ import PostUi from '@/components/PostUi/PostUi';
 import Post from '@/lib/models/post';
 
 export default function UserProfile() {
-
 	const params = useParams<{id:string}>();
 	const { data: session, status } = useSession();
 	const [user, setUser] = useState<User>();
