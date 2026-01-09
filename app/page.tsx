@@ -11,7 +11,6 @@ import { useModal } from '@/app/contextProviders/modalProvider'
  
 export default function SignIn() {
     const [error, setError] = useState<string | undefined>();
-    const [open, setOpen] = useState<boolean>(false);
     const { data: session, status } = useSession();
     const {
             setIsOpen, 
@@ -80,10 +79,10 @@ export default function SignIn() {
                     }
                 </div>
                 <div className='flex justify-center mt-10'>
-                    <button onClick={() => setUpModal()} className="text-primary">What is this?</button>
+                    <button onClick={() => setUpModal()} className="text-white cursor-pointer">What is this?</button>
                 </div>
                 <div className='flex justify-center mt-5'>
-                    <Link href='/calendar' className="text-primary">Lehigh Valley Events Calendar</Link>
+                    <Link href='/calendar' className="text-white">Lehigh Valley Events Calendar</Link>
                 </div>
             </div>
         </div>
