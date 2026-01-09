@@ -75,6 +75,7 @@ export default function UserProfile() {
 										{singleUser.bio}
 									</div>
 									<div className='flex justify-between text-sm uppercase'>
+										<div>Posts: <strong>{singleUser.postIds?.length || 0}</strong></div>
 										<div>Followers: <strong>{singleUser.followers.length || 0}</strong></div>
 										<div>Following: <strong>{singleUser.following.length || 0}</strong></div>
 									</div>
