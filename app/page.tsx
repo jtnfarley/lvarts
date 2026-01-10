@@ -35,11 +35,25 @@ export default function SignIn() {
         signIn(provider, options);
     }
 
-    const setUpModal = () => {
+    const setUpAboutModal = () => {
 		setIsOpen(true);
         setTitle('What this is:');
         setType('GenericModal');  
         setMessage(`Lehigh Valley Art & Music is a gathering place to promote and discover the thriving Lehigh Valley art scene. It is our little slice of the social media universe not controlled by sociopathic billionaires hellbent on sowing division and poisoning the social order. If you're not a troll bot, please join us. Promote your show. Display your work. Find your new favorite band. Post your Musikfest schedule. Engage and collaborate.`);
+	}
+
+    const setUpPrivacyModal = () => {
+		setIsOpen(true);
+        setTitle('Privacy Policy');
+        setType('GenericModal');  
+        setMessage(`This is run by a guy in Whitehall who has no interest in selling your data. With that said, this is a public website, and the Internet is overrun with bad actors. There's always a chance your data will leak out. Fortunately we don't store a lot of personal data. Just your name, email and your Google avatar, if you have one, but that's all mostly public anyway.`);
+	}
+
+     const setUpCookieModal = () => {
+		setIsOpen(true);
+        setTitle('Cookies! Mmmmmm');
+        setType('GenericModal');  
+        setMessage(`This site just uses functional cookies to keep you signed in. We don't use any tracking cookies or other such nonsense. You are not the product here.`);
 	}
 
     useEffect(() => {
@@ -50,7 +64,7 @@ export default function SignIn() {
 
     return (
         <div className="flex items-center justify-center h-screen">
-            <div className="gap-5 p-5 bg-gray-50/50 backdrop-blur-sm rounded-2xl">
+            <div className="gap-5 p-5 bg-gray-50/65 backdrop-blur-sm rounded-2xl">
                 <div className="flex justify-center">
                     <Image
                         src='/logos/lvarts-paths.svg'
@@ -79,10 +93,12 @@ export default function SignIn() {
                     }
                 </div>
                 <div className='flex justify-center mt-10'>
-                    <button onClick={() => setUpModal()} className="text-white cursor-pointer">What is this?</button>
+                    <Link href='/calendar' className="text-primary">Lehigh Valley Events Calendar</Link>
                 </div>
-                <div className='flex justify-center mt-5'>
-                    <Link href='/calendar' className="text-white">Lehigh Valley Events Calendar</Link>
+                <div className='flex justify-center mt-5 gap-5'>
+                    <button onClick={() => setUpAboutModal()} className="text-black cursor-pointer">What is this?</button>
+                    <button onClick={() => setUpPrivacyModal()} className="text-black cursor-pointer">Privacy Policy</button>
+                    <button onClick={() => setUpCookieModal()} className="text-black cursor-pointer">Cookie Policy</button>
                 </div>
             </div>
         </div>
