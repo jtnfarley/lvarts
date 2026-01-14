@@ -46,6 +46,9 @@ export const ModalRoot = () => {
                     isOpen={isOpen}
                     user={user!}
                     postId={actionData.postId!}
+                    postType={actionData.postType}
+                    eventTitle={actionData.eventTitle}
+                    eventDate={actionData.eventDate}
                 />
             }
         </>

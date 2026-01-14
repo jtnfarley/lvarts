@@ -25,6 +25,7 @@
     "html-react-parser": "^5.2.10",
     "input-otp": "^1.4.2",
     "lexical": "^0.38.2",
+    "lexical-beautiful-mentions": "^0.1.48",
     "lucide-react": "^0.540.0",
     "mongodb": "^6.19.0",
     "mongoose": "^8.17.1",

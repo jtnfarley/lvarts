@@ -20,6 +20,9 @@ type Context = {
     setAction:Function
     actionData: {
         postId?: string
+        postType?: string
+        eventTitle?: string
+        eventDate?: Date
     }
     setActionData:Function
     triggerAction:Function
@@ -43,7 +46,6 @@ export const ModalProvider = ({ children }: PropsWithChildren) => {
     const triggerAction = () => {
         switch (action) {
             case 'deleteThisPost':
-                console.log(actionData.postId)
                 if (actionData && actionData.postId) {
                     deleteThisPost(actionData.postId)
                 }

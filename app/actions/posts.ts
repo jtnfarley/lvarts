@@ -16,7 +16,6 @@ const include = {
 }
 
 export const getFeed = async (user:User, skip?:number, lastChecked?:Date):Promise<Array<Post>> => {
-    console.log(lastChecked, skip)
     const createdAt = (lastChecked && !skip) ? { gt: lastChecked } : undefined;
 
     const posts:Array<Post> = await prisma.posts.findMany({
@@ -192,7 +191,7 @@ export const savePost = async (postData:any) => {
 }
 
 export const editPost = async (postData:any) => {
-    const {content, lexical, postId} = postData
+    const {content, lexical, postId, eventTitle, eventDate} = postData
 
     const date = new Date()
     const updatedAt = date
@@ -204,12 +203,14 @@ export const editPost = async (postData:any) => {
         data: {
             content,
             lexical,
+            eventTitle: eventTitle || null,
+            eventDate: eventDate || null,
             edited: true,
             updatedAt
         }
     })
 
-    return post
+    // return post
 }
 
 export const likePost = async (postId:string, userId:string) => {

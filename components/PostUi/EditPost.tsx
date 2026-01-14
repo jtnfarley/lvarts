@@ -23,7 +23,12 @@ export default function EditPost(props:{postData:Post, user:User}) {
         setTitle('Edit Post');
         setType('EditPostModal');  
         setPostContent(post.lexical);
-		setActionData({postId: post.id});
+		setActionData({
+			postId: post.id, 
+			postType: post.postType, 
+			eventTitle: post.eventTitle, 
+			eventDate: post.eventDate
+		});
 		setUser(user);
 	}
 
