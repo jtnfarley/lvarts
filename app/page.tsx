@@ -39,7 +39,7 @@ export default function SignIn() {
 		setIsOpen(true);
         setTitle('What this is:');
         setType('GenericModal');  
-        setMessage(`Lehigh Valley Art & Music is a gathering place to promote and discover the thriving Lehigh Valley art scene. It is our little slice of the social media universe not controlled by sociopathic billionaires hellbent on sowing division and poisoning the social order. If you're not a troll bot, please join us. Promote your show. Display your work. Find your new favorite band. Post your Musikfest schedule. Engage and collaborate.`);
+        setMessage(`Lehigh Valley Art & Music is a gathering place to promote and discover the thriving Lehigh Valley art scene. It's like Twitter/X without sociopathic billionaires and Russian troll farms mucking it up. If you're not a troll bot, or a sociopathic billionaire, please join us. Promote your show. Display your work. Find your new favorite band. Post your Musikfest schedule. Engage and collaborate.`);
 	}
 
     const setUpPrivacyModal = () => {
