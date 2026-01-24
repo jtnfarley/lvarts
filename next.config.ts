@@ -8,7 +8,14 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    remotePatterns: [new URL('https://lvartsmusic-ny.b-cdn.net/**')],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lvartsmusic-ny.b-cdn.net',
+        port: '',
+        pathname: '**',
+      }
+    ],
   },
 };
 

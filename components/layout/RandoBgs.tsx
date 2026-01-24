@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import imageUrl from "@/constants/imageUrl";
 
 export default function RandoBgs() {
 	const [randoBg, setRandoBg] = useState<string>('');
@@ -38,7 +39,7 @@ export default function RandoBgs() {
 
 	const getRandoImage = () => {
 		const randoIndex = Math.floor(Math.random() * bgs.length);
-		setRandoBg(`/images/bgs/${bgs[randoIndex]}?v=${getRandoInt()}`);
+		setRandoBg(`${imageUrl}/assets/bgs/${bgs[randoIndex]}?v=${getRandoInt()}`);
 	}
 
 	const getRandoInt = ():number => {
