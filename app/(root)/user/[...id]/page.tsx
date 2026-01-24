@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { currentUser } from '@/app/actions/currentUser';
 import {APIProvider} from '@vis.gl/react-google-maps';
 import { getEnv } from '@/app/actions/getEnv';
-import { getUserDetails } from '@/app/actions/user';
+import { getUserDetailsWithPosts } from '@/app/actions/user';
 import UserDetails from '@/lib/models/userDetails';
 import Follow from '@/components/PostUi/Follow';
 import User from '@/lib/models/user';
@@ -33,7 +33,7 @@ export default function UserProfile() {
 		const gmk = await getEnv('GOOGLE_MAPS');
         setGoogleMapsApiKey(gmk);
 
-		const singleUser = await getUserDetails(params.id.toString())
+		const singleUser = await getUserDetailsWithPosts(params.id.toString())
 		if (!singleUser) return
 
 		setSingleUser(singleUser);
