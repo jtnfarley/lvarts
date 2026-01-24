@@ -10,11 +10,11 @@ import PostContent from './PostContent';
 import PostActions from './PostActions';
 
 export default function PostUi(props:{postData:Post, user:User, googleMapsApiKey:string | undefined}) {
-	const [post, setPost] = useState<Post>(props.postData)
-	const user = props.user
+	const post = props.postData;
+	const user = props.user;
 
-	const currentUserParentPost = (post.parentPost && post.parentPost.userId === user?.id)
-	const currentUserPost = (post.userId === user?.id)
+	const currentUserParentPost = (post.parentPost && post.parentPost.userId === user?.id);
+	const currentUserPost = (post.userId === user?.id);
 
     return (
 		<div>

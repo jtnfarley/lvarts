@@ -5,86 +5,108 @@ import Post from '@/lib/models/post';
 import User from '@/lib/models/user';
 import { useEffect, useRef, useState } from 'react';
 import PostUi from './PostUi/PostUi';
-import { getFeed } from '@/app/actions/posts';
 import { LoadOldPosts } from './PostUi/LoadOldPosts';
 import { BiRefresh } from "react-icons/bi";
 
-export default function Feed(props:{user:User, getUser:Function, googleMapsApiKey:string | undefined}) {
-	const [feed, setFeed] = useState<Array<Post>>();
-	const [renderKey, setRenderKey] = useState(0);
-	const [user, setUser] = useState<User|null>();
+export default function Feed(props:{feed:Post[], user:User, getNewPosts:Function, getOldPosts:Function, googleMapsApiKey:string | undefined}) {
+	const [feed, setFeed] = useState<Post[]>(props.feed);
+	const user = props.user;
+	const getNewPosts = props.getNewPosts;
+	const getOldPosts = props.getOldPosts;
+	const googleMapsApiKey = props.googleMapsApiKey;
 	const [hasQueuedPosts, setHasQueuedPosts] = useState(false);
 	const [endOfPosts, setEndOfPosts] = useState(false);
+	const [renderKey, setRenderKey] = useState(0);
 
 	const queuedPostsRef = useRef<Post[]>([]);
 	const updatingRef = useRef(false);
-	const tempFeedRef = useRef<Post[] | undefined>(undefined);
-	const lastCheckedRef = useRef<Date | undefined>(undefined);
-	const lastSkip = useRef<number>(0);
-
-	const getFeedArr = async (user:User, skip?:number):Promise<Array<Post> | undefined> => {
-        return await getFeed(user!, skip, lastCheckedRef.current)
-    }
+	const tempFeedRef = useRef<Post[]>(props.feed);
+	const lastCheckedRef = useRef<Date | undefined>(new Date());
 
 	const handlePostsUpdated = async (ev?:Event) => {
 		if (updatingRef.current) return //in case postsUpdated and the interval collide
+		
 		updatingRef.current = true
 
 		if (ev && ev instanceof CustomEvent && ev.detail) {
-			tempFeedRef.current = undefined;
-			lastCheckedRef.current = undefined;
+			if (ev.detail.action && ev.detail.action === 'delete') {
+				tempFeedRef.current = tempFeedRef.current.filter(post => post.id !== ev.detail.postId)
+			}
+
+			if (ev.detail.action && ev.detail.action === 'edit') {
+				tempFeedRef.current = []
+				lastCheckedRef.current = undefined
+			}
 		}
 
-		const userfromServer = await props.getUser()
-		setUser(userfromServer)
-		
-		const feedArr = await getFeedArr(userfromServer);
-		lastCheckedRef.current = new Date();
+		const newPosts = await getNewPosts(user, lastCheckedRef.current);
 
-		const tempFeed = tempFeedRef.current;
-		const newFeed = (feedArr && feedArr.length && tempFeed && tempFeed.length) ? [...feedArr, ...tempFeed] : (feedArr && feedArr.length) ? feedArr : tempFeed;
+		if (newPosts && newPosts.length) {
+			queuedPostsRef.current = [];
+			setHasQueuedPosts(false);
 
-		if (newFeed && newFeed.length) {
-			setFeed(newFeed)
-			lastSkip.current = newFeed.length;
-			tempFeedRef.current = newFeed
+			if (tempFeedRef.current && tempFeedRef.current.length) {
+				tempFeedRef.current = [...newPosts, ...tempFeedRef.current];
+			} else {
+				tempFeedRef.current = newPosts;
+			}
+
 			setRenderKey(prev => prev + 1)
 		}
-		updatingRef.current = false
-	}
 
-	const getNewPosts = async () => {
-		const userfromServer = await props.getUser()
-		setUser(userfromServer)
-		
-		const feedArr = await getFeedArr(userfromServer);
+		setFeed(tempFeedRef.current);
+
 		lastCheckedRef.current = new Date();
 
-		if (feedArr && feedArr.length) {
-			queuedPostsRef.current = [...feedArr, ...queuedPostsRef.current]
+		updatingRef.current = false
+
+		// const userfromServer = await props.getUser()
+		// setUser(userfromServer)
+		
+		// const feedArr = await getFeedArr(userfromServer);
+		// lastCheckedRef.current = new Date();
+
+		// const tempFeed = tempFeedRef.current;
+		// const newFeed = (feedArr && feedArr.length && tempFeed && tempFeed.length) ? [...feedArr, ...tempFeed] : (feedArr && feedArr.length) ? feedArr : tempFeed;
+
+		// if (newFeed && newFeed.length) {
+		// 	setFeed(newFeed)
+		// 	lastSkip.current = newFeed.length;
+		// 	tempFeedRef.current = newFeed
+		// 	setRenderKey(prev => prev + 1)
+		// }
+		// updatingRef.current = false
+	}
+
+	const getNewPostsFromServer = async () => {
+		
+		const newPosts = await getNewPosts(user, lastCheckedRef.current);
+		lastCheckedRef.current = new Date();
+
+		if (newPosts && newPosts.length && queuedPostsRef.current && queuedPostsRef.current.length) {
+			queuedPostsRef.current = [...newPosts, ...queuedPostsRef.current];
+			setHasQueuedPosts(true)
+		} else if (newPosts && newPosts.length) {
+			queuedPostsRef.current = newPosts;
 			setHasQueuedPosts(true)
 		}
 	}
 
 	const loadNewPosts = () => {
-		if (queuedPostsRef.current.length && feed) {
-			setFeed([...queuedPostsRef.current, ...feed])
+		if (queuedPostsRef.current.length && tempFeedRef.current && tempFeedRef.current.length) {
+			tempFeedRef.current = [...queuedPostsRef.current, ...tempFeedRef.current];
+			setFeed(tempFeedRef.current);
 			queuedPostsRef.current = [];
-			setHasQueuedPosts(false)
+			setHasQueuedPosts(false);
 		}
 	}
 
-	const getOldPosts = async () => {
-		const userfromServer = await props.getUser()
-		setUser(userfromServer)
-		
-		const feedArr = await getFeedArr(userfromServer, lastSkip.current);
+	const getOldPostsFromServer = async () => {
+		const oldPosts = await getOldPosts(user, feed.length);
 	
-		if (feedArr && feedArr.length && feed && feed.length) {
-			const feedJoined = [...feed, ...feedArr];
-			setFeed(feedJoined)
-			setHasQueuedPosts(true);
-			lastSkip.current = feedJoined.length;
+		if (oldPosts && oldPosts.length && tempFeedRef.current && tempFeedRef.current.length) {
+			tempFeedRef.current = [...tempFeedRef.current, ...oldPosts];
+			setFeed(tempFeedRef.current)
 		} else {
 			setEndOfPosts(true);
 		}
@@ -93,10 +115,8 @@ export default function Feed(props:{user:User, getUser:Function, googleMapsApiKe
 	useEffect(() => {
 		window.addEventListener("postsUpdated", handlePostsUpdated)
 
-		handlePostsUpdated()
-
 		const feedInterval = setInterval(() => {
-			getNewPosts();
+			getNewPostsFromServer();
 		}, 60000)
 
 		return () => {
@@ -107,7 +127,7 @@ export default function Feed(props:{user:User, getUser:Function, googleMapsApiKe
 
     return (
         <div className="flex flex-col gap-5 pb-5">
-			<APIProvider apiKey={props.googleMapsApiKey || ''}>
+			<APIProvider apiKey={googleMapsApiKey || ''}>
 				{
 					(hasQueuedPosts) && 
 						<div className='flex justify-center'>
@@ -122,10 +142,10 @@ export default function Feed(props:{user:User, getUser:Function, googleMapsApiKe
 				<>
                 	{feed.map((post:Post, index:number) => {
 						return (
-							<PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={user} googleMapsApiKey={props.googleMapsApiKey} />
+							<PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={user} googleMapsApiKey={googleMapsApiKey} />
 						)
 					})}
-					<LoadOldPosts getOldPosts={getOldPosts} endOfPosts={endOfPosts}/>
+					<LoadOldPosts getOldPosts={getOldPostsFromServer} endOfPosts={endOfPosts}/>
 				</>
 			}
 			</APIProvider>

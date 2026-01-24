@@ -15,32 +15,7 @@ const include = {
     }
 }
 
-export const getFeed = async (user:User, skip?:number, lastChecked?:Date):Promise<Array<Post>> => {
-    const createdAt = (lastChecked && !skip) ? { gt: lastChecked } : undefined;
 
-    const posts:Array<Post> = await prisma.posts.findMany({
-        where: {
-            OR: [
-                { userId: user?.id },
-                { userId: {
-                    in: user?.userDetails?.following
-                }},
-            ],
-            postType: {
-                not: 'chat'
-            },
-            createdAt
-        },
-        include,
-        orderBy: {
-            createdAt: 'desc'
-        },
-        take: 20,
-        skip: (skip) ? skip + 1 : 0
-    })
-
-    return posts
-}
 
 export const getPosts = async (queryString:string):Promise<Array<Post>> => {
     const posts:Array<Post> = await prisma.posts.findMany({
