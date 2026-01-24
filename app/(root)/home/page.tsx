@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description: 'Where the good stuff is',
 };
 
-export const getInitFeed = async (user:User):Promise<Array<Post>> => {
+const getInitFeed = async (user:User):Promise<Array<Post>> => {
 	const posts:Array<Post> = await prisma.posts.findMany({
 		where: {
 			OR: [
@@ -45,7 +45,7 @@ export const getInitFeed = async (user:User):Promise<Array<Post>> => {
 	return posts
 }
 
-export const getNewPosts = async (user:User, lastChecked:Date):Promise<Array<Post>> => {
+const getNewPosts = async (user:User, lastChecked:Date):Promise<Array<Post>> => {
 	'use server'
 
 	const posts:Array<Post> = await prisma.posts.findMany({
@@ -79,7 +79,7 @@ export const getNewPosts = async (user:User, lastChecked:Date):Promise<Array<Pos
 	return posts
 }
 
-export const getOldPosts = async (user:User, skip?:number):Promise<Array<Post>> => {
+const getOldPosts = async (user:User, skip?:number):Promise<Array<Post>> => {
 	'use server'
 
 	const posts:Array<Post> = await prisma.posts.findMany({
