@@ -1,67 +1,158 @@
-'use client'
-
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { useSession } from "next-auth/react";
-import {APIProvider} from '@vis.gl/react-google-maps';
-import { getEnv } from '@/app/actions/getEnv';
 import { currentUser } from '@/app/actions/currentUser';
 import AddPostForm from "@/components/forms/AddPostForm"
 import CommentFeed from "@/components/Comments/CommentFeed";
-import { getPost } from '@/app/actions/posts';
-import { useEffect, useState } from 'react';
-import User from '@/lib/models/user';
-import Post from '@/lib/models/post';
-import PostUi from '@/components/PostUi/PostUi';
+import SinglePost from '@/components/SinglePost';
+import { redirect } from 'next/navigation';
+import { prisma } from '@/prisma';
 
-export default function SinglePost() {
-    const [user, setUser] = useState<User | undefined>()
-    const [post, setPost] = useState<Post | undefined>()
-    const [googleMapsApiKey, setGoogleMapsApiKey] = useState<string | undefined>()
-    const params = useParams<{id:string}>();
-    const { data: session, status } = useSession();
+// import { useParams } from 'next/navigation';
+// import { useSession } from "next-auth/react";
+// import {APIProvider} from '@vis.gl/react-google-maps';
+// import { getEnv } from '@/app/actions/getEnv';
 
-    const getSinglePost = async () => {
-        const gmk = await getEnv('GOOGLE_MAPS');
-        setGoogleMapsApiKey(gmk);
 
-        const singlePost = await getPost(params.id.toString())
-        if (!singlePost) return
+// import { getPost } from '@/app/actions/posts';
+// import { useEffect, useState } from 'react';
+// import User from '@/lib/models/user';
+// import Post from '@/lib/models/post';
 
-        setPost(singlePost);
+const getPost = async (postId:string):Promise<any> => {
+    const post = await prisma.posts.findFirst({
+        where: {
+            id: postId
+        },
+        include: {
+            user:true,
+            userDetails: true,
+            parentPost: {
+                include: {
+                    userDetails: true
+                }
+            }
+        }
+    })
+
+    return post;
+}
+
+const getInitComments = async (postId:string):Promise<any> => {
+    const comments = await prisma.posts.findMany({
+        where: {
+            parentPostId:postId
+        },
+        include: {
+            user:true,
+            userDetails: true,
+            parentPost: {
+                include: {
+                    userDetails: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        },
+        take: 20
+    })
+
+    return comments;
+}
+
+const getNewComments = async (postId:string, lastChecked:Date):Promise<any> => {
+    'use server'
+    
+    const comments = await prisma.posts.findMany({
+        where: {
+            parentPostId:postId,
+            createdAt: { gt: lastChecked }
+        },
+        include: {
+            user:true,
+            userDetails: true,
+            parentPost: {
+                include: {
+                    userDetails: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
+    })
+
+    return comments;
+}
+
+const getOldComments = async (postId:string, skip?:number):Promise<any> => {
+    'use server'
+    
+    const comments = await prisma.posts.findMany({
+        where: {
+            parentPostId:postId
+        },
+        include: {
+            user:true,
+            userDetails: true,
+            parentPost: {
+                include: {
+                    userDetails: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        },
+        take: 20,
+        skip: (skip) ? skip + 1 : 0
+    })
+
+    return comments;
+}
+
+
+export default async function SinglePostPage({
+  params,
+}: {
+  params: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+    const { id } = await params;
+
+    const getUser = async () => {
+        'use server'
+        return await currentUser()
     }
 
-    const getCurrentUser = async () => {
-        const currUser = await currentUser()
-        // if (!currUser) return
+    const user = await getUser();
 
-        setUser(currUser);
+    if (!user) return redirect('/');
+
+    const googleMapsApiKey = process.env.GOOGLE_MAPS;
+
+    let post, comments;
+    
+    if (id) {
+        post = await getPost(id.toString());
+        comments = await getInitComments(id.toString());
     }
 
-    useEffect(() => {
-        if (status === 'authenticated') {
-            getCurrentUser()
-            getSinglePost()
-        }   
-    },[session])
+    if (!post) return redirect('/home');
 
 	return (
         <>
-        {(user && post) ?
-            googleMapsApiKey &&
-                <APIProvider apiKey={googleMapsApiKey || ''}>
-                        <div className='py-5 flex flex-col'>
-                            <div className='mb-4'>
-                                <PostUi postData={post} user={user} googleMapsApiKey={googleMapsApiKey} />
-                            </div>
-                            <div className='mt-2'>
-                                <AddPostForm user={user} postType='comment' edited={false} parentPostId={params.id.toString()}/>
-                            </div>
-                            <div>
-                                <CommentFeed parentPostId={params.id.toString()} user={user} googleMapsApiKey={googleMapsApiKey}/>
-                            </div>
-                        </div>
-                </APIProvider>
+        {(user) ?
+            (post && id && googleMapsApiKey) &&           
+                <div className='py-5 flex flex-col'>
+                    <div className='mb-4'>
+                        <SinglePost post={post} user={user} googleMapsApiKey={googleMapsApiKey} />
+                    </div>
+                    <div className='mt-2'>
+                        <AddPostForm user={user} postType='comment' edited={false} parentPostId={id.toString()}/>
+                    </div>
+                    <div>
+                        <CommentFeed comments={comments} parentPostId={id.toString()} user={user} getNewComments={getNewComments} getOldComments={getOldComments} googleMapsApiKey={googleMapsApiKey}/>
+                    </div>
+                </div>
                 :
                 <div className='rounded-box'>
                     <Link href={'/'} className='text-primary'>Log in to view full post</Link>

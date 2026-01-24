@@ -33,31 +33,6 @@ export const getPosts = async (queryString:string):Promise<Array<Post>> => {
     return posts
 }
 
-export const getPost = async (postId:string):Promise<any> => {
-    const post = await prisma.posts.findFirst({
-        where: {
-            id: postId
-        },
-        include
-    })
-
-    return post;
-}
-
-export const getComments = async (postId:string):Promise<any> => {
-    const comments = await prisma.posts.findMany({
-        where: {
-            parentPostId:postId
-        },
-        include,
-        orderBy: {
-            createdAt: 'desc'
-        }
-    })
-
-    return comments;
-}
-
 export const savePost = async (postData:any) => {
     const {
         content, 

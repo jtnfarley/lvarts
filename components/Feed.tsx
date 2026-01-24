@@ -59,23 +59,6 @@ export default function Feed(props:{feed:Post[], user:User, getNewPosts:Function
 		lastCheckedRef.current = new Date();
 
 		updatingRef.current = false
-
-		// const userfromServer = await props.getUser()
-		// setUser(userfromServer)
-		
-		// const feedArr = await getFeedArr(userfromServer);
-		// lastCheckedRef.current = new Date();
-
-		// const tempFeed = tempFeedRef.current;
-		// const newFeed = (feedArr && feedArr.length && tempFeed && tempFeed.length) ? [...feedArr, ...tempFeed] : (feedArr && feedArr.length) ? feedArr : tempFeed;
-
-		// if (newFeed && newFeed.length) {
-		// 	setFeed(newFeed)
-		// 	lastSkip.current = newFeed.length;
-		// 	tempFeedRef.current = newFeed
-		// 	setRenderKey(prev => prev + 1)
-		// }
-		// updatingRef.current = false
 	}
 
 	const getNewPostsFromServer = async () => {
