@@ -27,26 +27,6 @@ export const getUserDetails = async (userId:string) => {
     return userDetails
 }
 
-export const getRandoUsers = async (userId:string):Promise<UserDetails[]> => {
-    const userDetailsCount = await prisma.userDetails.count();
-    if (userDetailsCount) {
-        const skip = Math.floor(Math.random() * (userDetailsCount - 1)); //remove logged-in user
-        const userDetails = await prisma.userDetails.findMany({
-            // take: 5,
-            // skip: skip,
-            where: {
-                userId: {
-                    not: userId
-                }
-            }
-        });
-
-        return userDetails
-    }
-
-    return [];
-}
-
 export const updateUser = async ({
     id,
     userId,

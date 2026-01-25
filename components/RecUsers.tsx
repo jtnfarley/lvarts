@@ -1,20 +1,37 @@
-import { getRandoUsers } from "@/app/actions/user"
 import { currentUser } from '@/app/actions/currentUser';
 import UserCard from "./Cards/UserCard"
 import UserDetails from "@/lib/models/userDetails";
 import imageUrl from '@/constants/imageUrl';
+import { prisma } from '@/prisma';
+
+const getRandoUsers = async (userId:string):Promise<UserDetails[]> => {
+	'use server'
+	
+	const userDetailsCount = await prisma.userDetails.count();
+	if (userDetailsCount) {
+		const skip = Math.floor(Math.random() * (userDetailsCount - 1)); //remove logged-in user
+		const userDetails = await prisma.userDetails.findMany({
+			// take: 5,
+			// skip: skip,
+			where: {
+				userId: {
+					not: userId
+				}
+			}
+		});
+
+		return userDetails
+	}
+
+	return [];
+}
 
 export default async function RecUsers() {
 	const user = await currentUser()
 
 	if (!user) return null
-
-	const getRecUsers = async ():Promise<Array<UserDetails>> => {
-		'use server'
-		return await getRandoUsers(user.id)
-	}
 	
-	let recUsers:Array<UserDetails> = await getRecUsers()
+	let recUsers:Array<UserDetails> = await getRandoUsers(user.id)
 
 	return (
 		<section className="xl:bg-gray-50/70 xl:backdrop-blur-sm xl:rounded-3xl xl:p-5 lg:bg-none lg:p-0">
