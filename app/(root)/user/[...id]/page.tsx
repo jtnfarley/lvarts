@@ -1,99 +1,106 @@
-'use client'
-
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { useSession } from "next-auth/react";
 import { currentUser } from '@/app/actions/currentUser';
-import {APIProvider} from '@vis.gl/react-google-maps';
-import { getEnv } from '@/app/actions/getEnv';
-import { getUserDetailsWithPosts } from '@/app/actions/user';
 import UserDetails from '@/lib/models/userDetails';
-import Follow from '@/components/PostUi/Follow';
 import User from '@/lib/models/user';
-import imageUrl from '@/constants/imageUrl';
-import PostUi from '@/components/PostUi/PostUi';
 import Post from '@/lib/models/post';
+import { prisma } from '@/prisma';
+import { redirect } from 'next/navigation';
+import UserProfile from '@/components/UserProfile';
 
-export default function UserProfile() {
-	const params = useParams<{id:string}>();
-	const { data: session, status } = useSession();
-	const [user, setUser] = useState<User>();
-	const [singleUser, setSingleUser] = useState<UserDetails>();
-	const [avatarUrl, setAvatarUrl] = useState<string | undefined>();
-	const [posts, setPosts] = useState<Post[] | undefined>();
-	const [renderKey, setRenderKey] = useState(0);
-	const [googleMapsApiKey, setGoogleMapsApiKey] = useState<string | undefined>()
-
-	const getUser = async () => {
-		const user = await currentUser();
-		setUser(user);
-	}
-
-	const getSingleUser = async () => {
-		const gmk = await getEnv('GOOGLE_MAPS');
-        setGoogleMapsApiKey(gmk);
-
-		const singleUser = await getUserDetailsWithPosts(params.id.toString())
-		if (!singleUser) return
-
-		setSingleUser(singleUser);
-
-		if (singleUser.posts) {
-			setPosts(singleUser.posts);
+const getUserDetailsWithPosts = async (userId:string) => {
+	const userDetails = await prisma.userDetails.findFirst({
+		where: {
+			userId
+		},
+		include: {
+			posts: {
+				where: {
+					postType: {
+						not: 'chat'
+					}
+				},
+				include: {
+					parentPost:true,
+					userDetails: true
+				},
+				orderBy: {
+					createdAt: 'desc'
+				},
+				take: 20
+			}
 		}
-		const avatarUrlBase = imageUrl;
-    	const avatarUrlInit = singleUser && singleUser.avatar && singleUser.userDir ? `${avatarUrlBase}/${singleUser.userDir}/${singleUser.avatar}` : undefined;
-		setAvatarUrl(avatarUrlInit)
+	})
 
-		setRenderKey(prev => prev + 1)
-	}
+	return userDetails
+}
 
-	useEffect(() => {
-		if (status === 'authenticated') {
-			getSingleUser();
-			getUser();
-		}
-	}, [session])
+const getOldPosts = async (userId:string, skip?:number):Promise<Array<Post>> => {
+	'use server'
+
+	const posts:Array<Post> = await prisma.posts.findMany({
+		where: {
+			userId,
+			postType: {
+				not: 'chat'
+			}
+		},
+		include: {
+			user:true,
+			userDetails: true,
+			parentPost: {
+				include: {
+					userDetails: true
+				}
+			}
+		},
+		orderBy: {
+			createdAt: 'desc'
+		},
+		take: 20,
+		skip: (skip) ? skip + 1 : 0
+	})
+
+	return posts
+}
+
+export default async function UserProfilePage({
+  params,
+}: {
+  params: Promise<{ [key: string]: string }>;
+}) {
+	const {id} = await params;
+
+	const user = await currentUser();
+
+	if (!user) return redirect('/');
+
+	const userDetails = await getUserDetailsWithPosts(id.toString());
+
+	const googleMapsApiKey = process.env.GOOGLE_MAPS; //has to be handled on the server
+
+	// const getSingleUser = async () => {
+
+	// 	const singleUser = await getUserDetailsWithPosts(params.id.toString())
+	// 	if (!singleUser) return
+
+	// 	setSingleUser(singleUser);
+
+	// 	if (singleUser.posts) {
+	// 		setPosts(singleUser.posts);
+	// 	}
+	// 	const avatarUrlBase = imageUrl;
+    // 	const avatarUrlInit = singleUser && singleUser.avatar && singleUser.userDir ? `${avatarUrlBase}/${singleUser.userDir}/${singleUser.avatar}` : undefined;
+	// 	setAvatarUrl(avatarUrlInit)
+
+	// 	setRenderKey(prev => prev + 1)
+	// }
 
 	return (
 		<>
-            {googleMapsApiKey &&
-                <APIProvider apiKey={googleMapsApiKey || ''}>
-					<div className='pb-5'>
-						<div className="lg:bg-white lg:rounded-xl lg:p-5 sm:bg-none sm:p-0 mt-5 mb-5">
-							{singleUser && user && 
-								<section className="flex flex-col justify-between min-h-50">
-									<div className="mb-4 flex">
-										<img src={avatarUrl || '/images/melty-man.png'} className='w-[50px] h-[50px] me-3'/>
-										<div className='font-bold text-2xl'>{singleUser.displayName}</div>
-										{
-											user.id !== singleUser.userId &&
-												<Follow followUserId={singleUser.userId} user={user}/>
-										}
-									</div>
-									<div className="mb-4">
-										{singleUser.bio}
-									</div>
-									<div className='flex justify-between text-sm uppercase'>
-										<div>Posts: <strong>{singleUser.postIds?.length || 0}</strong></div>
-										<div>Followers: <strong>{singleUser.followers.length || 0}</strong></div>
-										<div>Following: <strong>{singleUser.following.length || 0}</strong></div>
-									</div>
-								</section>
-							}
-						</div>
-
-						{singleUser && user && posts &&
-							<div className='flex flex-col gap-5'>
-								{posts.map((post:Post, index:number) => {
-									return (
-										<PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={user} googleMapsApiKey={googleMapsApiKey} />
-									)
-								})}
-							</div>
-						}
-					</div>
-				</APIProvider>
+            {
+			googleMapsApiKey && user && userDetails &&
+				<div className='pb-5'>
+					<UserProfile currentUser={user} userDetails={userDetails} getOldPosts={getOldPosts} googleMapsApiKey={googleMapsApiKey}/>
+				</div>
 			}
 		</>
 	);

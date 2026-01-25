@@ -27,27 +27,6 @@ export const getUserDetails = async (userId:string) => {
     return userDetails
 }
 
-export const getUserDetailsWithPosts = async (userId:string) => {
-    const userDetails = await prisma.userDetails.findFirst({
-        where: {
-            userId
-        },
-        include: {
-            posts: {
-                include: {
-                    parentPost:true,
-                    userDetails: true
-                },
-                orderBy: {
-                    createdAt: 'desc'
-                },
-            }
-        }
-    })
-
-    return userDetails
-}
-
 export const getRandoUsers = async (userId:string):Promise<UserDetails[]> => {
     const userDetailsCount = await prisma.userDetails.count();
     if (userDetailsCount) {

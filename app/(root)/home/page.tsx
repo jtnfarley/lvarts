@@ -114,12 +114,7 @@ const getOldPosts = async (user:User, skip?:number):Promise<Array<Post>> => {
 }
 
 export default async function Home() {
-	const getUser = async () => {
-		'use server'
-		return await currentUser()
-	}
-
-	const user = await getUser();
+	const user = await currentUser();
 
 	if (!user) return redirect('/');
 	
@@ -130,8 +125,6 @@ export default async function Home() {
 	const feed = await getInitFeed(user)
 
 	const googleMapsApiKey = process.env.GOOGLE_MAPS; //has to be handled on the server
-
-	const userId = user?.id
 
 	return (
 		<div>
