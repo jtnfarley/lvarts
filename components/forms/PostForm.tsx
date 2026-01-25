@@ -9,6 +9,7 @@ import { InitialEditorStateType } from "lexical";
 import uploadFile from "@/app/actions/fileUploader";
 import User from "@/lib/models/user";
 import MediaUpload from "@/components/PostUi/MediaUpload"
+import { compressImage } from "@/lib/utils";
 
 interface Props {
     savePost:Function,
@@ -18,6 +19,12 @@ interface Props {
     parentPostId?:string,
     content?:InitialEditorStateType,
     postId?:string
+}
+
+interface OptimizedFile {
+    name:string,
+    type:string, 
+    url:string
 }
 
 const PostValidation = z.object({
@@ -36,7 +43,7 @@ const PostValidation = z.object({
 
 const PostForm = ({user, postType, edited, postId, parentPostId, savePost, content}: Props) => {
     const [clearEditor, setClearEditor] = useState(false);
-    const [tempImage, setTempImage] = useState<File | undefined>();
+    const [tempImage, setTempImage] = useState<OptimizedFile | undefined>();
     const editorRef: any = useRef(null);
 
     const { register, handleSubmit, setValue, control, reset, formState: { errors, isSubmitSuccessful } } = useForm<z.infer<typeof PostValidation>>({
@@ -76,8 +83,10 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
         if (user && user.userDetails)
             userDir = user.userDetails.userDir;
 
-        if (values.postFileObj.name && userDir) {
-            const file = values.postFileObj;
+        if (tempImage && userDir) {
+            const res = await fetch(tempImage.url);
+            const blob = await res.blob();
+            const file = new File([blob], tempImage.name, {type: tempImage.type})
             const formData = new FormData();
             formData.append('file', file);
             formData.append('userDir', userDir);
@@ -105,9 +114,29 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
         setTempImage(undefined);
     }
 
-    const setTempFile = (file:File) => {
+    const setTempFile = async (file:File) => {
         if (file) {
-            setTempImage(file);
+            const fileObj:OptimizedFile = {
+                name: '',
+                type:'',
+                url:''
+            };
+
+            let fileUrl;
+
+            if (file.type.match(/image/)) {
+                fileUrl = await compressImage(file);
+                fileObj.type = 'image/png';
+                fileObj.name = file.name.split('.')[0] +'.png';
+            } else if (file.type.match(/audio/)){
+                fileUrl = URL.createObjectURL(file);
+                fileObj.type = file.type;
+                fileObj.name = file.name;
+            }
+
+            fileObj.url = fileUrl || '';
+
+            setTempImage(fileObj);
         }
     }
 
@@ -140,10 +169,13 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
                     )}
                 />
                 {tempImage && (
-                    (tempImage.type.match(/audio/)) ?
-                        <audio src={URL.createObjectURL(tempImage)} controls/>
-                        :
-                        <img src={URL.createObjectURL(tempImage)}/>
+                    <div className="flex justify-center">
+                        { (tempImage.type.match(/audio/)) ?
+                            <audio src={tempImage.url} controls/>
+                            :
+                            <img src={tempImage.url}/>
+                        }
+                    </div>
                 )
                 }
 
