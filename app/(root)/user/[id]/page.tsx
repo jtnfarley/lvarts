@@ -1,10 +1,9 @@
-import { currentUser } from '@/app/actions/currentUser';
-import UserDetails from '@/lib/models/userDetails';
-import User from '@/lib/models/user';
 import Post from '@/lib/models/post';
 import { prisma } from '@/prisma';
 import { redirect } from 'next/navigation';
 import UserProfile from '@/components/UserProfile';
+import { auth } from '@/auth';
+import User from '@/lib/models/user';
 
 const getUserDetailsWithPosts = async (userId:string) => {
 	const userDetails = await prisma.userDetails.findFirst({
@@ -69,30 +68,18 @@ export default async function UserProfilePage({
 }) {
 	const {id} = await params;
 
-	const user = await currentUser();
+	const session = await auth();
+	let user;
 
-	if (!user) return redirect('/');
+	if (!session?.user || !session?.user?.id) {
+		return redirect('/');
+	} else {
+		user = session.user as User;
+	}
 
 	const userDetails = await getUserDetailsWithPosts(id.toString());
 
 	const googleMapsApiKey = process.env.GOOGLE_MAPS; //has to be handled on the server
-
-	// const getSingleUser = async () => {
-
-	// 	const singleUser = await getUserDetailsWithPosts(params.id.toString())
-	// 	if (!singleUser) return
-
-	// 	setSingleUser(singleUser);
-
-	// 	if (singleUser.posts) {
-	// 		setPosts(singleUser.posts);
-	// 	}
-	// 	const avatarUrlBase = imageUrl;
-    // 	const avatarUrlInit = singleUser && singleUser.avatar && singleUser.userDir ? `${avatarUrlBase}/${singleUser.userDir}/${singleUser.avatar}` : undefined;
-	// 	setAvatarUrl(avatarUrlInit)
-
-	// 	setRenderKey(prev => prev + 1)
-	// }
 
 	return (
 		<>

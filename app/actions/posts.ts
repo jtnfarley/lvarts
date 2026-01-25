@@ -2,36 +2,6 @@
 
 import {prisma} from '@/lib/db/prisma';
 import { Prisma } from '@prisma/client';
-import User from '@/lib/models/user';
-import Post from '@/lib/models/post';
-
-const include = {
-    user:true,
-    userDetails: true,
-    parentPost: {
-        include: {
-            userDetails: true
-        }
-    }
-}
-
-
-
-export const getPosts = async (queryString:string):Promise<Array<Post>> => {
-    const posts:Array<Post> = await prisma.posts.findMany({
-        where: {
-            content: {
-                contains: queryString
-            }
-        },
-        include,
-        orderBy: {
-            createdAt: 'desc'
-        }
-    })
-
-    return posts
-}
 
 export const savePost = async (postData:any) => {
     const {
@@ -203,7 +173,7 @@ export const likePost = async (postId:string, userId:string) => {
     })
 
     if (userDetails && userId !== post.userId) {
-        const noti = await prisma.notifications.create({
+        await prisma.notifications.create({
             data: {
                 createdAt: new Date(),
                 type: 'like',
@@ -330,24 +300,4 @@ export const deletePost = async (postId:string) => {
     }
 
     return deletedPost
-}
-
-export const getUserPosts = async (userId:string):Promise<Array<Post>> => {
-    const posts:Array<Post> = await prisma.posts.findMany({
-        where: {
-            userId: userId,
-            postType: {
-                not: 'chat'
-            }
-        },
-        orderBy: {
-            createdAt: 'desc'
-        },
-        include: {
-            userDetails: true
-        },
-        take: 40
-    })
-
-    return posts
 }

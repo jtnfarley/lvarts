@@ -1,12 +1,14 @@
 import Link from 'next/link';
 
-import { currentUser } from '@/app/actions/currentUser';
+import { auth } from '@/auth';
 import Events from "@/components/Events";
 import { BiCalendarPlus } from "react-icons/bi";
 
 import type { Metadata } from 'next';
 import { prisma } from '@/prisma';
 import Post from '@/lib/models/post';
+import { redirect } from 'next/navigation';
+import User from '@/lib/models/user';
 
 export const metadata: Metadata = {
   title: 'Event Calendar - Lehigh Vally Art & Music',
@@ -39,12 +41,12 @@ const getEvents = async ():Promise<Array<Post>> => {
 }
 
 export default async function Calendar() {
-	const getUser = async () => {
-		'use server'
-		return await currentUser()
-	}
+	const session = await auth();
+	let user;
 
-	const user = await getUser();
+	if (session?.user && session?.user?.id) {
+		user = session.user as User;
+	}
 
 	const googleMapsApiKey = process.env.GOOGLE_MAPS; //has to be handled on the server
 

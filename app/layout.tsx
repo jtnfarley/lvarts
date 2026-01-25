@@ -20,7 +20,7 @@ export default async function RootLayout({
 }>) {
 
 	return (
-		<SessionWrapper>
+		// <SessionWrapper>
 			<ModalProvider>
 				<html lang="en">
 					<head>
@@ -38,6 +38,6 @@ export default async function RootLayout({
 					</body>
 				</html>
 			</ModalProvider>
-		</SessionWrapper>
+		// </SessionWrapper>
 	);
 }

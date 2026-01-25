@@ -1,10 +1,11 @@
 import Link from 'next/link';
-import { currentUser } from '@/app/actions/currentUser';
 import AddPostForm from "@/components/forms/AddPostForm"
 import CommentFeed from "@/components/Comments/CommentFeed";
 import SinglePost from '@/components/SinglePost';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/prisma';
+import { auth } from '@/auth';
+import User from '@/lib/models/user';
 
 // import { useParams } from 'next/navigation';
 // import { useSession } from "next-auth/react";
@@ -20,7 +21,10 @@ import { prisma } from '@/prisma';
 const getPost = async (postId:string):Promise<any> => {
     const post = await prisma.posts.findFirst({
         where: {
-            id: postId
+            id: postId,
+            postType: {
+				not: 'chat'
+			}
         },
         include: {
             user:true,
@@ -39,7 +43,10 @@ const getPost = async (postId:string):Promise<any> => {
 const getInitComments = async (postId:string):Promise<any> => {
     const comments = await prisma.posts.findMany({
         where: {
-            parentPostId:postId
+            parentPostId:postId,
+            postType: {
+				not: 'chat'
+			}
         },
         include: {
             user:true,
@@ -65,7 +72,10 @@ const getNewComments = async (postId:string, lastChecked:Date):Promise<any> => {
     const comments = await prisma.posts.findMany({
         where: {
             parentPostId:postId,
-            createdAt: { gt: lastChecked }
+            createdAt: { gt: lastChecked },
+            postType: {
+				not: 'chat'
+			}
         },
         include: {
             user:true,
@@ -89,7 +99,10 @@ const getOldComments = async (postId:string, skip?:number):Promise<any> => {
     
     const comments = await prisma.posts.findMany({
         where: {
-            parentPostId:postId
+            parentPostId:postId,
+            postType: {
+				not: 'chat'
+			}
         },
         include: {
             user:true,
@@ -116,16 +129,16 @@ export default async function SinglePostPage({
 }: {
   params: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-    const { id } = await params;
+    const session = await auth();
+    let user;
 
-    const getUser = async () => {
-        'use server'
-        return await currentUser()
+    if (!session?.user || !session?.user?.id) {
+        return redirect('/');
+    } else {
+        user = session.user as User;
     }
 
-    const user = await getUser();
-
-    if (!user) return redirect('/');
+    const { id } = await params;
 
     const googleMapsApiKey = process.env.GOOGLE_MAPS;
 

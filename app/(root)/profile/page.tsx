@@ -1,11 +1,17 @@
 import { redirect } from 'next/navigation';
-import { currentUser } from '@/app/actions/currentUser';
 import AccountInfo from '@/components/forms/AccountInfo';
+import { auth } from '@/auth';
+import User from '@/lib/models/user';
 
 export default async function Profile() {
-	const user = await currentUser();
+	const session = await auth();
+	let user;
 
-	if (!user) return redirect('/');
+	if (!session?.user || !session?.user?.id) {
+		return redirect('/');
+	} else {
+		user = session.user as User;
+	}
 
 	return (
 		<div className='flex flex-col gap-5'>

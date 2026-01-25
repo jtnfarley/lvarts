@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useRef, useState } from 'react';
 import {APIProvider} from '@vis.gl/react-google-maps';
 import UserDetails from '@/lib/models/userDetails';
 import Follow from '@/components/PostUi/Follow';
@@ -25,30 +24,11 @@ export default function UserProfile(props:{currentUser:User, userDetails:UserDet
 		if (oldPosts && oldPosts.length && tempFeedRef.current && tempFeedRef.current.length) {
 			tempFeedRef.current = [...tempFeedRef.current, ...oldPosts];
 			setPosts(tempFeedRef.current)
+			setRenderKey(prev => prev + 1)
 		} else {
 			setEndOfPosts(true);
 		}
 	}
-
-
-	// const getSingleUser = async () => {
-	// 	const gmk = await getEnv('GOOGLE_MAPS');
-    //     setGoogleMapsApiKey(gmk);
-
-	// 	const singleUser = await getUserDetailsWithPosts(params.id.toString())
-	// 	if (!singleUser) return
-
-	// 	setSingleUser(singleUser);
-
-	// 	if (singleUser.posts) {
-	// 		setPosts(singleUser.posts);
-	// 	}
-	// 	const avatarUrlBase = imageUrl;
-    // 	const avatarUrlInit = singleUser && singleUser.avatar && singleUser.userDir ? `${avatarUrlBase}/${singleUser.userDir}/${singleUser.avatar}` : undefined;
-	// 	setAvatarUrl(avatarUrlInit)
-
-	// 	setRenderKey(prev => prev + 1)
-	// }
 
 	return (
 		<>

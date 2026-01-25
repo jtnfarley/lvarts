@@ -17,16 +17,6 @@ interface FollowUserParams {
     toFollowId: string
 }
 
-export const getUserDetails = async (userId:string) => {
-    const userDetails = await prisma.userDetails.findFirst({
-        where: {
-            userId
-        }
-    })
-
-    return userDetails
-}
-
 export const updateUser = async ({
     id,
     userId,

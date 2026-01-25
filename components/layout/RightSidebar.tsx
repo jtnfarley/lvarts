@@ -1,10 +1,16 @@
-import { currentUser } from '@/app/actions/currentUser';
 import RecUsers from '../RecUsers';
+import { auth } from '@/auth';
+import User from '@/lib/models/user';
 
 export default async function RightSidebar() {
-	const user = await currentUser()
+	const session = await auth();
+	let user;
 
-	if (!user) return null
+	if (!session?.user || !session?.user?.id) {
+		return null;
+	} else {
+		user = session.user as User;
+	}
 
 	return (
 		<section className="custom-scrollbar rightsidebar">

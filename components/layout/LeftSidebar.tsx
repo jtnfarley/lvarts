@@ -1,15 +1,18 @@
-import { currentUser } from '@/app/actions/currentUser';
 import Link from "next/link"
 import Image from "next/image"
 
 import SignOut from '@/components/auth/buttons/SignOut';
 import Nav from "./Nav";
+import { auth } from "@/auth";
+import User from "@/lib/models/user";
 
 export default async function LeftSidebar() {
-	// const pathname = usePathname()
-	const user = await currentUser()
+	const session = await auth();
+	let user;
 
-	const userId = user?.id
+	if (session?.user && session?.user?.id) {
+		user = session.user as User;
+	}
 
 	return (
 		<section className="leftsidebar custom-scrollbar justify-between">
@@ -29,9 +32,7 @@ export default async function LeftSidebar() {
                 </Link>
 				<div className='ms-3 uppercase'>beta version 0.1.0</div>
 				<div className='mt-4'>
-					{user && 
-						<Nav user={user}/>
-					}
+					<Nav user={user}/>
 				</div>
 			</div>
 			<div className='flex flex-col items-end pe-10'>

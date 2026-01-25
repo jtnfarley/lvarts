@@ -57,6 +57,22 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 				if (fullLink.match(/giphy/)) {
 					placeholder = placeholder.slice(0, indexA)
 				} else {
+					let linkText, linkLength, linkIndex;
+
+					if (fullLink.match(/http:/)) {
+						linkIndex = placeholder.indexOf('http://',editorLinks[i].index);
+						linkLength = placeholder.substring(linkIndex, placeholder.indexOf('</span>',linkIndex)).length;
+						linkText = placeholder.slice(linkIndex);
+						linkText = linkText.slice(0, linkText.indexOf('</span>'))
+						linkText = linkText.substring(7,30)+'...'
+					} else {
+						linkIndex = placeholder.indexOf('https://',editorLinks[i].index);
+						linkLength = placeholder.substring(linkIndex, placeholder.indexOf('</span>',linkIndex)).length;
+						linkText = placeholder.slice(linkIndex);
+						linkText = linkText.slice(0, linkText.indexOf('</span>'))
+						linkText = linkText.substring(8,30)+'...'
+					}
+					placeholder = `${placeholder.slice(0, linkIndex)}${linkText}${placeholder.slice(linkIndex + linkLength)}`
 					placeholder = placeholder.slice(0, placeholder.indexOf('>',editorLinks[i].index)) + " target='_blank'" + placeholder.slice(placeholder.indexOf('>',editorLinks[i].index)) 
 				}
 			}
