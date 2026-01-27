@@ -1,5 +1,6 @@
 'use client'
 
+import Link from "next/link"
 import Post from '@/lib/models/post';
 import User from '@/lib/models/user';
 import imageUrl from '@/constants/imageUrl';
@@ -18,7 +19,7 @@ export default function PostHeader(props:{postData:Post, user:User, currentUserP
 			<div className='flex flex-row gap-3'>
 				<div><img src={avatar} className='rounded-full w-[50px] h-[50px]'/></div>
 				<div>
-					<div className='text-sm font-bold'><a href={`/user/${post.user?.id}`} title={`${post.userDetails?.displayName}'s profile`}>{post.userDetails?.displayName}</a></div>
+					<div className='text-sm font-bold'><Link href={`/user/${post.user?.id}`} title={`${post.userDetails?.displayName}'s profile`}>{post.userDetails?.displayName}</Link></div>
 					<div className='text-[10px]'>{post.createdAt.toDateString()}</div>
 				</div>
 			</div>
