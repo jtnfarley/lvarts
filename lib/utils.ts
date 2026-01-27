@@ -37,8 +37,10 @@ export const formatDate = (date:Date | null | undefined):string => {
 	`
 }
 
-export const compressImage = (file:File, maxWidth = 800, maxHeight = 600, quality = 0.7):Promise<string | undefined> => {
+export const compressImage = (file:File, maxWidth = 800, maxHeight = 600):Promise<string | undefined> => {
 	return new Promise((resolve, reject) => {
+		
+		const quality = 1;
 		const img = new Image();
 		const reader = new FileReader();
 
@@ -54,6 +56,11 @@ export const compressImage = (file:File, maxWidth = 800, maxHeight = 600, qualit
 		img.onload = () => {
 			const canvas = document.createElement('canvas');
 			const ctx = canvas.getContext('2d');
+
+			if (img.height > img.width) {
+				maxHeight = maxWidth;
+				maxWidth = maxHeight;
+			}
 
 			const ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
 			canvas.width = img.width * ratio;

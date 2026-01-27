@@ -11,7 +11,9 @@ import { useState } from "react";
 import uploadFile from "@/app/actions/fileUploader";
 import { getRandomString } from "@/lib/utils";
 import imageUrl from '@/constants/imageUrl';
-// import { generateCodes } from '@/app/actions/invitationCodes';
+import { compressImage } from "@/lib/utils";
+import OptimizedFile from "@/lib/models/optimizedFile";
+import { Spinner } from "../layout/Spinner"
 
 
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
@@ -32,6 +34,8 @@ const AccountInfo = (props:{user: User}) => {
         )
     }
 
+    const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [tempImage, setTempImage] = useState<OptimizedFile | undefined>();
     const avatarUrlBase = imageUrl;
     const avatarUrlInit = user.userDetails && user.userDetails.avatar && user.userDetails.userDir ? `${avatarUrlBase}/${user.userDetails.userDir}/${user.userDetails.avatar}` : undefined
 
@@ -54,14 +58,40 @@ const AccountInfo = (props:{user: User}) => {
         setAvatarUrl(`${avatarUrlBase}/${userDir}/${file.name}`);
     }
 
+    const setTempFile = async (file:File | undefined) => {
+        if (file) {
+            const fileObj:OptimizedFile = {
+                name: '',
+                type:'',
+                url:''
+            };
+
+            let fileUrl;
+
+            if (file.type.match(/image/)) {
+                fileUrl = await compressImage(file, 100, 100);
+                fileObj.type = 'image/png';
+                fileObj.name = file.name.split('.')[0] +'.png';
+            } 
+
+            fileObj.url = fileUrl || '';
+
+            setAvatarUrl('');
+            setTempImage(fileObj);
+        }
+    }
+
     const onSubmit = async (values: z.infer<typeof UserValidation>) => {
+        setIsSaving(true);
         let id = user.userDetails?.id;
         let userDir = user.userDetails?.userDir || getRandomString(10);
         let avatarUrl = user.userDetails?.avatar || undefined;
 
         try {
-            if (values.avatar.name) {
-                const file = values.avatar;
+            if (tempImage && userDir) {
+                const res = await fetch(tempImage.url);
+                const blob = await res.blob();
+                const file = new File([blob], tempImage.name, {type: tempImage.type})
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('userDir', userDir);
@@ -90,6 +120,8 @@ const AccountInfo = (props:{user: User}) => {
         } catch (error) {
             console.error(error);
         }
+
+        setIsSaving(false);
     }
 
     // const generateInviteCodes = async () => {
@@ -106,8 +138,9 @@ const AccountInfo = (props:{user: User}) => {
                     encType="multipart/form-data"
                 >
                     <div className="mb-4">
-                        <label className="block text-gray-700 font-medium mb-2" htmlFor="name">
-                            Avatar
+                        <label className="flex items-center text-gray-700 font-medium mb-2" htmlFor="name">
+                            <div>Avatar</div>
+                            <div className="text-xs ms-1">(square images work best)</div>
                         </label>
                         <input 
                             {...avatarRegister}
@@ -119,13 +152,15 @@ const AccountInfo = (props:{user: User}) => {
                                 const file = event.target.files?.[0];
                                 avatarRegister.onChange(event);
                                 setValue('avatar', file, { shouldValidate: true });
-                                if (file)
-                                    setAvatarUrl(URL.createObjectURL(file))
+                                setTempFile(file);
                             }}
                         />
                         <label htmlFor="avatar" className="cursor-pointer">
-                            {avatarUrl ?
-                            <img src={avatarUrl} className='w-[40px] h-[40px]'/>
+                            {avatarUrl && avatarUrl !== '' ?
+                            <img src={avatarUrl} className='w-[80px] h-[80px] rounded-full'/>
+                            :
+                            tempImage ?
+                            <img src={tempImage.url} className='w-[80px] h-[80px] rounded-full'/>
                             :
                             <BiImageAdd size={40} title="upload an image" />
                             }
@@ -156,12 +191,19 @@ const AccountInfo = (props:{user: User}) => {
                         />
                     </div>
 
-                    <Button type='submit' className="bg-primary">
-                        Save
-                    </Button>
+                    <div className="flex">
+                        <Button type='submit' className="bg-primary cursor-pointer" disabled={(isSaving) ? true : false}>
+                            Save
+                        </Button>
+                        {
+                            isSaving && 
+                            <div className="ms-2">
+                                <Spinner/>
+                            </div>
+                        }
+                    </div>
                 </form>
             </section>
-            {/* <button onClick={() => generateInviteCodes()}>Generate Invite Codes</button> */}
         </div>
     )
 }

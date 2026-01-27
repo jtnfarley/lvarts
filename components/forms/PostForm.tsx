@@ -10,6 +10,8 @@ import uploadFile from "@/app/actions/fileUploader";
 import User from "@/lib/models/user";
 import MediaUpload from "@/components/PostUi/MediaUpload"
 import { compressImage } from "@/lib/utils";
+import OptimizedFile from "@/lib/models/optimizedFile";
+import { Spinner } from "../layout/Spinner";
 
 interface Props {
     savePost:Function,
@@ -19,12 +21,6 @@ interface Props {
     parentPostId?:string,
     content?:InitialEditorStateType,
     postId?:string
-}
-
-interface OptimizedFile {
-    name:string,
-    type:string, 
-    url:string
 }
 
 const PostValidation = z.object({
@@ -44,6 +40,7 @@ const PostValidation = z.object({
 const PostForm = ({user, postType, edited, postId, parentPostId, savePost, content}: Props) => {
     const [clearEditor, setClearEditor] = useState(false);
     const [tempImage, setTempImage] = useState<OptimizedFile | undefined>();
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const editorRef: any = useRef(null);
 
     const { register, handleSubmit, setValue, control, reset, formState: { errors, isSubmitSuccessful } } = useForm<z.infer<typeof PostValidation>>({
@@ -64,6 +61,8 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
     }
 
     const onSubmit = async (values: z.infer<typeof PostValidation>) => {
+        setIsSaving(true);
+
         if (postId) {
             values.postId = postId;
         }
@@ -112,6 +111,7 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
 
         setClearEditor(true);
         setTempImage(undefined);
+        setIsSaving(false);
     }
 
     const setTempFile = async (file:File) => {
@@ -184,13 +184,17 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
                         <MediaUpload register={register} setValue={setValue} setTempImage={setTempFile}/>
                     </div>
                     <div className="w-[50%] flex justify-end">
-                        <button type='submit' className="bg-orange px-2 py-2 rounded text-white uppercase font-semibold">
+                        {
+                            isSaving && 
+                            <div className="me-2">
+                                <Spinner/>
+                            </div>
+                        }
+                        <button type='submit' className="bg-orange px-2 py-2 rounded text-white uppercase font-semibold cursor-pointer disabled:bg-orange-200" disabled={(isSaving) ? true : false}>
                             Post
                         </button>
                     </div>
                 </div>
-
-                {/* <PostFormActions register={register} setValue={setValue} setTempImage={setTempImage}/> */}
             </div>
         </form>
     )
