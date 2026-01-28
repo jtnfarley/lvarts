@@ -1,15 +1,9 @@
 import SignOut from '@/components/auth/buttons/SignOut';
 import Nav from "./Nav";
-import { auth } from '@/auth';
-import User from '@/lib/models/user';
+import {isLoggedIn} from "@/app/data/currentUser";
 
 export default async function BottomBar() {
-	const session = await auth();
-	let user;
-
-	if (session?.user && session?.user?.id) {
-		user = session.user as User;
-	}
+	const user = await isLoggedIn();
 
 	return (
 		<section className="bottombar">

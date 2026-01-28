@@ -1,4 +1,4 @@
-import { auth } from '@/auth';
+import {currentUser} from "@/app/data/currentUser";
 import AddPostForm from "@/components/forms/AddPostForm"
 import Feed from "@/components/Feed";
 import RecUsers from '@/components/RecUsers';
@@ -114,14 +114,7 @@ const getOldPosts = async (user:User, skip?:number):Promise<Array<Post>> => {
 }
 
 export default async function Home() {
-	const session = await auth();
-	let user;
-
-    if (!session?.user || !session?.user?.id) {
-        return redirect('/');
-    } else {
-		user = session.user as User;
-	}
+	const user = await currentUser();
 	
 	if (!user.userDetails || !user.userDetails.displayName || user.userDetails.displayName === '') {
 		return redirect('/profile')

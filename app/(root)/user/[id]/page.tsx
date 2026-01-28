@@ -1,9 +1,7 @@
 import Post from '@/lib/models/post';
 import { prisma } from '@/prisma';
-import { redirect } from 'next/navigation';
 import UserProfile from '@/components/UserProfile';
-import { auth } from '@/auth';
-import User from '@/lib/models/user';
+import {currentUser} from "@/app/data/currentUser";
 
 const getUserDetailsWithPosts = async (userId:string) => {
 	const userDetails = await prisma.userDetails.findFirst({
@@ -68,14 +66,7 @@ export default async function UserProfilePage({
 }) {
 	const {id} = await params;
 
-	const session = await auth();
-	let user;
-
-	if (!session?.user || !session?.user?.id) {
-		return redirect('/');
-	} else {
-		user = session.user as User;
-	}
+	const user = await currentUser();
 
 	const userDetails = await getUserDetailsWithPosts(id.toString());
 

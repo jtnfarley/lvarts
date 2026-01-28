@@ -1,9 +1,7 @@
-import Link from "next/link"
-
 const TopBar = () => {
     return (
         <nav className="block topbar md:hidden">
-            <Link
+            <a
                 href='/home'
                 className="flex items-center gap-4"
             >
@@ -12,7 +10,7 @@ const TopBar = () => {
                     alt="Lehigh Valley Arts & Music"
                     className="max-w-762 w-full"
                 />
-            </Link>
+            </a>
             <div className='me-3 uppercase flex justify-end'>beta version 0.1.0</div>
         </nav>
     )

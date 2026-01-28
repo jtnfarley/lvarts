@@ -4,19 +4,7 @@ import CommentFeed from "@/components/Comments/CommentFeed";
 import SinglePost from '@/components/SinglePost';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/prisma';
-import { auth } from '@/auth';
-import User from '@/lib/models/user';
-
-// import { useParams } from 'next/navigation';
-// import { useSession } from "next-auth/react";
-// import {APIProvider} from '@vis.gl/react-google-maps';
-// import { getEnv } from '@/app/actions/getEnv';
-
-
-// import { getPost } from '@/app/actions/posts';
-// import { useEffect, useState } from 'react';
-// import User from '@/lib/models/user';
-// import Post from '@/lib/models/post';
+import {currentUser} from "@/app/data/currentUser";
 
 const getPost = async (postId:string):Promise<any> => {
     const post = await prisma.posts.findFirst({
@@ -129,14 +117,7 @@ export default async function SinglePostPage({
 }: {
   params: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-    const session = await auth();
-    let user;
-
-    if (!session?.user || !session?.user?.id) {
-        return redirect('/');
-    } else {
-        user = session.user as User;
-    }
+    const user = await currentUser();
 
     const { id } = await params;
 

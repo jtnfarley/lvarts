@@ -3,24 +3,15 @@ import Image from "next/image"
 
 import SignOut from '@/components/auth/buttons/SignOut';
 import Nav from "./Nav";
-import { auth } from "@/auth";
-import User from "@/lib/models/user";
+import {isLoggedIn} from "@/app/data/currentUser";
 
 export default async function LeftSidebar() {
-	const session = await auth();
-	let user;
-
-	if (session?.user && session?.user?.id) {
-		user = session.user as User;
-	}
+	const user = await isLoggedIn();
 
 	return (
 		<section className="leftsidebar custom-scrollbar justify-between">
 			<div className="flex w-full flex-1 flex-col">
-				<Link
-                    href='/home'
-                    className="flex items-center"
-                >
+				<a href='/home' className="flex items-center">
                     <Image
                         src='/logos/lvarts-paths.svg'
                         alt="Lehigh Valley Arts & Music"
@@ -29,7 +20,7 @@ export default async function LeftSidebar() {
                         className='w-70'
 						priority
                     />
-                </Link>
+                </a>
 				<div className='ms-3 uppercase'>beta version 0.1.0</div>
 				<div className='mt-4'>
 					<Nav user={user}/>

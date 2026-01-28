@@ -1,13 +1,11 @@
-import { redirect } from 'next/navigation';
-import { auth } from '@/auth';
+import {isLoggedIn} from "@/app/data/currentUser";
 import LandingPage from '@/components/LandingPage';
+import { redirect } from "next/navigation";
  
 export default async function SignIn() {
-    const session = await auth();
+    const user = await isLoggedIn();
 
-    if (session?.user && session?.user?.id) {
-        return redirect('/home');
-    }
+    if (user) return redirect('/home');
 
     return (
         <div className="flex items-center justify-center h-screen">

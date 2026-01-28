@@ -1,8 +1,6 @@
-import { auth } from '@/auth';
+import {currentUser} from "@/app/data/currentUser";
 import { prisma } from '@/prisma';
-import User from '@/lib/models/user';
 import Post from '@/lib/models/post';
-import { redirect } from 'next/navigation';
 import Search from '@/components/Search';
 
 const getPosts = async (queryString:string):Promise<Array<Post>> => {
@@ -37,14 +35,7 @@ export default async function SearchPage({
 }: {
   params: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-    const session = await auth();
-    let user;
-
-    if (!session?.user || !session?.user?.id) {
-        return redirect('/');
-    } else {
-        user = session.user as User;
-    }
+    const user = await currentUser();
 
     const { query } = await params;
 

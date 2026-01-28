@@ -1,10 +1,7 @@
 import NotificationsFeed from "@/components/NotificationsFeed";
 import Notification from '@/lib/models/notification';
-import { redirect } from 'next/navigation';
-
 import type { Metadata } from 'next';
-import { auth } from '@/auth';
-import User from '@/lib/models/user';
+import {currentUser} from "@/app/data/currentUser";
 import { prisma } from "@/prisma";
 
 export const metadata: Metadata = {
@@ -50,14 +47,7 @@ const updateNotis = async (notis:Notification[] | undefined) => {
 }
 
 export default async function Notifications() {
-	const session = await auth();
-	let user;
-
-	if (!session?.user || !session?.user?.id) {
-		return redirect('/');
-	} else {
-		user = session.user as User;
-	}
+	const user = await currentUser();
 
 	const notis = await getNotifications(user.id);
 

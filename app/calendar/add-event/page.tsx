@@ -1,9 +1,7 @@
 import AddEventForm from "@/components/forms/AddEventForm"
 
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
-import { auth } from '@/auth';
-import User from '@/lib/models/user';
+import {currentUser} from "@/app/data/currentUser";
 
 export const metadata: Metadata = {
   title: 'Event Calendar - Lehigh Vally Art & Music',
@@ -11,19 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AddEvent() {
-	const session = await auth();
-	let user;
-
-	if (!session?.user || !session?.user?.id) {
-		return redirect('/calendar');
-	} else {
-		user = session.user as User;
-	}
-
-
-	const googleMapsApiKey = process.env.GOOGLE_MAPS; //has to be handled on the server
-
-	const userId = user?.id
+	const user = await currentUser();
 
 	return (
 		<div>

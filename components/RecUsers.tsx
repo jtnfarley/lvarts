@@ -2,8 +2,7 @@ import UserCard from "./Cards/UserCard"
 import UserDetails from "@/lib/models/userDetails";
 import imageUrl from '@/constants/imageUrl';
 import { prisma } from '@/prisma';
-import { auth } from '@/auth';
-import User from '@/lib/models/user';
+import {currentUser} from "@/app/data/currentUser";
 
 const getRandoUsers = async (userId:string):Promise<UserDetails[]> => {
 	'use server'
@@ -28,14 +27,7 @@ const getRandoUsers = async (userId:string):Promise<UserDetails[]> => {
 }
 
 export default async function RecUsers() {
-	const session = await auth();
-	let user;
-
-	if (!session?.user || !session?.user?.id) {
-		return null;
-	} else {
-		user = session.user as User;
-	}
+	const user = await currentUser();
 	
 	let recUsers:Array<UserDetails> = await getRandoUsers(user.id)
 
