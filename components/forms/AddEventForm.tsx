@@ -11,13 +11,10 @@ import Post from "@/lib/models/post";
 import { useRef, useState } from "react";
 
 interface Props {
-    user: User,
-    postType: string,
-    edited: boolean,
-    parentPostId?:string
+    user: User
 }
 
-const AddEventForm = ({user, postType, edited, parentPostId}: Props) => {
+const AddEventForm = ({user}: Props) => {
     const [startDate, setStartDate] = useState<Date | null>(new Date());
 
     const eventNameEl = useRef<HTMLInputElement | null>(null);
@@ -49,7 +46,7 @@ const AddEventForm = ({user, postType, edited, parentPostId}: Props) => {
                 </div>
                 <div className="mt-4">
                     <div>Description</div>
-                    <PostForm user={user} postType={postType} edited={edited} parentPostId={parentPostId} savePost={saveEvent}/>
+                    <PostForm user={user} post={{postType:'event'} as Post} edited={false}  savePost={saveEvent}/>
                 </div>
             </div>
         </div>

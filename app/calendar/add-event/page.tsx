@@ -15,7 +15,7 @@ export default async function AddEvent() {
 		<div>
 			{user &&
 				<div>
-					<AddEventForm user={user} postType='event' edited={false}/>
+					<AddEventForm user={user}/>
 				</div>
 			}
 		</div>
