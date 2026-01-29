@@ -5,7 +5,6 @@ import * as z from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import RTEditor from "./Fields/RichTextEditor/RTEditor";
-import { InitialEditorStateType } from "lexical";
 import uploadFile from "@/app/actions/fileUploader";
 import User from "@/lib/models/user";
 import MediaUpload from "@/components/PostUi/MediaUpload"
@@ -13,14 +12,14 @@ import { compressImage } from "@/lib/utils";
 import OptimizedFile from "@/lib/models/optimizedFile";
 import { Spinner } from "../layout/Spinner";
 import Post from "@/lib/models/post";
-import { redirect } from "next/navigation";
+import imageUrl from "@/constants/imageUrl";
 
 interface Props {
     savePost:Function,
     user: User,
     postType?: string,
     edited?: boolean,
-    postData?:Post
+    post?:Post
 }
 
 const PostValidation = z.object({
@@ -37,16 +36,17 @@ const PostValidation = z.object({
     // privatePost: z.boolean(), 
 })
 
-const PostForm = ({user, postType, edited, savePost, postData}: Props) => {
+const PostForm = ({user, postType, edited, savePost, post}: Props) => {
     const [clearEditor, setClearEditor] = useState(false);
     const [tempImage, setTempImage] = useState<OptimizedFile | undefined>();
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [saved, setSaved] = useState<boolean>(false);
     const editorRef: any = useRef(null);
 
-    const parentPostId = postData?.parentPostId ?? undefined;
-    const postId = postData?.id ?? undefined;
-    const content = postData?.lexical ?? "";
+    const parentPostId = post?.parentPostId ?? undefined;
+    const postId = post?.id ?? undefined;
+    const content = post?.lexical ?? "";
+    const postFile = post?.postFile ?? undefined
 
     const { register, handleSubmit, setValue, control, reset, formState: { errors, isSubmitSuccessful } } = useForm<z.infer<typeof PostValidation>>({
         resolver: zodResolver(PostValidation),
@@ -67,13 +67,13 @@ const PostForm = ({user, postType, edited, savePost, postData}: Props) => {
 
     const onSubmit = async (values: z.infer<typeof PostValidation>) => {
         setIsSaving(true);
-console.log(values)
-        if (postData && postData.id) {
-            values.postId = postData.id;
+
+        if (post && post.id) {
+            values.postId = post.id;
         }
 
-        if (postData && postData.parentPostId) {
-            values.parentPostId = postData.parentPostId;
+        if (post && post.parentPostId) {
+            values.parentPostId = post.parentPostId;
         }
 
         if (values.content && values.content.html && values.content.lexical) {
@@ -103,11 +103,11 @@ console.log(values)
         }
 
         await savePost(values);
-        if (postData && postData.id) {
+        if (post && post.id) {
             dispatchEvent(new CustomEvent("postsUpdated", {
 				detail: {
 					action: `edit`,
-					postId: postData.id
+					postId: post.id
 				}
 			}));
         } else {
@@ -121,8 +121,8 @@ console.log(values)
             setSaved(false);
         }, 3000)
 
-        if (!postData?.id) {
-            setClearEditor(true); //setting here because editPost never gets back here
+        if (!post?.id) {
+            setClearEditor(true);
             setTempImage(undefined);
         }
     }
@@ -153,6 +153,16 @@ console.log(values)
         }
     }
 
+    const setPostFile = () => {
+        if (postFile) {
+            setTempImage({
+                name: postFile,
+                type: post?.postFileType,
+                url: `${imageUrl}/${user.userDetails?.userDir}/${postFile}`
+            } as OptimizedFile);
+        }
+    }
+
     useEffect(() => {
         if (isSubmitSuccessful) {
             reset();
@@ -165,6 +175,8 @@ console.log(values)
 
     useEffect(() => {
         window.addEventListener('editorUpdated', handleEditorUpdated);
+
+        setPostFile();
 
         return () => {
             window.removeEventListener('editorUpdated', handleEditorUpdated);
@@ -181,12 +193,13 @@ console.log(values)
                         <RTEditor ref={editorRef} onChange={field.onChange} clearEditor={clearEditor} content={content}/>
                     )}
                 />
-                {tempImage && (
+                {(tempImage) && (
                     <div className="flex justify-center">
-                        { (tempImage.type.match(/audio/)) ?
-                            <audio src={tempImage.url} controls/>
-                            :
-                            <img src={tempImage.url}/>
+                        {
+                            (tempImage.type.match(/audio/)) ?
+                                <audio src={tempImage.url} controls/>
+                                :
+                                <img src={tempImage.url}/>
                         }
                     </div>
                 )

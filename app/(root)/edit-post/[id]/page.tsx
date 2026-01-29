@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/prisma';
 import {currentUser} from "@/app/data/currentUser";
 import { revalidatePath } from "next/cache";
+import EditEventPostForm from "@/components/forms/EditEventPostForm";
 
 const getPost = async (postId:string, userId:string):Promise<any> => {
     const post = await prisma.posts.findFirst({
@@ -71,13 +72,24 @@ export default async function EditPostPage({
 	return (
         <div className="mt-5">
             <div className="rounded-box flex flex-row justify-center">
-                <div className="text-xl">Edit Post</div>
+                <div className="text-xl">Edit 
+                    {
+                            post.postType === 'event' ?
+                            ' Event'
+                            :
+                            ' Post'
+                    }</div>
             </div>
         {
             (post && id) &&           
                 <div className='py-5 flex flex-col'>
                     <div className='mt-2'>
-                        <EditPostForm post={post} user={user} savePost={editPost}/>
+                        {
+                            post.postType === 'event' ?
+                                <EditEventPostForm post={post} user={user} savePost={editPost} />
+                                :
+                                <EditPostForm post={post} user={user} savePost={editPost}/>
+                        }
                     </div>
                 </div>   
             }

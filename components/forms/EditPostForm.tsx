@@ -19,7 +19,7 @@ const EditPostForm = ({post, user, savePost}: Props) => {
     }
 
     return (
-        <PostForm user={user} postData={post} edited={true} savePost={editThisPost}/>
+        <PostForm user={user} post={post} edited={true} savePost={editThisPost}/>
     )
 }
 

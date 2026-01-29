@@ -20,7 +20,7 @@ const AddPostForm = ({user, postType, edited, parentPostId}: Props) => {
     } as Post
 
     return (
-        <PostForm user={user} postData={postData} edited={edited} savePost={savePost}/>
+        <PostForm user={user} post={postData} edited={edited} savePost={savePost}/>
     )
 }
 
