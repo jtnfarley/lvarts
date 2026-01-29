@@ -322,3 +322,19 @@
     filter: hue-rotate(360deg) blur(3px);
   }
 }
+
+@keyframes fade-in-out {
+  /* Start with no hue rotation */
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

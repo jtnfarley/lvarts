@@ -31,7 +31,7 @@ export default function PostActions(props:{postData:Post, user:User, currentUser
 				currentUserPost && 
 					<div className='w-1/2 flex flex-row justify-end'>
 						<div className='w-1/4 flex justify-end'>
-							<EditPost postData={post} user={user}/>
+							<EditPost postData={post}/>
 						</div>
 						<div className='w-1/4 flex justify-end'>
 							<DeletePost postData={post}/>

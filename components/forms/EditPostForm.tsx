@@ -1,28 +1,25 @@
 'use client'
 
-import { editPost } from "@/app/actions/posts";
+import { useState } from "react";
 import PostForm from "./PostForm";
-import { InitialEditorStateType } from "lexical";
 import User from "@/lib/models/user";
-import { useModal } from '@/app/contextProviders/modalProvider';
 import Post from "@/lib/models/post";
 
 interface Props {
-    content:InitialEditorStateType,
-    postId:string,
-    user:User
+    post:Post
+    user: User
+    savePost: Function
 }
 
-const EditPostForm = ({content, postId, user}: Props) => {
-    const { triggerAction } = useModal();
+const EditPostForm = ({post, user, savePost}: Props) => {
 
-    const editThisPost = (post:Post) => {
-        editPost(post);
-        triggerAction();
+    const editThisPost = async (post:Post) => {
+        const editedPost = await savePost(post);
+        console.log(editedPost)
     }
 
     return (
-        <PostForm content={content} postId={postId} savePost={editThisPost} user={user} postType={''} edited={true} parentPostId={''} />
+        <PostForm user={user} postData={post} edited={true} savePost={editThisPost}/>
     )
 }
 

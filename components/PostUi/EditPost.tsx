@@ -1,42 +1,17 @@
 'use client'
 
 import Post from '@/lib/models/post';
-import User from '@/lib/models/user';
-
 import { BiEdit } from "react-icons/bi";
-import { useModal } from '@/app/contextProviders/modalProvider'
+import Link from 'next/link';
 
-export default function EditPost(props:{postData:Post, user:User}) {
+export default function EditPost(props:{postData:Post}) {
 	const post:Post = props.postData
-	const user = props.user
-	const {
-        setIsOpen, 
-        setTitle, 
-        setType,   
-        setPostContent,
-		setActionData,
-		setUser
-    } = useModal()
-
-	const setUpModal = () => {
-		setIsOpen(true);
-        setTitle('Edit Post');
-        setType('EditPostModal');  
-        setPostContent(post.lexical);
-		setActionData({
-			postId: post.id, 
-			postType: post.postType, 
-			eventTitle: post.eventTitle, 
-			eventDate: post.eventDate
-		});
-		setUser(user);
-	}
 
     return (
 		<div className='text-2xl'>
-			<button onClick={() => setUpModal()}>
+			<Link href={`/edit-post/${post.id}`}>
 				<div className='text-2xl'><BiEdit /></div>
-			</button>
+			</Link>
 		</div>			
     )
 }

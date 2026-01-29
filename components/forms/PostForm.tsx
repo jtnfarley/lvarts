@@ -12,15 +12,15 @@ import MediaUpload from "@/components/PostUi/MediaUpload"
 import { compressImage } from "@/lib/utils";
 import OptimizedFile from "@/lib/models/optimizedFile";
 import { Spinner } from "../layout/Spinner";
+import Post from "@/lib/models/post";
+import { redirect } from "next/navigation";
 
 interface Props {
     savePost:Function,
     user: User,
     postType?: string,
     edited?: boolean,
-    parentPostId?:string,
-    content?:InitialEditorStateType,
-    postId?:string
+    postData?:Post
 }
 
 const PostValidation = z.object({
@@ -37,11 +37,16 @@ const PostValidation = z.object({
     // privatePost: z.boolean(), 
 })
 
-const PostForm = ({user, postType, edited, postId, parentPostId, savePost, content}: Props) => {
+const PostForm = ({user, postType, edited, savePost, postData}: Props) => {
     const [clearEditor, setClearEditor] = useState(false);
     const [tempImage, setTempImage] = useState<OptimizedFile | undefined>();
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [saved, setSaved] = useState<boolean>(false);
     const editorRef: any = useRef(null);
+
+    const parentPostId = postData?.parentPostId ?? undefined;
+    const postId = postData?.id ?? undefined;
+    const content = postData?.lexical ?? "";
 
     const { register, handleSubmit, setValue, control, reset, formState: { errors, isSubmitSuccessful } } = useForm<z.infer<typeof PostValidation>>({
         resolver: zodResolver(PostValidation),
@@ -49,9 +54,9 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
             userId: user.id,
             postType: postType ?? '',
             edited: edited ?? false,
-            parentPostId: parentPostId ?? undefined,
-            postId: postId ?? undefined,
-            content: content ?? ""
+            parentPostId: parentPostId,
+            postId: postId,
+            content: content
         }
     })
 
@@ -62,13 +67,13 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
 
     const onSubmit = async (values: z.infer<typeof PostValidation>) => {
         setIsSaving(true);
-
-        if (postId) {
-            values.postId = postId;
+console.log(values)
+        if (postData && postData.id) {
+            values.postId = postData.id;
         }
 
-        if (parentPostId) {
-            values.parentPostId = parentPostId;
+        if (postData && postData.parentPostId) {
+            values.parentPostId = postData.parentPostId;
         }
 
         if (values.content && values.content.html && values.content.lexical) {
@@ -98,20 +103,28 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
         }
 
         await savePost(values);
-        if (postId) {
+        if (postData && postData.id) {
             dispatchEvent(new CustomEvent("postsUpdated", {
 				detail: {
 					action: `edit`,
-					postId
+					postId: postData.id
 				}
 			}));
         } else {
             dispatchEvent(new Event('postsUpdated'));
         }
 
-        setClearEditor(true);
-        setTempImage(undefined);
         setIsSaving(false);
+        setSaved(true);
+
+        setTimeout(() => {
+            setSaved(false);
+        }, 3000)
+
+        if (!postData?.id) {
+            setClearEditor(true); //setting here because editPost never gets back here
+            setTempImage(undefined);
+        }
     }
 
     const setTempFile = async (file:File) => {
@@ -190,6 +203,14 @@ const PostForm = ({user, postType, edited, postId, parentPostId, savePost, conte
                                 <Spinner/>
                             </div>
                         }
+                        {
+                            saved &&
+                            <div className="me-2 bg-green-200 text-xs font-semibold uppercase text-green-700 border-1 border-green-700 px-2 py-1 my-2 rounded-sm"
+                            style={{opacity: 0, animation: 'fade-in-out 3s ease-in-out'}}>
+                                Post Saved
+                            </div>
+                        }
+    
                         <button type='submit' className="bg-orange px-2 py-2 rounded text-white uppercase font-semibold cursor-pointer disabled:bg-orange-200" disabled={(isSaving) ? true : false}>
                             Post
                         </button>
