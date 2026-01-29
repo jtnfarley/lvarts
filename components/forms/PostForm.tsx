@@ -181,7 +181,7 @@ const PostForm = ({user, postType, edited, savePost, post}: Props) => {
         return () => {
             window.removeEventListener('editorUpdated', handleEditorUpdated);
         }
-    }, [])
+    }, []) 
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
