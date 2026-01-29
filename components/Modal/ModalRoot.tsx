@@ -3,9 +3,7 @@
 import { useModal } from '@/app/contextProviders/modalProvider'
 
 import GenericModal from '@/components/Modal/GenericModal'
-import EditPostModal from '@/components/Modal/EditPostModal'
 import PostModal from '@/components/Modal/PostModal'
-import ConfirmationModal from '@/components/Modal/ConfirmationModal'
 
 export const ModalRoot = () => {
     const { 
@@ -36,19 +34,6 @@ export const ModalRoot = () => {
                     message={message}
                     isOpen={isOpen}
                     children={''}
-                />
-            }
-            {
-                type === 'EditPostModal' && 
-                <EditPostModal
-                    title={title}
-                    postContent={postContent}
-                    isOpen={isOpen}
-                    user={user!}
-                    postId={actionData.postId!}
-                    postType={actionData.postType}
-                    eventTitle={actionData.eventTitle}
-                    eventDate={actionData.eventDate}
                 />
             }
         </>
