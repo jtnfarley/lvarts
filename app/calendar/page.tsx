@@ -48,9 +48,9 @@ export default async function Calendar() {
 		<div className='bg-gray-50/50 backdrop-blur-sm p-5 rounded-lg mt-5'>
 			{user ?
 				<div className='flex justify-end'>
-					<Link href='/calendar/add-event' title='Add Event'>
+					<a href='/calendar/add-event' title='Add Event'>
 						<BiCalendarPlus className='text-4xl'/>
-					</Link>
+					</a>
 				</div>
 				:
 				<div>
