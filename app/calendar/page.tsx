@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import {isLoggedIn} from "@/app/data/currentUser";
-import Events from "@/components/Events";
+import EventsByMonth from "@/components/Events/EventsByMonth";
 import { BiCalendarPlus } from "react-icons/bi";
 
 import type { Metadata } from 'next';
@@ -58,7 +58,12 @@ export default async function Calendar() {
 				</div>
 			}
 			<div>
-				<Events events={events}/>
+				<div className="flex flex-col gap-5 pb-5">
+					<div className='text-xl'>Lehigh Valley Art & Music Events</div>
+					<div>
+						<EventsByMonth events={events}/>
+					</div>
+				</div>
 			</div>
 		</div>
 	);
