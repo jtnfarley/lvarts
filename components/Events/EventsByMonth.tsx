@@ -53,34 +53,34 @@ export default function EventsByMonth(props:{events:Post[]}) {
 	}
 	
     return (
-		<div className='overflow-x-hidden overflow-y-scroll relative'>
-		<div
-			className='flex flex-row flex-nowrap h-screen w-full overflow-x-auto'
-			id='months'
-			ref={monthsRef}
-		>
-			{
-				(eventsByMonth && eventsByMonth.length) &&
-					eventsByMonth.map(({name, events}, i) => {
-						if (events && events.length) {
-							return (	
-								<div className='month w-full flex flex-col flex-shrink-0 items-center' key={i}>
-									<EventsByMonthHeader month={name} year={getYear(events)} forward={forward} back={back}/>
-									<div  className="lg:grid lg:grid-cols-3 md:flex md:flex-col gap-4">
-									{
-										events.map((post:Post) => {
-											return (
-												<EventUi key={post.id} post={post} />
-											)
-										})
-									}
+		<div className='max-h-screen overflow-x-hidden overflow-y-scroll relative'>
+			<div
+				className='flex flex-row flex-nowrap w-full overflow-x-auto'
+				id='months'
+				ref={monthsRef}
+			>
+				{
+					(eventsByMonth && eventsByMonth.length) &&
+						eventsByMonth.map(({name, events}, i) => {
+							if (events && events.length) {
+								return (	
+									<div className='month w-full flex flex-col flex-shrink-0 items-center' key={i}>
+										<EventsByMonthHeader month={name} year={getYear(events)} forward={forward} back={back}/>
+										<div  className="lg:grid lg:grid-cols-3 md:flex md:flex-col gap-4">
+										{
+											events.map((post:Post) => {
+												return (
+													<EventUi key={post.id} post={post} />
+												)
+											})
+										}
+										</div>
 									</div>
-								</div>
-							)
-						}
-					})
-			}
-		</div>
+								)
+							}
+						})
+				}
+			</div>
 		</div>
     )
 }
