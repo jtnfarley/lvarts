@@ -91,7 +91,6 @@ export default function Feed(props:{feed:Post[], user:User, getNewPosts:Function
 		if (oldPosts && oldPosts.length && tempFeedRef.current && tempFeedRef.current.length) {
 			tempFeedRef.current = [...tempFeedRef.current, ...oldPosts];
 			setFeed(tempFeedRef.current)
-			setRenderKey(prev => prev + 1)
 		} else {
 			setEndOfPosts(true);
 		}
