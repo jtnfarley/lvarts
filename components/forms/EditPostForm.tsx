@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from "react";
 import PostForm from "./PostForm";
 import User from "@/lib/models/user";
 import Post from "@/lib/models/post";

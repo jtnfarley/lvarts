@@ -7,14 +7,16 @@ import NavClient from "./NavClient";
 
 const hasNewNotifications = async (userId:string):Promise<boolean> => {
 	'use server'
-
+console.log(userId)
 	const notifications:Array<Notification> = await prisma.notifications.findMany({
 		where: {
-			userId,
-			read: false
+			AND: [
+				{userId: userId},
+				{read: false}
+			]
 		}
 	})
-
+console.log(notifications)
 	return (notifications.length) ? true : false
 }
 

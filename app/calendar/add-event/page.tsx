@@ -1,5 +1,5 @@
 import AddEventForm from "@/components/forms/AddEventForm"
-
+import { savePost } from "@/app/data/posts";
 import type { Metadata } from 'next';
 import {currentUser} from "@/app/data/currentUser";
 
@@ -15,7 +15,7 @@ export default async function AddEvent() {
 		<div>
 			{user &&
 				<div>
-					<AddEventForm user={user}/>
+					<AddEventForm user={user} savePost={savePost}/>
 				</div>
 			}
 		</div>

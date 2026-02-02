@@ -4,7 +4,6 @@ import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css'
 
 import { BiCalendar } from "react-icons/bi";
-import { savePost } from "@/app/actions/posts";
 import PostForm from "./PostForm";
 import User from "@/lib/models/user";
 import Post from "@/lib/models/post";
@@ -12,9 +11,10 @@ import { useRef, useState } from "react";
 
 interface Props {
     user: User
+    savePost:Function
 }
 
-const AddEventForm = ({user}: Props) => {
+const AddEventForm = ({user, savePost}: Props) => {
     const [startDate, setStartDate] = useState<Date | null>(new Date());
 
     const eventNameEl = useRef<HTMLInputElement | null>(null);
@@ -22,7 +22,8 @@ const AddEventForm = ({user}: Props) => {
     const saveEvent = (post:Post) => {
         if (!eventNameEl || !eventNameEl.current) return;
         post.eventTitle = eventNameEl.current.value;
-        post.eventDate = startDate
+        post.eventDate = startDate;
+        post.postType = 'event';
         savePost(post);
         eventNameEl.current.value = '';
         setStartDate(null);

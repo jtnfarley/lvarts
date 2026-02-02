@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { Button } from '@/components/ui/button';
 import * as z from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { updateUser } from "@/app/actions/user"
 import User from "@/lib/models/user";
 import { BiImageAdd } from "react-icons/bi";
 import { useState } from "react";
@@ -25,8 +24,9 @@ const UserValidation = z.object({
     avatar: z.any().optional(),    
 })
 
-const AccountInfo = (props:{user: User}) => {
+const AccountInfo = (props:{user: User, saveUser:Function}) => {
     const [user, setUser] = useState<User>(props.user);
+    const saveUser = props.saveUser;
 
     if (!user) {
         return (
@@ -101,7 +101,7 @@ const AccountInfo = (props:{user: User}) => {
                 avatarUrl = file.name;
             }
             
-            const userDetails = await updateUser({
+            const userDetails = await saveUser({
                 id,
                 userId: user.id,
                 bio: values.bio,

@@ -1,7 +1,213 @@
 'use server'
 
 import {prisma} from '@/lib/db/prisma';
+import Post from '@/lib/models/post';
+import User from '@/lib/models/user';
 import { Prisma } from '@prisma/client';
+
+export const getInitFeed = async (user:User):Promise<Array<Post>> => {
+	const posts:Array<Post> = await prisma.posts.findMany({
+		where: {
+			OR: [
+				{ userId: user?.id },
+				{ userId: {
+					in: user?.userDetails?.following
+				}},
+			],
+			postType: {
+				not: 'chat'
+			}
+		},
+		include: {
+			user:true,
+			userDetails: true,
+			parentPost: {
+				include: {
+					userDetails: true
+				}
+			}
+		},
+		orderBy: {
+			createdAt: 'desc'
+		},
+		take: 20,
+	})
+
+	return posts
+}
+
+export const getNewPosts = async (user:User, lastChecked:Date):Promise<Array<Post>> => {
+	'use server'
+
+	const posts:Array<Post> = await prisma.posts.findMany({
+		where: {
+			OR: [
+				{ userId: user?.id },
+				{ userId: {
+					in: user?.userDetails?.following
+				}},
+			],
+			postType: {
+				not: 'chat'
+			},
+			createdAt: { gt: lastChecked }
+		},
+		include: {
+			user:true,
+			userDetails: true,
+			parentPost: {
+				include: {
+					userDetails: true
+				}
+			}
+		},
+		orderBy: {
+			createdAt: 'desc'
+		},
+		take: 20
+	})
+
+	return posts
+}
+
+export const getOldPosts = async (user:User, skip?:number):Promise<Array<Post>> => {
+	'use server'
+
+	const posts:Array<Post> = await prisma.posts.findMany({
+		where: {
+			OR: [
+				{ userId: user?.id },
+				{ userId: {
+					in: user?.userDetails?.following
+				}},
+			],
+			postType: {
+				not: 'chat'
+			}
+		},
+		include: {
+			user:true,
+			userDetails: true,
+			parentPost: {
+				include: {
+					userDetails: true
+				}
+			}
+		},
+		orderBy: {
+			createdAt: 'desc'
+		},
+		take: 20,
+		skip: (skip) ? skip + 1 : 0
+	})
+
+	return posts
+}
+
+export const getPost = async (postId:string):Promise<any> => {
+    const post = await prisma.posts.findFirst({
+        where: {
+            id: postId,
+            postType: {
+				not: 'chat'
+			}
+        },
+        include: {
+            user:true,
+            userDetails: true,
+            parentPost: {
+                include: {
+                    userDetails: true
+                }
+            }
+        }
+    })
+
+    return post;
+}
+
+export const getInitComments = async (postId:string):Promise<any> => {
+    const comments = await prisma.posts.findMany({
+        where: {
+            parentPostId:postId,
+            postType: {
+				not: 'chat'
+			}
+        },
+        include: {
+            user:true,
+            userDetails: true,
+            parentPost: {
+                include: {
+                    userDetails: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        },
+        take: 20
+    })
+
+    return comments;
+}
+
+export const getNewComments = async (postId:string, lastChecked:Date):Promise<any> => {
+    'use server'
+    
+    const comments = await prisma.posts.findMany({
+        where: {
+            parentPostId:postId,
+            createdAt: { gt: lastChecked },
+            postType: {
+				not: 'chat'
+			}
+        },
+        include: {
+            user:true,
+            userDetails: true,
+            parentPost: {
+                include: {
+                    userDetails: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
+    })
+
+    return comments;
+}
+
+export const getOldComments = async (postId:string, skip?:number):Promise<any> => {
+    'use server'
+    
+    const comments = await prisma.posts.findMany({
+        where: {
+            parentPostId:postId,
+            postType: {
+				not: 'chat'
+			}
+        },
+        include: {
+            user:true,
+            userDetails: true,
+            parentPost: {
+                include: {
+                    userDetails: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        },
+        take: 20,
+        skip: (skip) ? skip + 1 : 0
+    })
+
+    return comments;
+}
 
 export const savePost = async (postData:any) => {
     const {

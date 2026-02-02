@@ -36,7 +36,7 @@ const PostValidation = z.object({
     // privatePost: z.boolean(), 
 })
 
-const PostForm = ({user, postType, edited, savePost, post}: Props) => {
+const PostForm = ({user, edited, savePost, post}: Props) => {
     const [clearEditor, setClearEditor] = useState(false);
     const [tempImage, setTempImage] = useState<OptimizedFile | undefined>();
     const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -47,6 +47,7 @@ const PostForm = ({user, postType, edited, savePost, post}: Props) => {
     const postId = post?.id ?? undefined;
     const content = post?.lexical ?? "";
     const postFile = post?.postFile ?? undefined
+    const postType = post?.postType ?? undefined
 
     const { register, handleSubmit, setValue, control, reset, formState: { errors, isSubmitSuccessful } } = useForm<z.infer<typeof PostValidation>>({
         resolver: zodResolver(PostValidation),
@@ -67,6 +68,8 @@ const PostForm = ({user, postType, edited, savePost, post}: Props) => {
 
     const onSubmit = async (values: z.infer<typeof PostValidation>) => {
         setIsSaving(true);
+
+        values.postType = postType ?? 'post';
 
         if (post && post.id) {
             values.postId = post.id;

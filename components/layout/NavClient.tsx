@@ -12,7 +12,7 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 	const [hasNotis, setHasNotis] = useState<boolean>(props.hasNotis);
 
 	const checkNotis = async () => {
-		const newNotis = await hasNewNotifications();
+		const newNotis = await hasNewNotifications(user?.id);
 		setHasNotis(newNotis);
 	}
 

@@ -3,114 +3,8 @@ import AddPostForm from "@/components/forms/AddPostForm"
 import CommentFeed from "@/components/Comments/CommentFeed";
 import SinglePost from '@/components/SinglePost';
 import { redirect } from 'next/navigation';
-import { prisma } from '@/prisma';
 import {currentUser} from "@/app/data/currentUser";
-
-const getPost = async (postId:string):Promise<any> => {
-    const post = await prisma.posts.findFirst({
-        where: {
-            id: postId,
-            postType: {
-				not: 'chat'
-			}
-        },
-        include: {
-            user:true,
-            userDetails: true,
-            parentPost: {
-                include: {
-                    userDetails: true
-                }
-            }
-        }
-    })
-
-    return post;
-}
-
-const getInitComments = async (postId:string):Promise<any> => {
-    const comments = await prisma.posts.findMany({
-        where: {
-            parentPostId:postId,
-            postType: {
-				not: 'chat'
-			}
-        },
-        include: {
-            user:true,
-            userDetails: true,
-            parentPost: {
-                include: {
-                    userDetails: true
-                }
-            }
-        },
-        orderBy: {
-            createdAt: 'desc'
-        },
-        take: 20
-    })
-
-    return comments;
-}
-
-const getNewComments = async (postId:string, lastChecked:Date):Promise<any> => {
-    'use server'
-    
-    const comments = await prisma.posts.findMany({
-        where: {
-            parentPostId:postId,
-            createdAt: { gt: lastChecked },
-            postType: {
-				not: 'chat'
-			}
-        },
-        include: {
-            user:true,
-            userDetails: true,
-            parentPost: {
-                include: {
-                    userDetails: true
-                }
-            }
-        },
-        orderBy: {
-            createdAt: 'desc'
-        }
-    })
-
-    return comments;
-}
-
-const getOldComments = async (postId:string, skip?:number):Promise<any> => {
-    'use server'
-    
-    const comments = await prisma.posts.findMany({
-        where: {
-            parentPostId:postId,
-            postType: {
-				not: 'chat'
-			}
-        },
-        include: {
-            user:true,
-            userDetails: true,
-            parentPost: {
-                include: {
-                    userDetails: true
-                }
-            }
-        },
-        orderBy: {
-            createdAt: 'desc'
-        },
-        take: 20,
-        skip: (skip) ? skip + 1 : 0
-    })
-
-    return comments;
-}
-
+import { getPost, getInitComments, getNewComments, getOldComments, savePost } from "@/app/data/posts";
 
 export default async function SinglePostPage({
   params,
@@ -141,7 +35,7 @@ export default async function SinglePostPage({
                         <SinglePost post={post} user={user} googleMapsApiKey={googleMapsApiKey} />
                     </div>
                     <div className='mt-2'>
-                        <AddPostForm user={user} postType='comment' edited={false} parentPostId={id.toString()}/>
+                        <AddPostForm user={user} postType='comment' edited={false} parentPostId={id.toString()} savePost={savePost}/>
                     </div>
                     <div>
                         <CommentFeed comments={comments} parentPostId={id.toString()} user={user} getNewComments={getNewComments} getOldComments={getOldComments} googleMapsApiKey={googleMapsApiKey}/>
