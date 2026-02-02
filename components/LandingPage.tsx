@@ -9,6 +9,7 @@ import { useModal } from '@/app/contextProviders/modalProvider'
  
 export default function LandingPage() {
     const [error, setError] = useState<string | undefined>();
+    const [showAlert, setShowAlert] = useState<boolean>(false);
     const {
             setIsOpen, 
             setTitle, 
@@ -76,9 +77,14 @@ export default function LandingPage() {
                     <div className="flex justify-center my-3 border-b-2 border-gray-200 w-full"></div>
                     <div className="mb-2">Sign In with Email</div>
                     <div className="flex items-center">
-                        <input type='text' name='email' id='email' placeholder='Email' className="border-2 px-2 py-2 me-2 rounded-md bg-white"/>
+                        <input type='text' name='email' id='email' placeholder='Email' className="border-2 px-2 py-2 me-2 rounded-md bg-white" 
+                            onFocus={() => setShowAlert(true)}
+                        />
                         <Button onClick={() => signInUser('nodemailer')}>Send Link</Button>
                     </div>
+                    {showAlert && 
+                        <div className='text-green-900'><em>Be sure to check your spam folder for the sign-in link.</em></div>
+                    }
                     {error && 
                         <div className='text-red-800'>Please enter a valid email address</div>
                     }
