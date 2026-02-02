@@ -5,6 +5,7 @@ import {INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, REMOVE_LIST_
 import { useEffect, useState } from 'react';
 import {mergeRegister} from '@lexical/utils';
 import { MapToolbarPlugin } from './MapPlugin';
+import { EmojiToolbarPlugin } from './EmojiPlugin';
 
 function Divider(props:{key:string}) {
   return <div className="divider border border-right"/>;
@@ -101,6 +102,8 @@ export default function ToolbarPlugin() {
             }
             <Divider key={'mapDiv'}/>
             <MapToolbarPlugin/>
+            <Divider key={'emojiDiv'}/>
+            <EmojiToolbarPlugin/>
         </div>
     )
 }

@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import {mergeRegister} from '@lexical/utils';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
@@ -24,6 +25,8 @@ import "./styles.css";
 import { InitialEditorStateType, LexicalEditor } from "lexical";
 import { MapNode } from "./nodes/MapNode";
 import { MapPlugin } from "./plugins/MapPlugin";
+import { EmojiNode } from "./nodes/EmojiNode";
+import { EmojiPlugin } from "./plugins/EmojiPlugin";
 // import TreeViewPlugin from "./plugins/TreeViewPlugin";
 
 const EditorCapturePlugin = React.forwardRef((props: any, ref: any) => {
@@ -37,10 +40,6 @@ const EditorCapturePlugin = React.forwardRef((props: any, ref: any) => {
 
 	return null;
 });
-
-interface Props {
-	onChange:Function
-}
 
 function onError(error:Error) {
 	console.error(error)
@@ -58,7 +57,7 @@ const initialConfig:InitialConfigType = {
 	namespace: 'MyEditor',
 	theme: ExampleTheme,
 	onError,
-	nodes:[HashtagNode, ListNode, ListItemNode, AutoLinkNode, MapNode],
+	nodes:[HashtagNode, ListNode, ListItemNode, AutoLinkNode, MapNode, EmojiNode],
 	editorState:undefined
 };
 
@@ -91,6 +90,7 @@ export default function RTEditor(props:{ref:any, onChange: (html:object) => void
 			<HashtagPlugin/>
 			<AutoLinkPlugin/>
 			<MapPlugin/>
+			<EmojiPlugin/>
 			{/* <CharacterLimitPlugin charset='UTF-16' maxLength={250}/> */}
 			{/* <TreeViewPlugin/> */}
 			<CustomOnChangePlugin value={''} onChange={props.onChange}/>
