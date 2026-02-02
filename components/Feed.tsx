@@ -122,7 +122,7 @@ export default function Feed(props:{feed:Post[], user:User, getNewPosts:Function
 						</div>
 				}
             {
-				(user && feed && feed.length) &&
+				(user && feed && feed.length) ?
 				<>
                 	{feed.map((post:Post, index:number) => {
 						return (
@@ -131,6 +131,8 @@ export default function Feed(props:{feed:Post[], user:User, getNewPosts:Function
 					})}
 					<LoadOldPosts getOldPosts={getOldPostsFromServer} endOfPosts={endOfPosts}/>
 				</>
+				:
+				<div className='rounded-box flex-row'>It's quiet. <em>Too quiet.</em> Follow some folks to get in on the action.</div>
 			}
 			</APIProvider>
         </div>
