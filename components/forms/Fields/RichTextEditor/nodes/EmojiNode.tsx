@@ -6,73 +6,119 @@
  *
  */
 
-import type {EditorConfig, NodeKey, SerializedTextNode, Spread} from 'lexical';
+import type {EditorConfig, LexicalNode, NodeKey, SerializedTextNode, Spread} from 'lexical';
 
 import {TextNode} from 'lexical';
 
 export type SerializedEmojiNode = Spread<
     {
-        imageUrl: string;
+        unifiedID: string;
+        imageUrl?: string;
     },
     SerializedTextNode
 >;
 
-// @emoji-datasource-facebook is defined in vite.config.ts
-const BASE_EMOJI_URI = new URL(`emoji-datasource-facebook/`, import.meta.url).href;
+function parseNativeEmoji(unifiedID: string): string {
+    return unifiedID
+        .split('-')
+        .map((hex) => parseInt(hex, 16))
+        .filter((codePoint) => !Number.isNaN(codePoint))
+        .map((codePoint) => String.fromCodePoint(codePoint))
+        .join('');
+}
+
+function getEmojiImageUrl(unifiedID: string): string {
+    return `https://cdn.jsdelivr.net/npm/emoji-datasource-facebook/img/facebook/64/${unifiedID}.png`;
+}
+
+function normalizeUnifiedID(value: string): string {
+    const normalizedValue = value.toLowerCase();
+
+    if (!normalizedValue.includes('/')) {
+        return normalizedValue;
+    }
+
+    const unifiedMatch = normalizedValue.match(/([0-9a-f-]+)\.png$/i);
+    return unifiedMatch?.[1] ?? normalizedValue;
+}
 
 export class EmojiNode extends TextNode {
-    __imageUrl: string;
+    __unifiedID: string;
 
     static getType(): string {
         return 'EmojiNode';
     }
 
     static clone(node: EmojiNode): EmojiNode {
-        return new EmojiNode(node.__imageUrl, node.__key);
+        return new EmojiNode(node.__unifiedID, node.__key);
     }
 
-    constructor(imageUrl: string, key?: NodeKey) {
-        // const unicodeEmoji = String.fromCodePoint(
-        //     ...imageUrl.split('-').map((v) => parseInt(v, 16)),
-        // );
-        super(imageUrl, key);
-
-        this.__imageUrl = imageUrl.toLowerCase();
+    constructor(unifiedID: string, key?: NodeKey) {
+        const normalizedUnifiedID = normalizeUnifiedID(unifiedID);
+        super(parseNativeEmoji(normalizedUnifiedID), key);
+        this.__unifiedID = normalizedUnifiedID;
     }
 
-    /**
-     * DOM that will be rendered by browser within contenteditable
-     * This is what Lexical renders
-     */
-    createDOM(_config: EditorConfig): HTMLElement {
-        let imageUrl;
-
-        if (this.__imageUrl) {
-            imageUrl =  this.__imageUrl;
-        }
-        const dom = document.createElement('img');
+    decorateDOM(dom: HTMLElement): void {
         dom.className = 'emoji-node';
-        dom.src = imageUrl || '';
-        dom.style.width = `20px`;
-        dom.style.height = `20px`;
-        dom.innerText = ' ';
+        dom.textContent = parseNativeEmoji(this.__unifiedID);
+        dom.style.backgroundImage = `url("${getEmojiImageUrl(this.__unifiedID)}")`;
+        dom.style.backgroundPosition = 'center';
+        dom.style.backgroundRepeat = 'no-repeat';
+        dom.style.backgroundSize = 'contain';
+        dom.style.color = 'transparent';
+        dom.style.display = 'inline-block';
+        dom.style.height = '1.5em';
+        dom.style.width = '1.5em';
+        dom.style.overflow = 'hidden';
+        dom.style.verticalAlign = 'middle';
+        dom.style.whiteSpace = 'nowrap';
+        dom.setAttribute('data-emoji-unified-id', this.__unifiedID);
+        dom.setAttribute('aria-label', parseNativeEmoji(this.__unifiedID));
+    }
+
+    createDOM(_config: EditorConfig): HTMLElement {
+        const dom = super.createDOM(_config);
+        this.decorateDOM(dom);
         return dom;
     }
 
+    updateDOM(prevNode: this, dom: HTMLElement, config: EditorConfig): boolean {
+        const isUpdated = super.updateDOM(prevNode, dom, config);
+
+        if (prevNode.__unifiedID !== this.__unifiedID) {
+            this.decorateDOM(dom);
+        }
+
+        return isUpdated;
+    }
+
     static importJSON(serializedNode: SerializedEmojiNode): EmojiNode {
-        return $createEmojiNode(serializedNode.imageUrl);
+        return $createEmojiNode(serializedNode.unifiedID ?? serializedNode.imageUrl ?? '');
     }
 
     exportJSON(): SerializedEmojiNode {
         return {
             ...super.exportJSON(),
-            imageUrl: this.__imageUrl,
+            unifiedID: this.__unifiedID,
         };
+    }
+
+    canInsertTextBefore(): boolean {
+        return false;
+    }
+
+    canInsertTextAfter(): boolean {
+        return false;
+    }
+
+    isTextEntity(): true {
+        return true;
     }
 }
 
-export function $createEmojiNode(imageUrl: string): EmojiNode {
-    const node = new EmojiNode(imageUrl)
+export function $createEmojiNode(unifiedID: string): EmojiNode {
+    const node = new EmojiNode(unifiedID)
         // In token mode node can be navigated through character-by-character,
         // but are deleted as a single entity (not invdividually by character).
         // This also forces Lexical to create adjacent TextNode on user input instead of
@@ -80,4 +126,8 @@ export function $createEmojiNode(imageUrl: string): EmojiNode {
         .setMode('token');
 
     return node;
+}
+
+export function $isEmojiNode(node: LexicalNode | null | undefined): node is EmojiNode {
+    return node instanceof EmojiNode;
 }

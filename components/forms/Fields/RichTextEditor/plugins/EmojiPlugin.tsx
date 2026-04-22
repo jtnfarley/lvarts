@@ -6,19 +6,20 @@
  *
  */
 
-import {$createTextNode, $getSelection, $isRangeSelection, COMMAND_PRIORITY_LOW, TextNode} from 'lexical';
+import {$getSelection, $isRangeSelection, COMMAND_PRIORITY_LOW, TextNode} from 'lexical';
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { createCommand } from "lexical";
 import {$createEmojiNode, EmojiNode} from '../nodes/EmojiNode';
 import findEmoji from '../findEmoji';
-import { JSX, useEffect, useState } from 'react';
+import { JSX, useEffect, useRef, useState } from 'react';
 import EmojiPicker from 'emoji-picker-react';
+import type { EmojiClickData } from 'emoji-picker-react';
 import { BiSmile } from "react-icons/bi";
+import { mergeRegister } from '@lexical/utils';
 
-export const INSERT_EMOJI_COMMAND = createCommand('insertEmoji');
+export const INSERT_EMOJI_COMMAND = createCommand<EmojiClickData>('insertEmoji');
 
 function $textNodeTransform(node: TextNode): void {
-    console.log(node)
     if (!node.isSimpleText() || node.hasFormat('code')) {
         return;
     }
@@ -55,26 +56,24 @@ export function EmojiPlugin(): null {
 
     useEffect(() => {
         if (!editor.hasNodes([EmojiNode])) {
-            throw new Error('MapPlugin: MapNode not registered on editor');
+            throw new Error('EmojiPlugin: EmojiNode not registered on editor');
         }
 
-        editor.registerNodeTransform(TextNode, $textNodeTransform);
+        return mergeRegister(
+            editor.registerNodeTransform(TextNode, $textNodeTransform),
+            editor.registerCommand(INSERT_EMOJI_COMMAND, (data: EmojiClickData) => {
+                const selection = $getSelection();
 
-        return editor.registerCommand(INSERT_EMOJI_COMMAND, (data:any) => {
-            const selection = $getSelection();
+                if (!$isRangeSelection(selection)) {
+                    return false;
+                }
 
-            if (!$isRangeSelection(selection)) {
-                return false;
-            }
+                const emojiNode = $createEmojiNode(data.unified);
+                selection.insertNodes([emojiNode]);
 
-            const emojiNode = $createEmojiNode(data?.imageUrl);
-            selection.insertNodes([emojiNode]);
-
-            // const textNode = $createTextNode('');
-            // mapNode.append(textNode);
-            // textNode.select();
-            return true;
-        }, COMMAND_PRIORITY_LOW);
+                return true;
+            }, COMMAND_PRIORITY_LOW),
+        );
     }, [editor]);
 
     return null;
@@ -83,17 +82,35 @@ export function EmojiPlugin(): null {
 export function EmojiToolbarPlugin():JSX.Element {
     const [editor] = useLexicalComposerContext();
     const [emojiOpen, setEmojiOpen] = useState<boolean>(false);
+    const pickerRef = useRef<HTMLDivElement | null>(null);
 
     const openEmojiPicker = ():void => {
         setEmojiOpen(prev => !prev);
     }
 
-    const insertEmoji = (emojiObject:any) => {
+    const insertEmoji = (emojiObject: EmojiClickData) => {
         editor.dispatchCommand(INSERT_EMOJI_COMMAND, emojiObject);
+        setEmojiOpen(false);
     }
 
+    useEffect(() => {
+        const handlePointerDown = (event: MouseEvent | TouchEvent): void => {
+            if (!pickerRef.current?.contains(event.target as Node)) {
+                setEmojiOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handlePointerDown);
+        document.addEventListener('touchstart', handlePointerDown);
+
+        return () => {
+            document.removeEventListener('mousedown', handlePointerDown);
+            document.removeEventListener('touchstart', handlePointerDown);
+        };
+    }, []);
+
     return (
-        <div className='relative mx-2 mt-1'>
+        <div ref={pickerRef} className='relative mx-2 mt-1'>
             <button
                 onClick={openEmojiPicker}
                 className={`toolbar-item spaced`}
