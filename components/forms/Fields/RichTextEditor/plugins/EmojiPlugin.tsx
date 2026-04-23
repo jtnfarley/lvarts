@@ -119,7 +119,7 @@ export function EmojiToolbarPlugin():JSX.Element {
             >
                 <BiSmile />
             </button>
-            <div className='absolute left-[20px] top-[-20px]'>
+            <div className='absolute left-[20px] top-[-20px] z-1000'>
                 <EmojiPicker onEmojiClick={(emojiObject) => insertEmoji(emojiObject)} open={emojiOpen} />
             </div>
         </div>
