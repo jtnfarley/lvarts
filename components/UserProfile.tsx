@@ -48,6 +48,16 @@ export default function UserProfile(props:{currentUser:User, userDetails:UserDet
 								<div className="mb-4">
 									{userDetails.bio}
 								</div>
+								<div className="mb-4">
+									{userDetails.urls && userDetails.urls.length &&
+										userDetails.urls.map((url, index) => {
+											return (
+												<div key={index} className='mb-2'>
+													<a href={url} target='blank' className='text-blue-500'>{url}</a>
+												</div>
+											)
+										})}
+								</div>
 								<div className='flex justify-between text-sm uppercase'>
 									<div>Posts: <strong>{userDetails.postIds?.length || 0}</strong></div>
 									<div>Followers: <strong>{userDetails.followers.length || 0}</strong></div>

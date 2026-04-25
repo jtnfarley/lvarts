@@ -1,6 +1,6 @@
 'use client'
 
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { Button } from '@/components/ui/button';
 import * as z from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +12,10 @@ import { getRandomString } from "@/lib/utils";
 import imageUrl from '@/constants/imageUrl';
 import { compressImage } from "@/lib/utils";
 import OptimizedFile from "@/lib/models/optimizedFile";
+import type { UpdateUserParams } from "@/app/data/user";
+import type UserDetails from "@/lib/models/userDetails";
 import { Spinner } from "../layout/Spinner"
+import { BiPlus, BiX } from "react-icons/bi";
 
 
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
@@ -21,10 +24,11 @@ const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const UserValidation = z.object({
     displayName: z.string().min(1).max(100),
     bio: z.string().max(4000).optional(),
-    avatar: z.any().optional(),    
+    avatar: z.any().optional(),   
+    urls: z.array(z.object({ value: z.string() })).optional(), 
 })
 
-const AccountInfo = (props:{user: User, saveUser:Function}) => {
+const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Promise<UserDetails>}) => {
     const [user, setUser] = useState<User>(props.user);
     const saveUser = props.saveUser;
 
@@ -42,12 +46,18 @@ const AccountInfo = (props:{user: User, saveUser:Function}) => {
     const [userOnboarded, setUserOnboarded] = useState(user.userDetails && user.userDetails.displayName && user.userDetails.displayName !== '')
     const [avatarUrl, setAvatarUrl] = useState<string | undefined>(avatarUrlInit);
 
-    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<z.infer<typeof UserValidation>>({
+    const { register, handleSubmit, setValue, control, formState: { errors } } = useForm<z.infer<typeof UserValidation>>({
         resolver: zodResolver(UserValidation),
         defaultValues: {
             displayName: user.userDetails?.displayName || undefined,
             bio: user.userDetails?.bio || undefined,
+            urls: user.userDetails?.urls?.map((value) => ({ value })) || []
         }
+    })
+
+    const { fields: urlFields, append: appendUrl, remove: removeUrl } = useFieldArray({
+        control,
+        name: 'urls'
     })
 
     const avatarRegister = register('avatar')
@@ -100,14 +110,15 @@ const AccountInfo = (props:{user: User, saveUser:Function}) => {
 
                 avatarUrl = file.name;
             }
-            
+
             const userDetails = await saveUser({
                 id,
                 userId: user.id,
                 bio: values.bio,
                 displayName: values.displayName,
                 userDir,
-                avatar: avatarUrl
+                avatar: avatarUrl,
+                urls: values.urls?.map((url) => url.value.trim()).filter(Boolean) || []
             })
 
             if (values.displayName && values.displayName !== '' && !userOnboarded) {
@@ -124,10 +135,13 @@ const AccountInfo = (props:{user: User, saveUser:Function}) => {
         setIsSaving(false);
     }
 
-    // const generateInviteCodes = async () => {
-    //     const codes = await generateCodes(10)
-    //     console.log(codes)
-    // }
+    const addLinkInput = () => {
+        appendUrl({ value: '' })
+    }
+
+    const deleteLink = (index:number) => {
+        removeUrl(index)
+    }
 
     return (
         <div>
@@ -138,7 +152,7 @@ const AccountInfo = (props:{user: User, saveUser:Function}) => {
                     encType="multipart/form-data"
                 >
                     <div className="mb-4">
-                        <label className="flex items-center text-gray-700 font-medium mb-2" htmlFor="name">
+                        <label className="flex items-center text-gray-700 font-medium mb-2" htmlFor="avatar">
                             <div>Avatar</div>
                             <div className="text-xs ms-1">(square images work best)</div>
                         </label>
@@ -167,11 +181,11 @@ const AccountInfo = (props:{user: User, saveUser:Function}) => {
                         </label>
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 font-medium mb-2" htmlFor="name">
+                        <label className="block text-gray-700 font-medium mb-2" htmlFor="displayName">
                             Display Name
                         </label>
                         <input
-                            className="bg-white border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
+                            className="bg-white border border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
                             id="displayName"
                             {...register('displayName', { required: true })}
                         />
@@ -181,14 +195,40 @@ const AccountInfo = (props:{user: User, saveUser:Function}) => {
                         }
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 font-medium mb-2" htmlFor="name">
+                        <label className="block text-gray-700 font-medium mb-2" htmlFor="bio">
                             Bio
                         </label>
                         <textarea
-                            className="bg-white border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500 h-30"
+                            className="bg-white border border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500 h-30"
                             id="bio"
                             {...register('bio')}
                         />
+                    </div>
+                    <div className="mb-4">
+                        <label className="flex justify-between text-gray-700 font-medium mb-2" htmlFor="urls">
+                            <div>Links</div> 
+                            <div><Button type='button' className='bg-transparent text-gray-600 cursor-pointer shadow-none hover:bg-gray-100' onClick={addLinkInput}><BiPlus /></Button></div>
+                        </label>
+                        <div>
+                        {urlFields.map((field, index:number) => {
+                            return (
+                                <div className="flex w-full" key={field.id}>
+                                    <div className="flex-1">
+                                        <input
+                                            className="bg-white border border-gray-200 rounded w-full py-2 px-3 mb-2 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
+                                            id={`urls${index}`}
+                                            {...register(`urls.${index}.value`)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <Button type='button' className="bg-transparent shadow-none flex w-10 text-red-700 justify-center align-middle hover:bg-transparent cursor-pointer" onClick={() => deleteLink(index)}>
+                                            <BiX />
+                                        </Button>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                        </div>
                     </div>
 
                     <div className="flex">

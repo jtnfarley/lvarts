@@ -1,13 +1,14 @@
 import {prisma} from '@/lib/db/prisma'
 import UserDetails from '@/lib/models/userDetails'
 
-interface UpdateUserParams {
+export interface UpdateUserParams {
     id?: string,
     userId: string,
     bio?: string,
     displayName?: string,
     avatar?: string
-    userDir?: string
+    userDir?: string,
+    urls: string[]
 }
 
 export const updateUser = async ({
@@ -16,7 +17,8 @@ export const updateUser = async ({
     bio,
     displayName,
     avatar,
-    userDir
+    userDir,
+    urls
 }:UpdateUserParams): Promise<UserDetails> => {
     const date = new Date()
     const createdAt = date
@@ -33,6 +35,7 @@ export const updateUser = async ({
                     bio,
                     displayName,
                     updatedAt,
+                    urls,
                     ...(avatar !== undefined ? { avatar } : {}),
                     ...(userDir ? { userDir } : {})
                 }
@@ -54,7 +57,8 @@ export const updateUser = async ({
                     followers: [],
                     following: [],
                     likedPosts: [],
-                    postIds: []
+                    postIds: [],
+                    urls
                 }
             })
         }
@@ -62,7 +66,8 @@ export const updateUser = async ({
         return userDetails;
 
         // if (path === '/profile/edit') revalidatePath(path)
-    } catch (error:any) {
-        throw new Error(`Failed to update user: ${error.message}`)
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Unknown error'
+        throw new Error(`Failed to update user: ${message}`)
     }   
 }

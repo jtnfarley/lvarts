@@ -16,5 +16,6 @@ export default interface UserDetails {
 	postIds?: string[]
 	posts?: Post[]
 	suspended?: boolean | null
-	updatedAt: Date
+	updatedAt: Date,
+	urls: string[]
 }

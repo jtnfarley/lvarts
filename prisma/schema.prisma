@@ -130,6 +130,7 @@ model UserDetails {
   image         String?
   likedPosts    String[]        @db.ObjectId
   postIds       String[]        @db.ObjectId
+  urls          String[]
   suspended     Boolean?
   posts         Posts[]
   notifications Notifications[]
