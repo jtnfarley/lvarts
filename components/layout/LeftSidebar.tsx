@@ -4,6 +4,7 @@ import Image from "next/image"
 import SignOut from '@/components/auth/buttons/SignOut';
 import Nav from "./Nav";
 import {isLoggedIn} from "@/app/data/currentUser";
+import imageUrl from '@/constants/imageUrl';
 
 export default async function LeftSidebar() {
 	const user = await isLoggedIn();
@@ -21,7 +22,28 @@ export default async function LeftSidebar() {
 						priority
                     />
                 </a>
-				<div className='ms-3 uppercase'>beta version 0.1.0</div>
+				<div className='ms-3 uppercase'>beta version 0.1.9</div>
+				{user && user.userDetails && user.userDetails.avatar ?
+					<div className='h-50 flex justify-center items-center'>
+						<Image
+							src={`${imageUrl}/${user.userDetails.userDir}/${user.userDetails.avatar}`}
+							alt={user.userDetails?.displayName || 'Lehigh Valley Art & Music'}
+							width={300}
+							height={300}
+							className='w-35 h-35 rounded-full border-4'
+						/>
+					</div>
+					:
+					<div className='h-50 flex justify-center items-center'>
+						<Image
+							src={`/images/melty-man.png`}
+							alt={'Lehigh Valley Art & Music'}
+							width={300}
+							height={300}
+							className='w-35 h-35 rounded-full border-4'
+						/>
+					</div>
+				}
 				<div className='mt-4'>
 					<Nav user={user}/>
 				</div>
