@@ -32,7 +32,7 @@ export default async function RecUsers() {
 	let recUsers:Array<UserDetails> = await getRandoUsers(user.id)
 
 	return (
-		<section className="xl:bg-white xl:p-5 lg:bg-none lg:p-0 rounded-lg">
+		<section className="xl:bg-white xl:p-8 lg:bg-none lg:p-0 rounded-lg">
 			<div className='hidden text-gray-700 font-bold text-md uppercase xl:flex justify-center'>Your Next Best Friend</div>
 			<div className="flex gap-2 justify-between mt-5 xl:w-[250] xl:flex-col">
 				{

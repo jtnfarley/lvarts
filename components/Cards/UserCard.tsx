@@ -32,7 +32,7 @@ const UserCard = ({currentUser, recUserId, displayName, avatar, bio}: Props) => 
     }, [])
 
     return (
-        <article className="xl:w-full xl:bg-white xl:border-b-1 xl:px-7 xl:py-4">
+        <article className="xl:w-full xl:bg-white xl:border-b-1 xl:py-4">
             <div className="flex items-center text-gray-700 text-sm gap-3 justify-between">
                 <button className="flex gap-3 items-center cursor-pointer" onClick={viewProfile} title={displayName}>
                     <div><img src={avatar} className='rounded-sm border-dark-2 w-[50px] h-[50px] xl:border-0'/></div>
