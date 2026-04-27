@@ -14,6 +14,7 @@ export default interface UserDetails {
 	avatar?: string | null
 	likedPosts: string[]
 	postIds?: string[]
+	postCount?: number
 	posts?: Post[]
 	suspended?: boolean | null
 	updatedAt: Date,

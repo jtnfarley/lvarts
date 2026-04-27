@@ -7,18 +7,33 @@ import { prisma } from '@/prisma';
 import UserDetails from "./lib/models/userDetails";
 
 const getUserDetails = async (userId:string):Promise<UserDetails | null> => {
-  return new Promise(async resolve => {
-    const userDetails = await prisma.userDetails.findFirst({
-        omit: {
-            postIds: true
-        },
-        where: {
-            userId
+  const [userDetails, postCount] = await prisma.$transaction([
+    prisma.userDetails.findFirst({
+      omit: {
+        postIds: true
+      },
+      where: {
+        userId
+      }
+    }),
+    prisma.posts.count({
+      where: {
+        userId,
+        postType: {
+          not: 'chat'
         }
+      }
     })
+  ])
 
-    return resolve(userDetails);
-  })
+  if (!userDetails) {
+    return null
+  }
+
+  return {
+    ...userDetails,
+    postCount
+  }
 }
 
 declare module "next-auth" {

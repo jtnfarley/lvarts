@@ -42,7 +42,7 @@
     }
 
     .leftsidebar {
-        @apply w-md sticky left-0 top-0 z-20 flex h-screen flex-col justify-between overflow-auto border-r-1 border-r-lightgray bg-white pb-5 max-md:hidden;
+        @apply w-md sticky left-0 top-0 z-20 flex h-screen flex-col justify-between overflow-hidden border-r-1 border-r-lightgray bg-white pb-5 max-md:hidden;
     }
 
     .avatar-profile {

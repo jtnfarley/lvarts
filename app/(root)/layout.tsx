@@ -23,7 +23,7 @@ export default async function RootLayout({
 		<div>
 			<TopBar/>
 			<main className="flex flex-row">
-				<LeftSidebar/>
+				<LeftSidebar currentUser={user}/>
 				<section className="main-container">
 					<div className="flex flex-col min-h-screen w-full ">
 						<div className='my-4'>

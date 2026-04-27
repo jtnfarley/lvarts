@@ -2,33 +2,7 @@ import Post from '@/lib/models/post';
 import { prisma } from '@/prisma';
 import UserProfile from '@/components/UserProfile';
 import {currentUser} from "@/app/data/currentUser";
-
-const getUserDetailsWithPosts = async (userId:string) => {
-	const userDetails = await prisma.userDetails.findFirst({
-		where: {
-			userId
-		},
-		include: {
-			posts: {
-				where: {
-					postType: {
-						not: 'chat'
-					}
-				},
-				include: {
-					parentPost:true,
-					userDetails: true
-				},
-				orderBy: {
-					createdAt: 'desc'
-				},
-				take: 20
-			}
-		}
-	})
-
-	return userDetails
-}
+import { getUserDetailsWithPosts } from "@/app/data/userProfiles";
 
 const getOldPosts = async (userId:string, skip?:number):Promise<Array<Post>> => {
 	'use server'

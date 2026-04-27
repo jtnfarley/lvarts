@@ -34,7 +34,7 @@ export default function UserProfile(props:{currentUser:User, userDetails:UserDet
 		<>
             {googleMapsApiKey &&
                 <APIProvider apiKey={googleMapsApiKey || ''}>
-					<div className="lg:bg-white lg:rounded-xl lg:p-5 sm:bg-none sm:p-0 mt-5 mb-5">
+					<div className="xl:hidden lg:block lg:bg-white lg:rounded-xl lg:p-5 sm:bg-none sm:p-0 mt-5 mb-5">
 						{currentUser && userDetails && 
 							<section className="flex flex-col justify-between min-h-50 rounded-box">
 								<div className="mb-4 flex">
@@ -49,7 +49,7 @@ export default function UserProfile(props:{currentUser:User, userDetails:UserDet
 									{userDetails.bio}
 								</div>
 								<div className="mb-4">
-									{userDetails.urls && userDetails.urls.length &&
+									{userDetails.urls && userDetails.urls.length > 0 &&
 										userDetails.urls.map((url, index) => {
 											return (
 												<div key={index} className='mb-2'>
@@ -59,7 +59,7 @@ export default function UserProfile(props:{currentUser:User, userDetails:UserDet
 										})}
 								</div>
 								<div className='flex justify-between text-sm uppercase'>
-									<div>Posts: <strong>{userDetails.postIds?.length || 0}</strong></div>
+									<div>Posts: <strong>{userDetails.postCount || 0}</strong></div>
 									<div>Followers: <strong>{userDetails.followers.length || 0}</strong></div>
 									<div>Following: <strong>{userDetails.following.length || 0}</strong></div>
 								</div>

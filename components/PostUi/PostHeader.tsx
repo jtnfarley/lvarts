@@ -16,13 +16,13 @@ export default function PostHeader(props:{postData:Post, user:User, currentUserP
 
     return (
 		<div className='flex flex-row px-3 py-3 shadow-md rounded-2xl'>
-			<div className='flex flex-row gap-3'>
+			<Link href={`/user/${post.user?.id}`} title={`${post.userDetails?.displayName}'s profile`} className='flex flex-row gap-3'>
 				<div><img src={avatar} className='rounded-full w-[50px] h-[50px]'/></div>
 				<div>
-					<div className='text-sm font-bold'><Link href={`/user/${post.user?.id}`} title={`${post.userDetails?.displayName}'s profile`}>{post.userDetails?.displayName}</Link></div>
+					<div className='text-sm font-bold'>{post.userDetails?.displayName}</div>
 					<div className='text-[10px]'>{post.createdAt.toDateString()}</div>
 				</div>
-			</div>
+			</Link>
 			{!currentUserPost && 
 				<Follow followUserId={post.userId} user={props.user}/>
 			}
