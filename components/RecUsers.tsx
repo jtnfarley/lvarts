@@ -11,7 +11,7 @@ const getRandoUsers = async (userId:string):Promise<UserDetails[]> => {
 	if (userDetailsCount) {
 		const skip = Math.floor(Math.random() * (userDetailsCount - 1)); //remove logged-in user
 		const userDetails = await prisma.userDetails.findMany({
-			// take: 5,
+			take: 5,
 			// skip: skip,
 			where: {
 				userId: {
@@ -32,9 +32,9 @@ export default async function RecUsers() {
 	let recUsers:Array<UserDetails> = await getRandoUsers(user.id)
 
 	return (
-		<section className="xl:bg-gray-50/70 xl:backdrop-blur-sm xl:rounded-3xl xl:p-5 lg:bg-none lg:p-0">
-			<div className='hidden text-gray-700 font-bold text-md uppercase xl:block'>Your Next Best Friend</div>
-			<div className="flex xl:mt-7 xl:w-[250] xl:flex-col gap-3">
+		<section className="xl:bg-white xl:p-5 lg:bg-none lg:p-0 rounded-lg">
+			<div className='hidden text-gray-700 font-bold text-md uppercase xl:flex justify-center'>Your Next Best Friend</div>
+			<div className="flex gap-2 justify-between mt-5 xl:w-[250] xl:flex-col">
 				{
 					recUsers.length > 0 ? (
 						<>
@@ -48,7 +48,8 @@ export default async function RecUsers() {
 										avatar={ (userDetails && userDetails.userDir && userDetails.avatar) ?
 											`${imageUrl}/${userDetails.userDir}/${userDetails.avatar}` :
 											'/images/melty-man.png'
-									}
+										}
+										bio={ userDetails.bio }
 										// userType = 'User'
 									/>
 								))

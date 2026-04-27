@@ -11,7 +11,6 @@ const TopBar = () => {
                     className="max-w-762 w-full"
                 />
             </a>
-            <div className='me-3 uppercase flex justify-end'>beta version 0.1.0</div>
         </nav>
     )
 }

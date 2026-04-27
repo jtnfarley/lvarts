@@ -25,17 +25,15 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 	}, [])
 
 	return (		
-		<div className='flex md:flex-col md:pe-10 gap-8 items-end'>
+		<div className='flex gap-8 justify-center items-center'>
 			{user ?
 				<>
 					<a href="/home" className={`leftsidebar_link flex flex-row items-center`}>
-						<p className="hidden text-gray-500 text-lg md:block me-4">Home</p>
 						<div className="relative">
 							<BiSolidHomeAlt2 className="leftIcon"/>
 						</div>
 					</a>
 					<Link href="/notifications" className={`leftsidebar_link flex flex-row items-center`} onClick={() => setHasNotis(false)}>
-						<p className="hidden text-gray-500 text-lg md:block me-4">Notifications</p>
 						<div className="relative">
 							<BiSolidBell className="leftIcon"/>
 							{hasNotis &&
@@ -44,13 +42,11 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 						</div>
 					</Link>
 					<Link href="/calendar" className={`leftsidebar_link flex flex-row items-center`}>
-						<p className="hidden text-gray-500 text-lg md:block me-4">Calendar</p>
 						<div className="relative">
 							<BiSolidCalendar className="leftIcon"/>
 						</div>
 					</Link>
 					<Link href="/profile" className={`leftsidebar_link flex flex-row items-center`}>
-						<p className="hidden text-gray-500 text-lg md:block me-4">Profile</p>
 						<div className="relative">
 							<BiSolidUser className="leftIcon"/>
 						</div>

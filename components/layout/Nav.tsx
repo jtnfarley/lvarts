@@ -29,7 +29,7 @@ export default async function Nav(props: {user?:User}) {
 	}
 
 	return (		
-		<div className='flex md:flex-col md:pe-10 gap-8 items-end'>
+		<div className=''>
 			{user ?
 				<NavClient user={user} hasNotis={hasNotis} hasNewNotifications={hasNewNotifications}/>
 				:

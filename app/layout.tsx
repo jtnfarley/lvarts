@@ -27,7 +27,7 @@ export default async function RootLayout({
 					<RandoBgs/>
 					
 					<main className='lg:flex lg:justify-center'>
-						<div className="lg:w-[1300px]">
+						<div className="lg:w-full">
 							{children}
 						</div>
 					</main>

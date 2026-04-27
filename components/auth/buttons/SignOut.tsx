@@ -16,8 +16,8 @@ export default function SignOut() {
 
     return (
         <button onClick={signOutUser} className='text-gray-500 text-lg flex flex-row items-center'>
-            <BiSolidArrowToLeft className='leftIcon'/>
-            <div className='hidden md:block'>Log Out</div>
+            <BiSolidArrowToLeft />
+            <div className='hidden md:block'>Sign Out</div>
         </button>
     )
 }
