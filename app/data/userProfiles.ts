@@ -56,7 +56,11 @@ export const getUserDetailsWithPosts = async (userId:string): Promise<UserDetail
                         }
                     },
                     include: {
-                        parentPost: true,
+                        parentPost: {
+                            include: {
+                                userDetails: true
+                            }
+                        },
                         userDetails: true
                     },
                     orderBy: {

@@ -9,7 +9,7 @@ const getRandoUsers = async (userId:string):Promise<UserDetails[]> => {
 	
 	const userDetailsCount = await prisma.userDetails.count();
 	if (userDetailsCount) {
-		const skip = Math.floor(Math.random() * (userDetailsCount - 1)); //remove logged-in user
+		const skip = Math.floor(Math.random() * (userDetailsCount - 1)) ?? 5; //remove logged-in user
 		const userDetails = await prisma.userDetails.findMany({
 			take: 5,
 			skip: skip,

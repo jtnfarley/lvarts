@@ -13,8 +13,8 @@ import { LoadOldPosts } from './PostUi/LoadOldPosts';
 import { usePathname } from 'next/navigation';
 import SidebarProfile from '@/lib/models/sidebarProfile';
 
-export default function UserProfile(props:{currentUser:User, getOldPosts:Function, googleMapsApiKey:string}) {
-	const {currentUser, getOldPosts, googleMapsApiKey} = props;
+export default function UserProfile(props:{currentUser:User, userDetails:UserDetails, getOldPosts:Function, googleMapsApiKey:string}) {
+	const {currentUser, getOldPosts, googleMapsApiKey, userDetails} = props;
 	const pathname = usePathname();
 	const loggedInProfile = toSidebarProfile(currentUser);
 	const viewedUserId = getProfileUserIdFromPath(pathname);
@@ -28,9 +28,9 @@ export default function UserProfile(props:{currentUser:User, getOldPosts:Functio
 		return null;
 	})
 
-	const [posts, setPosts] = useState<Post[]>(currentUser.userDetails?.posts || []);
+	const [posts, setPosts] = useState<Post[]>(userDetails.posts || []);
 	const [renderKey, setRenderKey] = useState(0);
-	const tempFeedRef = useRef<Post[]>(currentUser.userDetails?.posts);
+	const tempFeedRef = useRef<Post[]>(userDetails.posts);
 	const [endOfPosts, setEndOfPosts] = useState(false);
 
 	const getOldPostsFromServer = async () => {
@@ -89,7 +89,7 @@ export default function UserProfile(props:{currentUser:User, getOldPosts:Functio
 						}
 					</div>
 
-					{currentUser && currentUser.userDetails && posts &&
+					{userDetails && posts &&
 						<div className='flex flex-col gap-5'>
 							{posts.map((post:Post, index:number) => {
 								return (
