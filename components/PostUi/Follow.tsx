@@ -19,6 +19,7 @@ export default function Follow(props:{followUserId:string, user:User}) {
 			setFollowing(false)
 			return
 		}   
+		console.log(user.id, followUserId)
 		await followUser({userId:user.id, toFollowId:followUserId})
 		setFollowing(true)
 	}

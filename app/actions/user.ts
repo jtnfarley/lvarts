@@ -30,6 +30,28 @@ export const followUser = async ({userId, toFollowId}:FollowUserParams) => {
         }
     })
 
+    const followedUser = await prisma.userDetails.findFirst({
+        where: {
+            userId: toFollowId
+        }
+    })
+
+    if (!followedUser) return;
+
+    const followers = followedUser.followers
+    if (followers.includes(user.id)) return
+
+    followers.push(user.id)
+
+    await prisma.userDetails.update({
+        where: {
+            id: followedUser.id
+        },
+        data: {
+            followers
+        }
+    })
+
     await prisma.notifications.create({
         data: {
             createdAt: new Date(),
@@ -53,6 +75,7 @@ export const unfollowUser = async ({userId, toFollowId}:FollowUserParams) => {
 
     const following = user.following
     if (!following.includes(toFollowId)) return
+
     const index = following.indexOf(toFollowId)
     following.splice(index, 1)
     if (index === -1) return
@@ -63,6 +86,30 @@ export const unfollowUser = async ({userId, toFollowId}:FollowUserParams) => {
         },
         data: {
             following: following || []
+        }
+    })
+
+    const unfollowedUser = await prisma.userDetails.findFirst({
+        where: {
+            userId: toFollowId
+        }
+    })
+
+    if (!unfollowedUser) return;
+
+    const followers = unfollowedUser.followers
+    if (!followers.includes(user.id)) return
+
+    const ufIndex = followers.indexOf(user.id)
+    followers.splice(ufIndex, 1)
+    if (ufIndex === -1) return
+
+    await prisma.userDetails.update({
+        where: {
+            id: unfollowedUser.id
+        },
+        data: {
+            followers
         }
     })
 }
