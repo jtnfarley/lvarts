@@ -23,7 +23,7 @@ const UserCard = ({currentUser, recUserId, displayName, avatar, bio}: Props) => 
     }
 
     const truncateBio = (bio:string) => {
-        return (bio.length > 100) ? bio.substring(0, 100) : bio;
+        return (bio.length > 100) ? `${bio.substring(0, 100)}...` : bio;
     } 
     useEffect(() => {
         if (currentUser.userDetails?.following?.includes(recUserId)) {
