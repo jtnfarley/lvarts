@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import User from "./models/user";
+import SidebarProfile from "./models/sidebarProfile";
 
 export function cn(...inputs: ClassValue[]) {
   	return twMerge(clsx(inputs))
@@ -75,4 +77,28 @@ export const compressImage = (file:File, maxWidth = 800, maxHeight = 600):Promis
 			}
 		};
 	});
+}
+
+export const getProfileUserIdFromPath = (pathname:string) => {
+	const match = pathname.match(/^\/user\/([^/]+)$/)
+
+	return match ? match[1] : null
+}
+
+export const toSidebarProfile = (user:User): SidebarProfile | null => {
+	if (!user.userDetails) {
+		return null
+	}
+
+	return {
+		userId: user.userDetails.userId,
+		displayName: user.userDetails.displayName,
+		avatar: user.userDetails.avatar,
+		userDir: user.userDetails.userDir,
+		followers: user.userDetails.followers,
+		following: user.userDetails.following,
+		bio: user.userDetails.bio,
+		postCount: user.userDetails.postCount || 0,
+		urls: user.userDetails.urls || []
+	}
 }

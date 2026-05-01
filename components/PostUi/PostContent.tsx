@@ -8,6 +8,7 @@ import Post from '@/lib/models/post';
 import PostMedia from './PostMedia';
 import PostTemplateTags from './PostTemplateTags';
 import { formatDate } from '@/lib/utils';
+import { getPostTypeLabel, isSceneCommunityPostType, splitPostTags } from '@/lib/scenePosts';
 
 export default function PostContent(props:{post:Post, googleMapsApiKey:string | undefined}) {
 	const post = props.post;
@@ -17,6 +18,9 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 				index: number,
 				tagText: string
 			}>>();
+    const displayTitle = post.headline || post.eventTitle
+    const postTags = splitPostTags(post.tags)
+    const sceneTypeLabel = isSceneCommunityPostType(post.postType) ? getPostTypeLabel(post.postType) : null
 
 	const parseTemplateTags = (post:string) => {
 		let placeholder = post;
@@ -117,12 +121,52 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 		<div>
 			<div className='px-4 pb-4 pt-3'>
 				{
-					post.eventTitle &&
-						<div className='text-2xl font-bold'><Link href={`/post/${post.id}`} title={post.eventTitle}>{post.eventTitle}</Link></div>
+					displayTitle &&
+						<div className='text-2xl font-bold'><Link href={`/post/${post.id}`} title={displayTitle}>{displayTitle}</Link></div>
 				}
 				{
 					post.eventDate &&
 						<div className='mb-5 text-lg'>{formatDate(post.eventDate)}</div>
+				}
+				{
+					(sceneTypeLabel || post.status) &&
+						<div className='mb-4 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-wide'>
+							{sceneTypeLabel &&
+								<div className='rounded-full bg-orange/10 px-3 py-1 text-orange-700'>{sceneTypeLabel}</div>
+							}
+							{post.status &&
+								<div className='rounded-full bg-slate-100 px-3 py-1 text-slate-700'>{post.status}</div>
+							}
+						</div>
+				}
+				{
+					(post.town || post.neighborhood || post.venueName || post.locationLabel) &&
+						<div className='mb-4 rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-700'>
+							<div className='mb-1 font-semibold uppercase tracking-wide text-gray-500'>Scene Details</div>
+							<div className='flex flex-wrap gap-x-4 gap-y-1'>
+								{post.town && <div>Town: <strong>{post.town}</strong></div>}
+								{post.neighborhood && <div>Neighborhood: <strong>{post.neighborhood}</strong></div>}
+								{post.venueName && <div>Venue: <strong>{post.venueName}</strong></div>}
+								{post.locationLabel && <div>Address: <strong>{post.locationLabel}</strong></div>}
+							</div>
+						</div>
+				}
+				{
+					post.seeking &&
+						<div className='mb-4 rounded-2xl bg-orange/5 px-4 py-3 text-sm'>
+							<div className='mb-1 font-semibold uppercase tracking-wide text-orange-700'>Seeking</div>
+							<div>{post.seeking}</div>
+						</div>
+				}
+				{
+					postTags.length > 0 &&
+						<div className='mb-4 flex flex-wrap gap-2 text-sm'>
+							{postTags.map((tag) => (
+								<Link key={tag} href={`/search/${encodeURIComponent(tag)}`} className='rounded-full bg-blue-50 px-3 py-1 text-blue-600'>
+									#{tag}
+								</Link>
+							))}
+						</div>
 				}
 				{ cleanContent && 
 					<>

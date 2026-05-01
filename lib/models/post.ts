@@ -5,6 +5,7 @@ export default interface Post {
     id: string
 	content: string
 	lexical?: string | null
+	headline?: string | null
     userId: string 
 	userDetailsId?: string | null
 	userDetails?: UserDetails | null
@@ -25,4 +26,11 @@ export default interface Post {
 	commentCount?: number | null
 	eventTitle?: string | null
 	eventDate?: Date | null
+	town?: string | null
+	neighborhood?: string | null
+	venueName?: string | null
+	locationLabel?: string | null
+	tags?: string | null
+	seeking?: string | null
+	status?: string | null
 }

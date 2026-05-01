@@ -46,6 +46,11 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 							<BiSolidCalendar className="leftIcon"/>
 						</div>
 					</Link>
+					<Link href="/scene" className={`leftsidebar_link flex flex-row items-center`}>
+						<div className="relative">
+							<BiSolidSearch className="leftIcon"/>
+						</div>
+					</Link>
 					<Link href="/profile" className={`leftsidebar_link flex flex-row items-center`}>
 						<div className="relative">
 							<BiSolidUser className="leftIcon"/>

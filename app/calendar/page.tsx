@@ -6,6 +6,7 @@ import { BiCalendarPlus } from "react-icons/bi";
 import type { Metadata } from 'next';
 import { prisma } from '@/prisma';
 import Post from '@/lib/models/post';
+import { SCENE_SCHEDULED_POST_TYPES } from '@/lib/scenePosts';
 
 export const metadata: Metadata = {
   title: 'Event Calendar - Lehigh Vally Art & Music',
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
 const getEvents = async ():Promise<Array<Post>> => {
 	const posts:Array<Post> = await prisma.posts.findMany({
 		where: {
-			postType: 'event',
+			postType: {
+				in: [...SCENE_SCHEDULED_POST_TYPES]
+			},
 			eventDate: {
 				gt: new Date()
 			}
@@ -59,7 +62,7 @@ export default async function Calendar() {
 			}
 			<div>
 				<div className="flex flex-col gap-5 pb-5">
-					<div className='text-xl'>Lehigh Valley Art & Music Events</div>
+					<div className='text-xl'>Lehigh Valley Events, Open Mics & Jam Sessions</div>
 					<div>
 						<EventsByMonth events={events}/>
 					</div>

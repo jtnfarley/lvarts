@@ -23,7 +23,7 @@ export const getInitFeed = async (user:User):Promise<Array<Post>> => {
 			userDetails: true,
 			parentPost: {
 				include: {
-					userDetails: true
+                    userDetails: true
 				}
 			}
 		},
@@ -213,6 +213,7 @@ export const savePost = async (postData:any) => {
     const {
         content, 
         lexical, 
+        headline,
         userId, 
         postType, 
         postFile, 
@@ -221,7 +222,14 @@ export const savePost = async (postData:any) => {
         parentPostId, 
         edited,
         eventTitle,
-        eventDate
+        eventDate,
+        town,
+        neighborhood,
+        venueName,
+        locationLabel,
+        tags,
+        seeking,
+        status
     } = postData
 
     const date = new Date()
@@ -247,6 +255,7 @@ export const savePost = async (postData:any) => {
                 following: [],
                 likedPosts: [],
                 postIds: [],
+                urls: []
             }
         })
     }
@@ -254,6 +263,7 @@ export const savePost = async (postData:any) => {
     const postDataCreate: Prisma.PostsUncheckedCreateInput = {
         content,
         lexical: lexical ?? null,
+        headline: headline ?? null,
         userId,
         userDetailsId: userDetails.id,
         postType: postType ?? null,
@@ -263,8 +273,15 @@ export const savePost = async (postData:any) => {
         parentPostId: parentPostId ?? null,
         createdAt,
         updatedAt,
-        eventTitle,
-        eventDate,
+        eventTitle: eventTitle ?? null,
+        eventDate: eventDate ?? null,
+        town: town ?? null,
+        neighborhood: neighborhood ?? null,
+        venueName: venueName ?? null,
+        locationLabel: locationLabel ?? null,
+        tags: tags ?? null,
+        seeking: seeking ?? null,
+        status: status ?? null,
         ...(postFileType !== undefined ? { postFileType } : {}),
     }
 

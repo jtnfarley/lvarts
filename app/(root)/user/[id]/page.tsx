@@ -44,6 +44,8 @@ export default async function UserProfilePage({
 
 	const userDetails = await getUserDetailsWithPosts(id.toString());
 
+	user.userDetails = userDetails ?? user.userDetails;
+
 	const googleMapsApiKey = process.env.GOOGLE_MAPS; //has to be handled on the server
 
 	return (
@@ -51,7 +53,7 @@ export default async function UserProfilePage({
             {
 			googleMapsApiKey && user && userDetails &&
 				<div className='pb-5'>
-					<UserProfile currentUser={user} userDetails={userDetails} getOldPosts={getOldPosts} googleMapsApiKey={googleMapsApiKey}/>
+					<UserProfile currentUser={user} getOldPosts={getOldPosts} googleMapsApiKey={googleMapsApiKey}/>
 				</div>
 			}
 		</>

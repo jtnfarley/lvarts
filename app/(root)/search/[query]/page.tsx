@@ -6,9 +6,48 @@ import Search from '@/components/Search';
 const getPosts = async (queryString:string):Promise<Array<Post>> => {
     const posts:Array<Post> = await prisma.posts.findMany({
         where: {
-            content: {
-                contains: queryString
-            },
+            OR: [
+                {
+                    content: {
+                        contains: queryString
+                    }
+                },
+                {
+                    headline: {
+                        contains: queryString
+                    }
+                },
+                {
+                    eventTitle: {
+                        contains: queryString
+                    }
+                },
+                {
+                    town: {
+                        contains: queryString
+                    }
+                },
+                {
+                    neighborhood: {
+                        contains: queryString
+                    }
+                },
+                {
+                    venueName: {
+                        contains: queryString
+                    }
+                },
+                {
+                    locationLabel: {
+                        contains: queryString
+                    }
+                },
+                {
+                    tags: {
+                        contains: queryString
+                    }
+                }
+            ],
             postType: {
                 not: 'chat'
             }

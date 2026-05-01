@@ -1,25 +1,40 @@
 'use client'
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {APIProvider} from '@vis.gl/react-google-maps';
 import UserDetails from '@/lib/models/userDetails';
-import Follow from '@/components/PostUi/Follow';
 import User from '@/lib/models/user';
-import imageUrl from '@/constants/imageUrl';
 import PostUi from '@/components/PostUi/PostUi';
 import Post from '@/lib/models/post';
+import { getSidebarUserProfile } from '@/app/data/sidebar';
+import { getProfileUserIdFromPath, toSidebarProfile } from "@/lib/utils"
+import Profile from "./Cards/Profile"
 import { LoadOldPosts } from './PostUi/LoadOldPosts';
+import { usePathname } from 'next/navigation';
+import SidebarProfile from '@/lib/models/sidebarProfile';
 
-export default function UserProfile(props:{currentUser:User, userDetails:UserDetails, getOldPosts:Function, googleMapsApiKey:string}) {
-	const {currentUser, userDetails, getOldPosts, googleMapsApiKey} = props;
-	const avatarUrl = `${imageUrl}/${userDetails.userDir}/${userDetails.avatar}`
-	const [posts, setPosts] = useState<Post[]>(userDetails.posts || []);
+export default function UserProfile(props:{currentUser:User, getOldPosts:Function, googleMapsApiKey:string}) {
+	const {currentUser, getOldPosts, googleMapsApiKey} = props;
+	const pathname = usePathname();
+	const loggedInProfile = toSidebarProfile(currentUser);
+	const viewedUserId = getProfileUserIdFromPath(pathname);
+	const targetUserId = viewedUserId || currentUser.id;
+
+	const [profile, setProfile] = useState<SidebarProfile | null>(() => {
+		if (targetUserId === currentUser.id) {
+			return loggedInProfile;
+		}
+
+		return null;
+	})
+
+	const [posts, setPosts] = useState<Post[]>(currentUser.userDetails?.posts || []);
 	const [renderKey, setRenderKey] = useState(0);
-	const tempFeedRef = useRef<Post[]>(userDetails.posts);
+	const tempFeedRef = useRef<Post[]>(currentUser.userDetails?.posts);
 	const [endOfPosts, setEndOfPosts] = useState(false);
 
 	const getOldPostsFromServer = async () => {
-		const oldPosts = await getOldPosts(userDetails.userId, posts.length);
+		const oldPosts = await getOldPosts(profile?.userId, posts.length);
 	
 		if (oldPosts && oldPosts.length && tempFeedRef.current && tempFeedRef.current.length) {
 			tempFeedRef.current = [...tempFeedRef.current, ...oldPosts];
@@ -30,44 +45,51 @@ export default function UserProfile(props:{currentUser:User, userDetails:UserDet
 		}
 	}
 
+	useEffect(() => {
+		let cancelled = false;
+
+		if (targetUserId === currentUser.id && loggedInProfile) {
+			setProfile(loggedInProfile);
+
+			return () => {
+				cancelled = true;
+			}
+		}
+
+		setProfile(null);
+
+		const loadProfile = async () => {
+			try {
+				const nextProfile = await getSidebarUserProfile(targetUserId);
+
+				if (!cancelled) {
+					setProfile(nextProfile || loggedInProfile);
+				}
+			} catch {
+				if (!cancelled) {
+					setProfile(loggedInProfile);
+				}
+			}
+		}
+
+		loadProfile();
+
+		return () => {
+			cancelled = true;
+		}
+	}, [currentUser.id, targetUserId])
+
 	return (
 		<>
             {googleMapsApiKey &&
                 <APIProvider apiKey={googleMapsApiKey || ''}>
-					<div className="xl:hidden lg:block lg:bg-white lg:rounded-xl lg:p-5 sm:bg-none sm:p-0 mt-5 mb-5">
-						{currentUser && userDetails && 
-							<section className="flex flex-col justify-between min-h-50 rounded-box">
-								<div className="mb-4 flex">
-									<img src={avatarUrl || '/images/melty-man.png'} className='w-[50px] h-[50px] me-3 rounded-full'/>
-									<div className='font-bold text-2xl'>{userDetails.displayName}</div>
-									{
-										currentUser.id !== userDetails.userId &&
-											<Follow followUserId={userDetails.userId} user={currentUser}/>
-									}
-								</div>
-								<div className="mb-4">
-									{userDetails.bio}
-								</div>
-								<div className="mb-4">
-									{userDetails.urls && userDetails.urls.length > 0 &&
-										userDetails.urls.map((url, index) => {
-											return (
-												<div key={index} className='mb-2'>
-													<a href={url} target='blank' className='text-blue-500'>{url}</a>
-												</div>
-											)
-										})}
-								</div>
-								<div className='flex justify-between text-sm uppercase'>
-									<div>Posts: <strong>{userDetails.postCount || 0}</strong></div>
-									<div>Followers: <strong>{userDetails.followers.length || 0}</strong></div>
-									<div>Following: <strong>{userDetails.following.length || 0}</strong></div>
-								</div>
-							</section>
+					<div className="xl:hidden lg:block lg:bg-white lg:rounded-xl lg:p-5 sm:bg-none sm:p-0 mt-5 mb-5 border border-orange">
+						{profile && 
+							<Profile profile={profile}/>
 						}
 					</div>
 
-					{userDetails && currentUser && posts &&
+					{currentUser && currentUser.userDetails && posts &&
 						<div className='flex flex-col gap-5'>
 							{posts.map((post:Post, index:number) => {
 								return (

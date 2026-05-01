@@ -1,9 +1,12 @@
 'use client'
 
-import { useForm,Controller } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
+import DatePicker from "react-datepicker";
+import 'react-datepicker/dist/react-datepicker.css'
+
 import RTEditor from "./Fields/RichTextEditor/RTEditor";
 import uploadFile from "@/app/actions/fileUploader";
 import User from "@/lib/models/user";
@@ -13,6 +16,8 @@ import OptimizedFile from "@/lib/models/optimizedFile";
 import { Spinner } from "../layout/Spinner";
 import Post from "@/lib/models/post";
 import imageUrl from "@/constants/imageUrl";
+import { getPostTypeLabel, isSceneCommunityPostType, isSceneScheduledPostType } from "@/lib/scenePosts";
+import { BiCalendar } from "react-icons/bi";
 
 interface Props {
     savePost:Function,
@@ -33,6 +38,16 @@ const PostValidation = z.object({
     postFile: z.string().optional(),
     postFileType: z.string().optional(),
     postFileObj: z.any().optional(),
+    headline: z.string().optional(),
+    eventTitle: z.string().optional(),
+    eventDate: z.date().nullable().optional(),
+    town: z.string().optional(),
+    neighborhood: z.string().optional(),
+    venueName: z.string().optional(),
+    locationLabel: z.string().optional(),
+    tags: z.string().optional(),
+    seeking: z.string().optional(),
+    status: z.string().optional(),
     // privatePost: z.boolean(), 
 })
 
@@ -47,18 +62,36 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
     const postId = post?.id ?? undefined;
     const content = post?.lexical ?? "";
     const postFile = post?.postFile ?? undefined
-    const postType = post?.postType ?? undefined
+    const resolvedPostType = post?.postType ?? 'post'
+    const isScenePost = isSceneCommunityPostType(resolvedPostType)
+    const isScheduledPost = isSceneScheduledPostType(resolvedPostType)
+    const statusOptions = resolvedPostType === 'collab'
+        ? ['open', 'reviewing', 'filled']
+        : resolvedPostType === 'recommendation'
+            ? ['seeking tips', 'sorted']
+            : ['open', 'active']
+    const defaultValues = {
+        userId: user.id,
+        postType: resolvedPostType,
+        edited: edited ?? false,
+        parentPostId,
+        postId,
+        content,
+        headline: post?.headline ?? '',
+        eventTitle: post?.eventTitle ?? '',
+        eventDate: post?.eventDate ?? (isScheduledPost ? new Date() : null),
+        town: post?.town ?? '',
+        neighborhood: post?.neighborhood ?? '',
+        venueName: post?.venueName ?? '',
+        locationLabel: post?.locationLabel ?? '',
+        tags: post?.tags ?? '',
+        seeking: post?.seeking ?? '',
+        status: post?.status ?? ''
+    }
 
     const { register, handleSubmit, setValue, control, reset, formState: { errors, isSubmitSuccessful } } = useForm<z.infer<typeof PostValidation>>({
         resolver: zodResolver(PostValidation),
-        defaultValues: {
-            userId: user.id,
-            postType: postType ?? '',
-            edited: edited ?? false,
-            parentPostId: parentPostId,
-            postId: postId,
-            content: content
-        }
+        defaultValues
     })
 
     const sendFile = async (filedata:{file:File, userDir:string}) => {
@@ -66,10 +99,16 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
         await uploadFile({file, userDir});
     }
 
+    const normalizeOptionalValue = (value?: string) => {
+        const normalized = value?.trim()
+
+        return normalized ? normalized : undefined
+    }
+
     const onSubmit = async (values: z.infer<typeof PostValidation>) => {
         setIsSaving(true);
 
-        values.postType = postType ?? 'post';
+        values.postType = resolvedPostType;
 
         if (post && post.id) {
             values.postId = post.id;
@@ -84,6 +123,22 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
             values.content = html;
             values.lexical = JSON.stringify(lexical);
         }
+
+        values.headline = normalizeOptionalValue(values.headline)
+        values.eventTitle = normalizeOptionalValue(values.eventTitle)
+        values.town = normalizeOptionalValue(values.town)
+        values.neighborhood = normalizeOptionalValue(values.neighborhood)
+        values.venueName = normalizeOptionalValue(values.venueName)
+        values.locationLabel = normalizeOptionalValue(values.locationLabel)
+        values.tags = normalizeOptionalValue(
+            values.tags
+                ?.split(',')
+                .map((tag) => tag.trim())
+                .filter(Boolean)
+                .join(', ')
+        )
+        values.seeking = normalizeOptionalValue(values.seeking)
+        values.status = normalizeOptionalValue(values.status)
 
         let userDir, postFileUrl;
 
@@ -167,10 +222,10 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
     }
 
     useEffect(() => {
-        if (isSubmitSuccessful) {
-            reset();
+        if (isSubmitSuccessful && !post?.id) {
+            reset(defaultValues);
         }
-    }, [isSubmitSuccessful, reset, errors]);
+    }, [defaultValues, isSubmitSuccessful, post?.id, reset, errors]);
 
     const handleEditorUpdated = () => {
         setClearEditor(false);
@@ -186,9 +241,140 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
         }
     }, []) 
 
+    const typeLabel = getPostTypeLabel(resolvedPostType)
+
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
 			<div className="mb-10">
+                {isScenePost &&
+                    <div className="mb-4 rounded-2xl border border-orange/40 bg-orange/5 p-4">
+                        <div className="text-lg font-semibold">{typeLabel}</div>
+                        <div className="text-sm text-gray-600">
+                            {resolvedPostType === 'collab' && 'Post a call for bandmates, artists, vendors, volunteers, or collaborators.'}
+                            {resolvedPostType === 'recommendation' && 'Ask the Valley where to go, who to book, or what to check out.'}
+                            {resolvedPostType === 'openmic' && 'Track an upcoming open mic with time, place, and the vibe people should expect.'}
+                            {resolvedPostType === 'jam' && 'Share an upcoming jam session so people can find it on the tracker and scene map.'}
+                        </div>
+                    </div>
+                }
+
+                {isScenePost && !isScheduledPost &&
+                    <div className="mb-4">
+                        <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Headline</div>
+                        <input
+                            {...register('headline')}
+                            className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                            placeholder={resolvedPostType === 'collab' ? 'Need a bassist for South Side indie set' : 'Best cozy venue for acoustic nights?'}
+                        />
+                    </div>
+                }
+
+                {isScheduledPost &&
+                    <div className="mb-4 grid gap-4 md:grid-cols-2">
+                        <div>
+                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Title</div>
+                            <input
+                                {...register('eventTitle')}
+                                className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                placeholder={resolvedPostType === 'event' ? 'First Friday Showcase' : `${typeLabel} at The Funhouse`}
+                            />
+                        </div>
+                        <div>
+                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Date & Time</div>
+                            <Controller
+                                control={control}
+                                name='eventDate'
+                                render={({ field }) => (
+                                    <DatePicker
+                                        selected={field.value || null}
+                                        onChange={(date:Date | null) => field.onChange(date)}
+                                        showTimeSelect
+                                        showIcon
+                                        dateFormat="MMMM d, yyyy h:mm aa"
+                                        className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                        icon={<BiCalendar />}
+                                    />
+                                )}
+                            />
+                        </div>
+                    </div>
+                }
+
+                {(isScenePost || isScheduledPost) &&
+                    <div className="mb-4 grid gap-4 md:grid-cols-2">
+                        <div>
+                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Town</div>
+                            <input
+                                {...register('town')}
+                                className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                placeholder="Bethlehem"
+                            />
+                        </div>
+                        <div>
+                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Neighborhood</div>
+                            <input
+                                {...register('neighborhood')}
+                                className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                placeholder="South Side"
+                            />
+                        </div>
+                        <div>
+                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Venue</div>
+                            <input
+                                {...register('venueName')}
+                                className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                placeholder="ArtsQuest, The Funhouse, SteelStacks"
+                            />
+                        </div>
+                        <div>
+                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Map Address</div>
+                            <input
+                                {...register('locationLabel')}
+                                className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                placeholder="101 Founders Way, Bethlehem, PA"
+                            />
+                        </div>
+                    </div>
+                }
+
+                {isScenePost &&
+                    <div className="mb-4 grid gap-4 md:grid-cols-2">
+                        <div>
+                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Tags</div>
+                            <input
+                                {...register('tags')}
+                                className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                placeholder="indie, synth, diy, jazz"
+                            />
+                        </div>
+                        {(resolvedPostType === 'collab' || resolvedPostType === 'recommendation') &&
+                            <div>
+                                <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Status</div>
+                                <select
+                                    {...register('status')}
+                                    className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                >
+                                    <option value="">Select a status</option>
+                                    {statusOptions.map((status) => (
+                                        <option key={status} value={status}>{status}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        }
+                    </div>
+                }
+
+                {resolvedPostType === 'collab' &&
+                    <div className="mb-4">
+                        <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Seeking</div>
+                        <input
+                            {...register('seeking')}
+                            className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                            placeholder="Drummer who can handle post-punk and late rehearsals"
+                        />
+                    </div>
+                }
+
                 <Controller
                     control={control}
                     name='content'
