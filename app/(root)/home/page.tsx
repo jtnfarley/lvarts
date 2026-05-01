@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function Home() {
 	const user = await currentUser();
 	
-	if (!user.userDetails || !user.userDetails.displayName || user.userDetails.displayName === '') {
+	if (!user.userDetails || !user.userDetails.displayName || user.userDetails.displayName === '' || !user.userDetails.handle || user.userDetails.handle === '') {
 		return redirect('/profile')
 	}
 

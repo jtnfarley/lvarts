@@ -10,6 +10,7 @@ export const getSidebarProfile = async (userId:string): Promise<SidebarProfile |
             },
             select: {
                 userId: true,
+                handle: true,
                 displayName: true,
                 avatar: true,
                 userDir: true,

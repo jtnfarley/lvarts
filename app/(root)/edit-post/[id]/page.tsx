@@ -4,6 +4,7 @@ import { prisma } from '@/prisma';
 import {currentUser} from "@/app/data/currentUser";
 import { revalidatePath } from "next/cache";
 import { getPostTypeLabel } from "@/lib/scenePosts";
+import { notifyMentionedUsers } from "@/app/data/postMentions";
 
 const getPost = async (postId:string, userId:string):Promise<any> => {
     const post = await prisma.posts.findFirst({
@@ -31,6 +32,7 @@ const editPost = async (postData:any) => {
     const {
         content,
         lexical,
+        userId,
         postId,
         eventTitle,
         eventDate,
@@ -47,6 +49,20 @@ const editPost = async (postData:any) => {
     } = postData
     const date = new Date()
     const updatedAt = date
+    const existingPost = await prisma.posts.findFirst({
+        where: {
+            id: postId
+        },
+        select: {
+            id: true,
+            lexical: true,
+            userDetailsId: true
+        }
+    })
+
+    if (!existingPost) {
+        return null;
+    }
 
     const post = await prisma.posts.update({
         where: {
@@ -72,6 +88,16 @@ const editPost = async (postData:any) => {
             ...(postFileType !== undefined ? { postFileType } : {})
         }
     })
+
+    if (existingPost.userDetailsId) {
+        await notifyMentionedUsers({
+            postId: post.id,
+            authorUserId: userId,
+            authorUserDetailsId: existingPost.userDetailsId,
+            lexical: post.lexical,
+            previousLexical: existingPost.lexical
+        })
+    }
 
     return post;
 }

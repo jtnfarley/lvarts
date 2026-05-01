@@ -16,7 +16,7 @@ export default function NotificationsFeed(props:{user:User, notis:Notification[]
 		}
 	})
 
-    return (
+	return (
         <div className='flex flex-col gap-5'>
             {
 				(user && notis && notis.length) &&
@@ -31,7 +31,9 @@ export default function NotificationsFeed(props:{user:User, notis:Notification[]
 								</Link>
 
 								{(noti.type === 'comment') ? <span> commented on <Link href={`/post/${noti.post?.id}`}>your post</Link></span> : 
-									(noti.type === 'like') ? <span> liked <Link href={`/post/${noti.post?.id}`}>your post</Link></span> : ' followed you' 
+									(noti.type === 'like') ? <span> liked <Link href={`/post/${noti.post?.id}`}>your post</Link></span> :
+									(noti.type === 'mention') ? <span> mentioned you in <Link href={`/post/${noti.post?.id}`}>{noti.post?.parentPostId ? 'a comment' : 'a post'}</Link></span> :
+									' followed you' 
 								}
 							</div>
 						)

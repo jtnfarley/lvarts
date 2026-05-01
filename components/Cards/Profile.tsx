@@ -22,7 +22,12 @@ export default function Profile(props:{profile:SidebarProfile}) {
                     className='avatar-profile'
                 />
             </div>
-            <div className="flex justify-center uppercase text-xl font-bold mb-6">{profile.displayName}</div>
+            <div className="mb-6 flex flex-col items-center">
+                <div className="flex justify-center text-xl font-bold uppercase">{profile.displayName || (profile.handle ? `@${profile.handle}` : '')}</div>
+                {profile.handle &&
+                    <div className="mt-1 text-xs font-semibold tracking-[0.24em] text-gray-500">@{profile.handle}</div>
+                }
+            </div>
             <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto pe-2">	
                 <div className="w-full flex flex-col items-center justify-center mb-5">
                     <div className="text-2xl"><strong>{profile.postCount || 0}</strong></div>

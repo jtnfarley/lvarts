@@ -4,6 +4,8 @@ import {prisma} from '@/lib/db/prisma';
 import Post from '@/lib/models/post';
 import User from '@/lib/models/user';
 import { Prisma } from '@prisma/client';
+import { notifyMentionedUsers } from './postMentions';
+import { generateUniqueHandle } from './handles';
 
 export const getInitFeed = async (user:User):Promise<Array<Post>> => {
 	const posts:Array<Post> = await prisma.posts.findMany({
@@ -246,6 +248,7 @@ export const savePost = async (postData:any) => {
         userDetails = await prisma.userDetails.create({
             data: {
                 userId,
+                handle: await generateUniqueHandle(userId),
                 displayName: '',
                 createdAt,
                 updatedAt,
@@ -329,6 +332,13 @@ export const savePost = async (postData:any) => {
             })
         }
     }
+
+    await notifyMentionedUsers({
+        postId: post.id,
+        authorUserId: userId,
+        authorUserDetailsId: userDetails.id,
+        lexical,
+    })
     
     return post
 }

@@ -3,6 +3,7 @@ import Post from "./post"
 export default interface UserDetails {
     id: string
     userId: string
+	handle: string
 	bio?: string | null
 	chatIds?: string[]
 	comments: string[]

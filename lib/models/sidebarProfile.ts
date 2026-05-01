@@ -1,5 +1,6 @@
 export default interface SidebarProfile {
     userId: string
+    handle?: string | null
     displayName?: string | null
     avatar?: string | null
     userDir?: string | null

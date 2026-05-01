@@ -118,6 +118,111 @@ h1 {
   text-decoration: none;
 }
 
+.editor-mention {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  border-radius: 999px;
+  background: #fff7ed;
+  color: #c2410c;
+  font-weight: 600;
+  padding: 1px 6px;
+}
+
+.editor-mention-focused {
+  outline: 2px solid #fdba74;
+}
+
+.editor-mention-trigger {
+  color: #ea580c;
+}
+
+.editor-mention-value {
+  color: #9a3412;
+}
+
+.editor-mention-link {
+  color: #c2410c;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.editor-mention-link:hover {
+  text-decoration: underline;
+}
+
+.mention-menu {
+  margin: 8px 0 0;
+  min-width: 260px;
+  list-style: none;
+  overflow: hidden;
+  border: 1px solid #fed7aa;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+  padding: 6px;
+  z-index: 1000;
+}
+
+.mention-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.mention-menu-item.selected,
+.mention-menu-item:hover {
+  background: #fff7ed;
+}
+
+.mention-menu-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.mention-menu-copy {
+  min-width: 0;
+}
+
+.mention-menu-name {
+  color: #111827;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.mention-menu-display {
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mention-menu-bio {
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mention-empty {
+  margin-top: 8px;
+  min-width: 260px;
+  border: 1px solid #fed7aa;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+  color: #6b7280;
+  font-size: 13px;
+  padding: 12px 14px;
+}
+
 .tree-view-output {
   display: block;
   background: #222;

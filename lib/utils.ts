@@ -92,6 +92,7 @@ export const toSidebarProfile = (user:User): SidebarProfile | null => {
 
 	return {
 		userId: user.userDetails.userId,
+		handle: user.userDetails.handle,
 		displayName: user.userDetails.displayName,
 		avatar: user.userDetails.avatar,
 		userDir: user.userDetails.userDir,

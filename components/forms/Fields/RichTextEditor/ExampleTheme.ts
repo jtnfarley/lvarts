@@ -8,6 +8,14 @@
 
 export default {
   code: 'editor-code',
+  beautifulMentions: {
+    "@": {
+      trigger: "editor-mention-trigger",
+      value: "editor-mention-value",
+      container: "editor-mention",
+      containerFocused: "editor-mention-focused",
+    },
+  },
   heading: {
     h1: 'editor-heading-h1',
     h2: 'editor-heading-h2',

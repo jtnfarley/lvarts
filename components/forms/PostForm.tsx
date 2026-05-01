@@ -379,7 +379,13 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
                     control={control}
                     name='content'
                     render={({ field }) => (
-                        <RTEditor ref={editorRef} onChange={field.onChange} clearEditor={clearEditor} content={content}/>
+                        <RTEditor
+                            ref={editorRef}
+                            onChange={field.onChange}
+                            clearEditor={clearEditor}
+                            content={content}
+                            currentUserId={user.id}
+                        />
                     )}
                 />
                 {(tempImage) && (

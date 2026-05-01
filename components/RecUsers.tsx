@@ -45,6 +45,7 @@ export default async function RecUsers() {
 										currentUser={ user }
 										recUserId={ userDetails.userId }
 										displayName={ userDetails.displayName }
+										handle={ userDetails.handle }
 										avatar={ (userDetails && userDetails.userDir && userDetails.avatar) ?
 											`${imageUrl}/${userDetails.userDir}/${userDetails.avatar}` :
 											'/images/melty-man.png'

@@ -8,12 +8,13 @@ import Follow from '../PostUi/Follow';
 interface Props {
     currentUser: User
     recUserId: string
-    displayName: string
+    displayName?: string | null
+    handle?: string | null
     avatar?: string,
     bio?: string
 }
 
-const UserCard = ({currentUser, recUserId, displayName, avatar, bio}: Props) => {
+const UserCard = ({currentUser, recUserId, displayName, handle, avatar, bio}: Props) => {
 
     const router = useRouter()
     const [following, setFollowing] = useState(false)
@@ -34,10 +35,13 @@ const UserCard = ({currentUser, recUserId, displayName, avatar, bio}: Props) => 
     return (
         <article className="xl:w-full xl:bg-white xl:border-b-1 xl:py-4">
             <div className="flex items-center text-gray-700 text-sm gap-3 justify-between">
-                <button className="flex gap-3 items-center cursor-pointer" onClick={viewProfile} title={displayName}>
+                <button className="flex gap-3 items-center cursor-pointer" onClick={viewProfile} title={displayName || (handle ? `@${handle}` : 'Profile')}>
                     <div><img src={avatar} className='rounded-sm border-dark-2 w-[50px] h-[50px] xl:border-0'/></div>
-                    
-                    <div className='hidden xl:block text-xl'>{displayName}</div>
+
+                    <div className='hidden xl:block'>
+                        <div className='text-xl'>{displayName || (handle ? `@${handle}` : 'Artist')}</div>
+                        {handle && <div className='text-xs uppercase tracking-[0.18em] text-gray-500'>@{handle}</div>}
+                    </div>
                 </button>
                 <div className='hidden xl:block'>
                     <Follow followUserId={recUserId} user={currentUser}/>

@@ -6,22 +6,25 @@ import * as z from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import User from "@/lib/models/user";
 import { BiImageAdd } from "react-icons/bi";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { BiPlus, BiRefresh, BiX } from "react-icons/bi";
 import uploadFile from "@/app/actions/fileUploader";
 import { getRandomString } from "@/lib/utils";
+import { getHandleSuggestion } from "@/app/actions/handles";
 import imageUrl from '@/constants/imageUrl';
 import { compressImage } from "@/lib/utils";
+import { HANDLE_REGEX } from "@/lib/handles";
 import OptimizedFile from "@/lib/models/optimizedFile";
 import type { UpdateUserParams } from "@/app/data/user";
 import type UserDetails from "@/lib/models/userDetails";
 import { Spinner } from "../layout/Spinner"
-import { BiPlus, BiX } from "react-icons/bi";
 
 
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 const UserValidation = z.object({
+    handle: z.string().min(3).max(30).regex(HANDLE_REGEX, 'Use lowercase letters, numbers, or underscores.'),
     displayName: z.string().min(1).max(100),
     bio: z.string().max(4000).optional(),
     avatar: z.any().optional(),   
@@ -39,6 +42,8 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
     }
 
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [isGeneratingHandle, setIsGeneratingHandle] = useState<boolean>(false);
+    const [handleError, setHandleError] = useState<string | null>(null);
     const [tempImage, setTempImage] = useState<OptimizedFile | undefined>();
     const avatarUrlBase = imageUrl;
     const avatarUrlInit = user.userDetails && user.userDetails.avatar && user.userDetails.userDir ? `${avatarUrlBase}/${user.userDetails.userDir}/${user.userDetails.avatar}` : undefined
@@ -46,9 +51,10 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
     const [userOnboarded, setUserOnboarded] = useState(user.userDetails && user.userDetails.displayName && user.userDetails.displayName !== '')
     const [avatarUrl, setAvatarUrl] = useState<string | undefined>(avatarUrlInit);
 
-    const { register, handleSubmit, setValue, control, formState: { errors } } = useForm<z.infer<typeof UserValidation>>({
+    const { register, handleSubmit, setValue, watch, control, formState: { errors } } = useForm<z.infer<typeof UserValidation>>({
         resolver: zodResolver(UserValidation),
         defaultValues: {
+            handle: user.userDetails?.handle || undefined,
             displayName: user.userDetails?.displayName || undefined,
             bio: user.userDetails?.bio || undefined,
             urls: user.userDetails?.urls?.map((value) => ({ value })) || []
@@ -61,6 +67,27 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
     })
 
     const avatarRegister = register('avatar')
+
+    const refreshHandle = async () => {
+        setHandleError(null);
+        setIsGeneratingHandle(true);
+
+        try {
+            const nextHandle = await getHandleSuggestion({
+                currentHandle: watch('handle') || user.userDetails?.handle,
+                currentUserId: user.id
+            });
+
+            setValue('handle', nextHandle, {
+                shouldDirty: true,
+                shouldValidate: true
+            });
+        } catch {
+            setHandleError('Could not generate a new handle right now.');
+        } finally {
+            setIsGeneratingHandle(false);
+        }
+    }
 
     const sendFile = async (filedata:{file:File, userDir:string}) => {
         const {file, userDir} = filedata;
@@ -114,6 +141,7 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
             const userDetails = await saveUser({
                 id,
                 userId: user.id,
+                handle: values.handle,
                 bio: values.bio,
                 displayName: values.displayName,
                 userDir,
@@ -125,11 +153,13 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
                 setUserOnboarded(true)
             }
 
+            setHandleError(null);
             user.userDetails = userDetails;
 
             setUser({...user})
         } catch (error) {
             console.error(error);
+            setHandleError(error instanceof Error ? error.message : 'Could not save your handle.');
         }
 
         setIsSaving(false);
@@ -142,6 +172,12 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
     const deleteLink = (index:number) => {
         removeUrl(index)
     }
+
+    useEffect(() => {
+        if (!user.userDetails?.handle) {
+            void refreshHandle();
+        }
+    }, [])
 
     return (
         <div>
@@ -179,6 +215,34 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
                             <BiImageAdd size={40} title="upload an image" />
                             }
                         </label>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-medium mb-2" htmlFor="handle">
+                            Handle
+                        </label>
+                        <div className="flex gap-2">
+                            <div className="relative flex-1">
+                                <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-500">@</div>
+                                <input
+                                    className="w-full rounded border border-gray-200 bg-gray-50 py-2 pl-7 pr-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
+                                    id="handle"
+                                    readOnly
+                                    {...register('handle', { required: true })}
+                                />
+                            </div>
+                            <Button
+                                type='button'
+                                className="bg-transparent text-gray-600 shadow-none hover:bg-gray-100 cursor-pointer"
+                                onClick={refreshHandle}
+                                disabled={isGeneratingHandle || isSaving}
+                            >
+                                {isGeneratingHandle ? <Spinner/> : <BiRefresh />}
+                            </Button>
+                        </div>
+                        <div className="mt-2 text-xs text-gray-500">Unique handles are used for mentions and profile identity.</div>
+                        {(errors.handle || handleError) &&
+                            <div className="mt-2 text-xs italic text-red-500">{errors.handle?.message || handleError}</div>
+                        }
                     </div>
                     <div className="mb-4">
                         <label className="block text-gray-700 font-medium mb-2" htmlFor="displayName">
