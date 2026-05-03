@@ -12,8 +12,6 @@ import type SidebarProfile from '@/lib/models/sidebarProfile';
 import type User from '@/lib/models/user';
 import Profile from "../Cards/Profile"
 
-
-
 export default function LeftSidebar(props:{currentUser:User}) {
 	const { currentUser } = props
 	const pathname = usePathname()
@@ -77,7 +75,7 @@ export default function LeftSidebar(props:{currentUser:User}) {
                 </Link>
 				<div className="mt-4 flex min-h-0 flex-1 flex-col overflow-hidden border border-orange">
 					{profile ? 
-						<Profile profile={profile}/>
+						<Profile profile={profile} user={currentUser}/>
 						:
 						<div className="flex flex-1 items-center justify-center uppercase text-sm text-gray-400">Loading profile</div>
 					}
