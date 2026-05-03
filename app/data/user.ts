@@ -90,7 +90,7 @@ export const updateUser = async ({
                     chats: [],
                     comments: [],
                     followers: [],
-                    following: [],
+                    following: ['6939e1895a3da4a39985c95a'],
                     likedPosts: [],
                     postIds: [],
                     urls
