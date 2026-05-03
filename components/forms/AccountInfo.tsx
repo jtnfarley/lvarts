@@ -13,7 +13,7 @@ import { getRandomString } from "@/lib/utils";
 import { getHandleSuggestion } from "@/app/actions/handles";
 import imageUrl from '@/constants/imageUrl';
 import { compressImage } from "@/lib/utils";
-import { HANDLE_REGEX } from "@/lib/handles";
+import { HANDLE_REGEX, normalizeHandle } from "@/lib/handles";
 import OptimizedFile from "@/lib/models/optimizedFile";
 import type { UpdateUserParams } from "@/app/data/user";
 import type UserDetails from "@/lib/models/userDetails";
@@ -50,6 +50,7 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
 
     const [userOnboarded, setUserOnboarded] = useState(user.userDetails && user.userDetails.displayName && user.userDetails.displayName !== '')
     const [avatarUrl, setAvatarUrl] = useState<string | undefined>(avatarUrlInit);
+    const hasPermanentHandle = Boolean(user.userDetails?.handle);
 
     const { register, handleSubmit, setValue, watch, control, formState: { errors } } = useForm<z.infer<typeof UserValidation>>({
         resolver: zodResolver(UserValidation),
@@ -141,7 +142,7 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
             const userDetails = await saveUser({
                 id,
                 userId: user.id,
-                handle: values.handle,
+                handle: hasPermanentHandle ? user.userDetails?.handle : values.handle,
                 bio: values.bio,
                 displayName: values.displayName,
                 userDir,
@@ -224,22 +225,35 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
                             <div className="relative flex-1">
                                 <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-500">@</div>
                                 <input
-                                    className="w-full rounded border border-gray-200 bg-gray-50 py-2 pl-7 pr-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
+                                    className="w-full rounded border border-gray-200 bg-gray-50 py-2 pl-7 pr-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500 disabled:cursor-not-allowed disabled:text-gray-500"
                                     id="handle"
-                                    readOnly
+                                    disabled={hasPermanentHandle}
                                     {...register('handle', { required: true })}
+                                    onChange={(event) => {
+                                        setValue('handle', normalizeHandle(event.target.value), {
+                                            shouldDirty: true,
+                                            shouldValidate: true
+                                        });
+                                    }}
                                 />
                             </div>
-                            <Button
-                                type='button'
-                                className="bg-transparent text-gray-600 shadow-none hover:bg-gray-100 cursor-pointer"
-                                onClick={refreshHandle}
-                                disabled={isGeneratingHandle || isSaving}
-                            >
-                                {isGeneratingHandle ? <Spinner/> : <BiRefresh />}
-                            </Button>
+                            {!hasPermanentHandle &&
+                                <Button
+                                    type='button'
+                                    className="bg-transparent text-gray-600 shadow-none hover:bg-gray-100 cursor-pointer"
+                                    onClick={refreshHandle}
+                                    disabled={isGeneratingHandle || isSaving}
+                                    title="Generate a handle"
+                                >
+                                    {isGeneratingHandle ? <Spinner/> : <BiRefresh />}
+                                </Button>
+                            }
                         </div>
-                        <div className="mt-2 text-xs text-gray-500">Unique handles are used for mentions and profile identity.</div>
+                        <div className="mt-2 text-xs text-gray-500">
+                            {hasPermanentHandle
+                                ? 'Your handle is permanent.'
+                                : 'Enter a custom handle or generate one. You can only set it once.'}
+                        </div>
                         {(errors.handle || handleError) &&
                             <div className="mt-2 text-xs italic text-red-500">{errors.handle?.message || handleError}</div>
                         }

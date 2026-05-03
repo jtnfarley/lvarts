@@ -1,6 +1,7 @@
 import {prisma} from '@/lib/db/prisma'
 import UserDetails from '@/lib/models/userDetails'
 import { generateUniqueHandle, resolveHandle } from './handles'
+import { normalizeHandle } from '@/lib/handles'
 
 export interface UpdateUserParams {
     id?: string,
@@ -29,28 +30,42 @@ export const updateUser = async ({
 
     let userDetails: UserDetails;
     try {
-        const existingUserDetails = id
-            ? await prisma.userDetails.findFirst({
-                where: {
-                    id
-                },
-                select: {
-                    handle: true
-                }
-            })
-            : null
-        const resolvedHandle = await resolveHandle({
-            requestedHandle: handle || existingUserDetails?.handle || await generateUniqueHandle(userId),
-            excludeUserId: userId
+        const existingUserDetails = await prisma.userDetails.findFirst({
+            where: id ? { id } : { userId },
+            select: {
+                id: true,
+                userId: true,
+                handle: true
+            }
         })
 
-        if (id) {
+        if (existingUserDetails && existingUserDetails.userId !== userId) {
+            throw new Error('Cannot update another user profile.')
+        }
+
+        const normalizedRequestedHandle = handle ? normalizeHandle(handle) : undefined
+        const resolvedHandle = existingUserDetails?.handle
+            ? existingUserDetails.handle
+            : await resolveHandle({
+                requestedHandle: normalizedRequestedHandle || await generateUniqueHandle(userId),
+                excludeUserId: userId
+            })
+
+        if (
+            existingUserDetails?.handle &&
+            normalizedRequestedHandle &&
+            normalizedRequestedHandle !== existingUserDetails.handle
+        ) {
+            throw new Error('Handles can only be set once and cannot be changed.')
+        }
+
+        if (existingUserDetails) {
             userDetails = await prisma.userDetails.update({
                 where: {
-                    id: id
+                    id: existingUserDetails.id
                 },
                 data: {
-                    handle: resolvedHandle,
+                    ...(!existingUserDetails.handle ? { handle: resolvedHandle } : {}),
                     bio,
                     displayName,
                     updatedAt,
