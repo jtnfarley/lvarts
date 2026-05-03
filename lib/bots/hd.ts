@@ -1,4 +1,4 @@
-[
+export default [
     {
         id: "lais",
         title: "LAIS",

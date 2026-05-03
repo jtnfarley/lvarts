@@ -2,7 +2,7 @@ import UserDetails from "./userDetails"
 import User from "./user"
 
 export default interface Post {
-    id: string
+    id?: string
 	content: string
 	lexical?: string | null
 	headline?: string | null
