@@ -8,7 +8,7 @@ export default async function SignIn() {
     if (user) return redirect('/home');
 
     return (
-        <div className="flex items-center justify-center h-screen">
+        <div>
             <LandingPage/>
         </div>
     )
