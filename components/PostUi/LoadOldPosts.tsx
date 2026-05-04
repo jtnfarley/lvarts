@@ -20,7 +20,7 @@ export function LoadOldPosts(props:{getOldPosts:Function, endOfPosts:boolean}) {
                 !endOfPosts ?
                     <Spinner/>
                 :
-                    <div>That's all, folks!</div>
+                    <div className="text-white">That's all, folks!</div>
             }
         </div>
     )

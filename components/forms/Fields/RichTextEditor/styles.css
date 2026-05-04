@@ -43,14 +43,13 @@ h1 {
 }
 
 .editor-container {
-  margin: 20px auto 20px auto;
   border-radius: 10px;
   color: #000;
   position: relative;
   line-height: 20px;
   font-weight: 400;
   text-align: left;
-  border:1px solid #eee;
+  /* border:1px solid #eee; */
   padding:5px;
   background: #fff;
 }
@@ -312,9 +311,11 @@ h1 {
 }
 
 .editor-paragraph {
-  margin: 0;
-  margin-bottom: 8px;
   position: relative;
+}
+
+.postContent .editor-paragraph {
+  margin: 0 15px 8px;
 }
 
 .editor-paragraph:last-child {

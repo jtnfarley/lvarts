@@ -6,6 +6,7 @@ import User from "@/lib/models/user";
 import { BiSolidCircle } from "react-icons/bi";
 import { BiArrowFromLeft } from "react-icons/bi";
 import { useEffect, useState } from "react";
+import SignOut from '@/components/auth/buttons/SignOut';
 
 export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNotifications:Function}) {
 	const {user, hasNewNotifications} = props;
@@ -25,15 +26,15 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 	}, [])
 
 	return (		
-		<div className='flex gap-8 justify-center items-center'>
+		<div className='flex gap-8 justify-center items-center mb-6'>
 			{user ?
 				<>
-					<a href="/home" className={`leftsidebar_link flex flex-row items-center`}>
+					<a href="/home" className={`leftsidebar_link flex flex-row items-center`} title="Home">
 						<div className="relative">
 							<BiSolidHomeAlt2 className="leftIcon"/>
 						</div>
 					</a>
-					<Link href="/notifications" className={`leftsidebar_link flex flex-row items-center`} onClick={() => setHasNotis(false)}>
+					<Link href="/notifications" className={`leftsidebar_link flex flex-row items-center`} title="Notifications" onClick={() => setHasNotis(false)}>
 						<div className="relative">
 							<BiSolidBell className="leftIcon"/>
 							{hasNotis &&
@@ -41,7 +42,7 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 							}
 						</div>
 					</Link>
-					<Link href="/calendar" className={`leftsidebar_link flex flex-row items-center`}>
+					<Link href="/calendar" className={`leftsidebar_link flex flex-row items-center`} title="Calendar">
 						<div className="relative">
 							<BiSolidCalendar className="leftIcon"/>
 						</div>
@@ -51,11 +52,18 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 							<BiSolidSearch className="leftIcon"/>
 						</div>
 					</Link> */}
-					<Link href="/profile" className={`leftsidebar_link flex flex-row items-center`}>
+					<Link href="/profile" className={`leftsidebar_link flex flex-row items-center`} title="Edit Profile">
 						<div className="relative">
 							<BiSolidUser className="leftIcon"/>
 						</div>
 					</Link>
+					{user &&
+						<>
+							<div>
+								<SignOut/>
+							</div>
+						</>
+					}
 				</>
 				:
 				<Link href='/' className='leftsidebar_link flex flex-row items-center'>

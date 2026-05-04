@@ -8,15 +8,16 @@ const getRandoUsers = async (userId:string):Promise<UserDetails[]> => {
 	'use server'
 	
 	const userDetailsCount = await prisma.userDetails.count();
-	if (userDetailsCount) {
-		let skip = Math.floor(Math.random() * (userDetailsCount - 1)); //remove logged-in user
-		const take = 5;
+	if (userDetailsCount) {	
+		const lessLocalUser = userDetailsCount - 1;	//remove logged-in user
+		let skip = Math.floor(Math.random() * (lessLocalUser)); 
+		const take = lessLocalUser;
 
 		if (skip > userDetailsCount - take) skip = Math.floor(Math.random() * (userDetailsCount - take));
-		
+
 		const userDetails = await prisma.userDetails.findMany({
 			take,
-			skip,
+			skip, 
 			where: {
 				userId: {
 					not: userId
@@ -30,16 +31,33 @@ const getRandoUsers = async (userId:string):Promise<UserDetails[]> => {
 	return [];
 }
 
+function shuffle(array:Array<any>):Array<any> {
+  for (let i = array.length - 1; i > 0; i--) {
+    // Pick a random index from 0 to i
+    const j = Math.floor(Math.random() * (i + 1));
+    // Swap elements array[i] and array[j]
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  
+  return array.slice(0, 5);
+}
+
 export default async function RecUsers() {
 	const user = await currentUser();
+
+	const randUsers:Array<UserDetails> = await getRandoUsers(user.id)
 	
-	let recUsers:Array<UserDetails> = await getRandoUsers(user.id)
+	let recUsers;
+
+	if (randUsers && randUsers.length) {
+		recUsers = shuffle(randUsers);
+	}
 
 	return (
-		<section className="xl:bg-white xl:p-8 lg:bg-none lg:p-0 rounded-lg">
-			<div className='hidden text-gray-700 font-bold text-md uppercase xl:flex justify-center'>Your Next Best Friend</div>
-			<div className="flex gap-2 justify-between mt-5 xl:w-full xl:flex-col">
-				{
+		<section>
+			<div className="flex xl:w-full xl:flex-col rounded-tl-lg rounded-bl-lg xl:bg-[#fffaf3]/50 xl:p-6">
+				<div className='hidden text-gray-700 font-bold text-md uppercase xl:flex justify-center'>Your Next Best Friend</div>
+				{recUsers && recUsers.length && 
 					recUsers.length > 0 ? (
 						<>
 							{

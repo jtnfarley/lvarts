@@ -245,7 +245,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-			<div className="mb-10">
+			<div>
                 {isScenePost &&
                     <div className="mb-4 rounded-2xl border border-orange/40 bg-orange/5 p-4">
                         <div className="text-lg font-semibold">{typeLabel}</div>
@@ -400,7 +400,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
                 )
                 }
 
-                <div className="mt-2 flex flex-row">
+                <div className="mt-2 flex flex-row p-4">
                     <div className="w-[50%]">
                         <MediaUpload register={register} setValue={setValue} setTempImage={setTempFile}/>
                     </div>

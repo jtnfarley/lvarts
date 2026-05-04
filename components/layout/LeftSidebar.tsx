@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation"
 
 import { getSidebarUserProfile } from '@/app/data/sidebar';
 import { getProfileUserIdFromPath, toSidebarProfile } from "@/lib/utils"
-import SignOut from '@/components/auth/buttons/SignOut';
 import type SidebarProfile from '@/lib/models/sidebarProfile';
 import type User from '@/lib/models/user';
 import Profile from "../Cards/Profile"
@@ -61,32 +60,24 @@ export default function LeftSidebar(props:{currentUser:User}) {
 	}, [currentUser.id, targetUserId])
 
 	return (
-		<section className="leftsidebar p-4">
+		<section className="leftsidebar pt-3">
+			<Link href='/home' className="flex justify-center items-center">
+				<Image
+					src='/logos/art-abbr-paths.svg'
+					alt="Lehigh Valley Arts & Music"
+					width={125}
+					height={125}
+					priority 
+					className="rotate-345"
+				/>
+			</Link>
 			<div className="flex min-h-0 w-full flex-1 flex-col">
-				<Link href='/home' className="flex items-center">
-                    <Image
-                        src='/logos/lvarts-paths.svg'
-                        alt="Lehigh Valley Arts & Music"
-                        width={500}
-                        height={195}
-                        className='w-full'
-						priority
-                    />
-                </Link>
-				<div className="mt-4 flex min-h-0 flex-1 flex-col overflow-hidden border border-orange">
+				<div className="mt-4 flex min-h-0 flex-1 flex-col overflow-hidden">
 					{profile ? 
 						<Profile profile={profile} user={currentUser}/>
 						:
 						<div className="flex flex-1 items-center justify-center uppercase text-sm text-gray-400">Loading profile</div>
 					}
-					<div className='mt-6 flex flex-col items-center'>
-						{currentUser &&
-							<div>
-								<SignOut/>
-								<div className='mt-3 text-md text-gray-400'><Link href='/code-of-conduct' className='code-link'>Code of Conduct</Link></div>
-							</div>
-						}
-					</div>
 				</div>
 			</div>
 		</section>

@@ -27,7 +27,7 @@ export default async function Home() {
 			<div className='xl:hidden'>
 				<RecUsers/>	
 			</div>
-			<div>
+			<div className="bg-white p-0 rounded-box mb-10">
 				<AddPostForm user={user} postType='post' edited={false} savePost={savePost} />
 			</div>
 			<div>

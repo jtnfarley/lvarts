@@ -15,7 +15,7 @@ export default function Profile(props:{profile:SidebarProfile, user:User}) {
 		'/images/melty-man.png'
 
 	return (	
-        <div className="flex min-h-0 flex-1 flex-col bg-white px-5 py-8">
+        <div className="flex min-h-0 flex-1 flex-col px-5 py-8 bg-[#fffdf9]/50 rounded-tr-md">
             {profile && user && profile.userId === user.id && 
                 <div className="w-full flex justify-center mb-8">
                     <button onClick={() => redirect(`/profile`)}><BiEdit className="inline"/> Edit Profile</button>
@@ -35,7 +35,7 @@ export default function Profile(props:{profile:SidebarProfile, user:User}) {
                     {profile.displayName || (profile.handle ? `@${profile.handle}` : '')}
                 </div>
                 {profile.handle &&
-                    <div className="mt-1 text-xs font-semibold tracking-[0.24em] text-gray-500">@{profile.handle}</div>
+                    <div className="mt-1 text-md font-semibold tracking-[0.24em] text-gray-900">@{profile.handle}</div>
                 }
             </div>
             <div className="flex-1 min-h-0 relative pe-2">
@@ -61,7 +61,7 @@ export default function Profile(props:{profile:SidebarProfile, user:User}) {
                             {profile.urls.map((url, index) => {
                                 return (
                                     <div key={index} className='mb-2'>
-                                        <a href={(url.match(/^https?:\/\//)) ? url : `https://${url}`} target='blank' className='text-blue-500'>{url}</a>
+                                        <a href={(url.match(/^https?:\/\//)) ? url : `https://${url}`} target='blank' className='text-blue-900'>{url}</a>
                                     </div>
                                 )
                             })}

@@ -18,13 +18,13 @@ export default function PostUi(props:{postData:Post, user:User, googleMapsApiKey
 
     return (
 		<div>
-			<div className='text-sm pb-2 italic md:text-fray-700'>
+			<div className='text-sm pb-2 italic md:text-white'>
 				{post.postType === 'comment' && 
 					<Link href={`/post/${post.parentPostId}`}>commenting on {(currentUserParentPost) ? 'your' : `${post.parentPost?.userDetails?.displayName}'s`} post</Link>
 				}
 			</div>
 
-			<div key={post.id} className="rounded-box">
+			<div key={post.id} className="rounded-box bg-white">
 				<PostHeader postData={post} user={user} currentUserPost={currentUserPost}/>
 				<PostContent post={post} googleMapsApiKey={props.googleMapsApiKey}/>
 				<div className='grid grid-flow-col grid-rows-1 px-4 py-4'>

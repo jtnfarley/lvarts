@@ -119,7 +119,7 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 
     return (
 		<div>
-			<div className='px-4 pb-4 pt-3'>
+			<div className='postContent'>
 				{
 					displayTitle &&
 						<div className='text-2xl font-bold'><Link href={`/post/${post.id}`} title={displayTitle}>{displayTitle}</Link></div>
@@ -175,7 +175,9 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 					</>
 				}
 			</div>
+
 			<PostMedia post={post}/>
+
 			{templateTagArr && templateTagArr.length &&
 				<PostTemplateTags templateTags={templateTagArr} googleMapsApiKey={props.googleMapsApiKey}/>
 			}

@@ -22,7 +22,7 @@
 
 @layer components {
     .main-container {
-        @apply flex min-h-screen bg-gray-50/70 backdrop-blur-sm flex-1 flex-col items-center px-6 pt-3 max-md:pb-32 sm:px-10 overflow-auto ;
+        @apply flex w-lg min-h-screen flex-1 flex-col items-center px-6 pt-3 max-md:pb-32 md:px-25 overflow-auto xl:mt-10;
     }
 
     .calendar-container {
@@ -34,7 +34,7 @@
     } */
 
     .rounded-box {
-        @apply flex flex-col gap-2 rounded-2xl bg-white p-3;
+        @apply flex flex-col gap-2 rounded-lg p-3;
     }
 
     .avatar {
@@ -42,7 +42,7 @@
     }
 
     .leftsidebar {
-        @apply w-md sticky left-0 top-0 z-20 flex h-screen flex-col justify-between overflow-hidden border-r-1 border-r-lightgray bg-white pb-5 max-md:hidden;
+        @apply max-w-sm sticky left-0 top-0 z-20 flex h-screen flex-col justify-between overflow-hidden max-md:hidden;
     }
 
     .avatar-profile {
@@ -50,7 +50,7 @@
     }
 
     .leftIcon {
-        @apply text-2xl fill-primary-dark;
+        @apply text-3xl fill-orange;
     }
 
     .bottombar {
@@ -73,21 +73,21 @@
         @apply text-2xl font-bold text-light-1;
     }
 
-      .rightsidebar {
-            @apply w-md sticky right-0 top-0 z-20 flex h-screen w-fit flex-col justify-between gap-12 overflow-auto px-5 py-5 max-xl:hidden;
-        }
+    .rightsidebar {
+        @apply w-xs sticky right-0 top-0 z-20 h-screen justify-between gap-3 overflow-auto max-xl:hidden;
+    }
 
-        .user-card {
-            @apply flex flex-col;
-        }
+    .user-card {
+        @apply flex flex-col;
+    }
 
-        .user-card_avatar {
-            @apply flex flex-1 items-start justify-start gap-3 sm:items-center;
-        }
+    .user-card_avatar {
+        @apply flex flex-1 items-start justify-start gap-3 sm:items-center;
+    }
 
-        .user-card_btn {
-            @apply h-auto min-w-[74px] rounded-lg bg-primary text-[12px];
-        }
+    .user-card_btn {
+        @apply h-auto min-w-[74px] rounded-lg bg-primary text-[12px];
+    }
 
     /*       .account-form_input {
             @apply border border-dark-4 bg-dark-3 text-light-1 !important;
