@@ -18,10 +18,10 @@ export default function PostHeader(props:{postData:Post, user:User, currentUserP
     return (
 		<div className='flex flex-row p-3'>
 			<Link href={`/user/${post.user?.id}`} title={`${profileLabel}'s profile`} className='flex flex-row gap-3'>
-				<div><img src={avatar} className='rounded-full w-[50px] h-[50px]'/></div>
+				<div><img src={avatar} className='rounded-md border-2 border-orange-300 w-[60px] h-[60px]'/></div>
 				<div>
-					<div className='text-sm font-bold'>{profileLabel}</div>
-					<div className='flex items-center gap-1 text-[10px]'>
+					<div className='text-lg font-bold'>{profileLabel}</div>
+					<div className='flex items-center gap-1 text-sm sm:text-md'>
 						{post.userDetails?.handle && post.userDetails?.displayName && <span>@{post.userDetails.handle}</span>}
 						{post.userDetails?.handle && post.userDetails?.displayName && <span>&bull;</span>}
 						<div>{post.createdAt.toDateString()}</div>

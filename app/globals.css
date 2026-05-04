@@ -50,7 +50,7 @@
     }
 
     .leftIcon {
-        @apply text-3xl fill-orange;
+        @apply text-3xl fill-[#f3e5c9];
     }
 
     .bottombar {

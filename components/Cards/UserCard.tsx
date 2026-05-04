@@ -36,13 +36,13 @@ const UserCard = ({currentUser, recUserId, displayName, handle, avatar, bio}: Pr
         <article className="xl:w-full xl:border-b xl:border-b-gray-400 py-4">
             <div className="flex items-center text-gray-700 text-sm gap-3 justify-between">
                 <button className="xl:flex w-full gap-3 items-center cursor-pointer" onClick={viewProfile} title={displayName || (handle ? `@${handle}` : 'Profile')}>
-                    <div>
-                        <img src={avatar} className='rounded-sm border-dark-2 w-[50px] h-[50px] xl:border-0'/>
+                    <div className="w-[45px]">
+                        <img src={avatar} className='rounded-sm border-1 border-gray-400 w-[45px] h-[45px]'/>
                     </div>
 
                     <div className='hidden xl:block'>
-                        <div className='xl:text-black xl:text-xl '>{displayName || (handle ? `@${handle}` : 'Artist')}</div>
-                        {handle && <div className='hidden xl:block text-xs uppercase tracking-[0.18em] text-gray-800'>@{handle}</div>}
+                        <div className='xl:text-gray-400 xl:text-[16px] font-bold'>{displayName || (handle ? `@${handle}` : 'Artist')}</div>
+                        {handle && <div className='hidden xl:block text-sm lowercase tracking-[0.18em] text-gray-400'>@{handle}</div>}
                     </div>
                 </button>
                 <div className='hidden xl:block'>
@@ -51,7 +51,7 @@ const UserCard = ({currentUser, recUserId, displayName, handle, avatar, bio}: Pr
             </div>
             {bio && bio !== '' &&
                 <div className="mt-3">
-                    <div className='hidden xl:block text-md rounded-sm'>{truncateBio(bio)}</div>
+                    <div className='hidden xl:block text-sm rounded-sm text-gray-400'>{truncateBio(bio)}</div>
                 </div>
             }
         </article>

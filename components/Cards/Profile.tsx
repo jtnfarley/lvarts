@@ -15,9 +15,9 @@ export default function Profile(props:{profile:SidebarProfile, user:User}) {
 		'/images/melty-man.png'
 
 	return (	
-        <div className="flex min-h-0 flex-1 flex-col px-5 py-8 bg-[#fffdf9]/50 rounded-tr-md">
+        <div className="flex min-h-0 flex-1 flex-col px-5 py-8 bg-gray-700/30 rounded-tr-md">
             {profile && user && profile.userId === user.id && 
-                <div className="w-full flex justify-center mb-8">
+                <div className="w-full flex justify-center mb-8 text-gray-400">
                     <button onClick={() => redirect(`/profile`)}><BiEdit className="inline"/> Edit Profile</button>
                 </div>
             }
@@ -30,15 +30,15 @@ export default function Profile(props:{profile:SidebarProfile, user:User}) {
                     className='avatar-profile'
                 />
             </div>
-            <div className="mb-6 flex flex-col items-center">
+            <div className="mb-6 flex flex-col items-center text-gray-400">
                 <div className="flex justify-center text-xl font-bold uppercase">
                     {profile.displayName || (profile.handle ? `@${profile.handle}` : '')}
                 </div>
                 {profile.handle &&
-                    <div className="mt-1 text-md font-semibold tracking-[0.24em] text-gray-900">@{profile.handle}</div>
+                    <div className="mt-1 text-md font-semibold tracking-[0.24em] text-gray-400">@{profile.handle}</div>
                 }
             </div>
-            <div className="flex-1 min-h-0 relative pe-2">
+            <div className="flex-1 min-h-0 relative pe-2 text-gray-400">
                 <div className="h-full custom-scrollbar overflow-y-auto pb-20">
                     <div className="w-full flex flex-col items-center justify-center mb-5">
                         <div className="text-2xl"><strong>{profile.postCount || 0}</strong></div>
@@ -61,7 +61,7 @@ export default function Profile(props:{profile:SidebarProfile, user:User}) {
                             {profile.urls.map((url, index) => {
                                 return (
                                     <div key={index} className='mb-2'>
-                                        <a href={(url.match(/^https?:\/\//)) ? url : `https://${url}`} target='blank' className='text-blue-900'>{url}</a>
+                                        <a href={(url.match(/^https?:\/\//)) ? url : `https://${url}`} target='blank' className='text-blue-500'>{url}</a>
                                     </div>
                                 )
                             })}
