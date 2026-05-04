@@ -7,7 +7,8 @@ export interface UpdateUserParams {
     id?: string,
     userId: string,
     handle?: string,
-    bio?: string,
+    bioLexical?: string
+	bioHtml?: string,
     displayName?: string,
     avatar?: string
     userDir?: string,
@@ -18,7 +19,8 @@ export const updateUser = async ({
     id,
     userId,
     handle,
-    bio,
+    bioLexical,
+    bioHtml,
     displayName,
     avatar,
     userDir,
@@ -66,7 +68,8 @@ export const updateUser = async ({
                 },
                 data: {
                     ...(!existingUserDetails.handle ? { handle: resolvedHandle } : {}),
-                    bio,
+                    bioLexical,
+                    bioHtml,
                     displayName,
                     updatedAt,
                     urls,
@@ -81,7 +84,8 @@ export const updateUser = async ({
                         connect: { id: userId }
                     },
                     handle: resolvedHandle,
-                    bio,
+                    bioLexical,
+                    bioHtml,
                     displayName,
                     avatar,
                     userDir,

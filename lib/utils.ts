@@ -98,7 +98,7 @@ export const toSidebarProfile = (user:User): SidebarProfile | null => {
 		userDir: user.userDetails.userDir,
 		followers: user.userDetails.followers,
 		following: user.userDetails.following,
-		bio: user.userDetails.bio,
+		bioHtml: user.userDetails.bioHtml,
 		postCount: user.userDetails.postCount || 0,
 		urls: user.userDetails.urls || []
 	}

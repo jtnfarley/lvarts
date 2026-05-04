@@ -72,7 +72,7 @@ export default async function RecUsers() {
 											`${imageUrl}/${userDetails.userDir}/${userDetails.avatar}` :
 											'/images/melty-man.png'
 										}
-										bio={ userDetails.bio }
+										bioHtml={ userDetails.bioHtml }
 										// userType = 'User'
 									/>
 								))

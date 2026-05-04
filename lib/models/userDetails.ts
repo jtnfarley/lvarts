@@ -1,10 +1,12 @@
+import { AnyMxRecord } from "dns"
 import Post from "./post"
 
 export default interface UserDetails {
-    id: string
-    userId: string
+	id: string
+	userId: string
 	handle: string
-	bio?: string | null
+	bioLexical?: string | null
+	bioHtml?: string | null
 	chatIds?: string[]
 	comments: string[]
 	createdAt: Date

@@ -1,12 +1,12 @@
 'use client'
 
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { Button } from '@/components/ui/button';
 import * as z from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import User from "@/lib/models/user";
 import { BiImageAdd } from "react-icons/bi";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BiPlus, BiRefresh, BiX } from "react-icons/bi";
 import uploadFile from "@/app/actions/fileUploader";
 import { getRandomString } from "@/lib/utils";
@@ -18,6 +18,7 @@ import OptimizedFile from "@/lib/models/optimizedFile";
 import type { UpdateUserParams } from "@/app/data/user";
 import type UserDetails from "@/lib/models/userDetails";
 import { Spinner } from "../layout/Spinner"
+import RTEditor from "./Fields/RichTextEditor/RTEditor";
 
 
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
@@ -26,7 +27,7 @@ const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const UserValidation = z.object({
     handle: z.string().min(3).max(30).regex(HANDLE_REGEX, 'Use lowercase letters, numbers, or underscores.'),
     displayName: z.string().min(1).max(100),
-    bio: z.string().max(4000).optional(),
+    bio: z.any().optional(),
     avatar: z.any().optional(),   
     urls: z.array(z.object({ value: z.string() })).optional(), 
 })
@@ -51,13 +52,15 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
     const [userOnboarded, setUserOnboarded] = useState(user.userDetails && user.userDetails.displayName && user.userDetails.displayName !== '')
     const [avatarUrl, setAvatarUrl] = useState<string | undefined>(avatarUrlInit);
     const hasPermanentHandle = Boolean(user.userDetails?.handle);
+    const editorRef: any = useRef(null);
+    const bio = user.userDetails?.bioLexical || undefined;
 
     const { register, handleSubmit, setValue, watch, control, formState: { errors } } = useForm<z.infer<typeof UserValidation>>({
         resolver: zodResolver(UserValidation),
         defaultValues: {
             handle: user.userDetails?.handle || undefined,
             displayName: user.userDetails?.displayName || undefined,
-            bio: user.userDetails?.bio || undefined,
+            bio: bio,
             urls: user.userDetails?.urls?.map((value) => ({ value })) || []
         }
     })
@@ -120,6 +123,7 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
     }
 
     const onSubmit = async (values: z.infer<typeof UserValidation>) => {
+        console.log(values)
         setIsSaving(true);
         let id = user.userDetails?.id;
         let userDir = user.userDetails?.userDir || getRandomString(10);
@@ -139,11 +143,17 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
                 avatarUrl = file.name;
             }
 
+            if (values.bio && values.bio.html && values.bio.lexical) {
+                const {lexical} = values.bio;
+                values.bio.lexical = JSON.stringify(lexical);
+            }
+
             const userDetails = await saveUser({
                 id,
                 userId: user.id,
                 handle: hasPermanentHandle ? user.userDetails?.handle : values.handle,
-                bio: values.bio,
+                bioHtml: values.bio.html,
+                bioLexical: values.bio.lexical,
                 displayName: values.displayName,
                 userDir,
                 avatar: avatarUrl,
@@ -276,10 +286,18 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
                         <label className="block text-gray-700 font-medium mb-2" htmlFor="bio">
                             Bio
                         </label>
-                        <textarea
-                            className="bg-white border border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500 h-30"
-                            id="bio"
-                            {...register('bio')}
+                        <Controller
+                            control={control}
+                            name='bio'
+                            render={({ field }) => (
+                                <RTEditor
+                                    ref={editorRef}
+                                    onChange={field.onChange}
+                                    clearEditor={false}
+                                    content={bio}
+                                    currentUserId={user.id}
+                                />
+                            )}
                         />
                     </div>
                     <div className="mb-4">

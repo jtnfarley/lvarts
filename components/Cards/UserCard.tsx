@@ -11,10 +11,10 @@ interface Props {
     displayName?: string | null
     handle?: string | null
     avatar?: string,
-    bio?: string
+    bioHtml?: string | null
 }
 
-const UserCard = ({currentUser, recUserId, displayName, handle, avatar, bio}: Props) => {
+const UserCard = ({currentUser, recUserId, displayName, handle, avatar, bioHtml}: Props) => {
 
     const router = useRouter()
     const [following, setFollowing] = useState(false)
@@ -23,6 +23,7 @@ const UserCard = ({currentUser, recUserId, displayName, handle, avatar, bio}: Pr
         router.push(`/user/${recUserId}`)
     }
 
+    const bio = bioHtml ? bioHtml.replace(/<[^>]*>/g, '') : '';
     const truncateBio = (bio:string) => {
         return (bio.length > 100) ? `${bio.substring(0, 100)}...` : bio;
     } 

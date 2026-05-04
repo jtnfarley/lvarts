@@ -130,7 +130,8 @@ model UserDetails {
   userDir       String?
   createdAt     DateTime        @db.Date
   updatedAt     DateTime        @db.Date
-  bio           String?
+  bioHtml       String?
+  bioLexical    String?
   avatar        String?
   chats         String[]        @db.ObjectId
   comments      String[]        @db.ObjectId

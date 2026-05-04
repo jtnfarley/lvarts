@@ -30,18 +30,13 @@ export default function LeftSidebar(props:{currentUser:User}) {
 
 		if (targetUserId === currentUser.id && loggedInProfile) {
 			setProfile(loggedInProfile)
-
-			return () => {
-				cancelled = true
-			}
+		} else {
+			setProfile(null)
 		}
-
-		setProfile(null)
 
 		const loadProfile = async () => {
 			try {
 				const nextProfile = await getSidebarUserProfile(targetUserId)
-
 				if (!cancelled) {
 					setProfile(nextProfile || loggedInProfile)
 				}

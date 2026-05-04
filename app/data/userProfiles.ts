@@ -16,7 +16,7 @@ export const getSidebarProfile = async (userId:string): Promise<SidebarProfile |
                 userDir: true,
                 followers: true,
                 following: true,
-                bio: true,
+                bioHtml: true,
                 urls: true
             }
         }),

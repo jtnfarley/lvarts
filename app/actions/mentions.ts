@@ -79,7 +79,7 @@ export const searchMentionUsers = async ({
       displayName: true,
       avatar: true,
       userDir: true,
-      bio: true,
+      bioHtml: true,
       updatedAt: true,
     },
     orderBy: [
@@ -116,6 +116,6 @@ export const searchMentionUsers = async ({
       displayName: user.displayName?.trim() || null,
       avatar: user.avatar ?? null,
       userDir: user.userDir ?? null,
-      bio: user.bio ?? null,
+      bio: user.bioHtml ?? null,
     }));
 };

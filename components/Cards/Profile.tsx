@@ -2,17 +2,28 @@
 
 import Image from "next/image"
 import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
 import imageUrl from '@/constants/imageUrl';
 import { BiEdit, BiArrowBack } from "react-icons/bi";
 import type SidebarProfile from '@/lib/models/sidebarProfile';
 import User from "@/lib/models/user";
+import createDOMPurify from "dompurify";
 
 export default function Profile(props:{profile:SidebarProfile, user:User}) {
 	const { profile, user } = props;
-
+	const [bioHtml, setBioHtml] = useState('');
 	const avatarSrc = (profile && profile.userDir && profile.avatar) ?
 		`${imageUrl}/${profile.userDir}/${profile.avatar}` :
 		'/images/melty-man.png'
+
+	useEffect(() => {
+		if (!profile.bioHtml) {
+			setBioHtml('');
+			return;
+		}
+
+		setBioHtml(createDOMPurify(window).sanitize(profile.bioHtml));
+	}, [profile.bioHtml]);
 
 	return (	
         <div className="flex min-h-0 flex-1 flex-col px-5 py-8 bg-gray-700/30 rounded-tr-md">
@@ -54,7 +65,9 @@ export default function Profile(props:{profile:SidebarProfile, user:User}) {
                             <div className="uppercase text-sm">following</div>
                         </div>
                     </div>
-                    <div className="mb-10">{profile.bio}</div>
+                    {bioHtml &&
+                        <div className="mb-10" dangerouslySetInnerHTML={{ __html: bioHtml }} />
+                    }
                     {profile.urls && profile.urls.length > 0 &&
                         <div className="mb-4">
                             <div className="text-lg font-bold flex justify-center">Links</div>

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import parse from 'html-react-parser';
-import DOMPurify from 'dompurify';
+import createDOMPurify from 'dompurify';
 import Post from '@/lib/models/post';
 import PostMedia from './PostMedia';
 import PostTemplateTags from './PostTemplateTags';
@@ -114,7 +114,7 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 	}
 
 	useEffect(() => {
-		parseLinks(DOMPurify.sanitize(post.content));
+		parseLinks(createDOMPurify(window).sanitize(post.content));
 	},[])
 
     return (

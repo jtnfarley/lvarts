@@ -50,13 +50,9 @@ export default function UserProfile(props:{currentUser:User, userDetails:UserDet
 
 		if (targetUserId === currentUser.id && loggedInProfile) {
 			setProfile(loggedInProfile);
-
-			return () => {
-				cancelled = true;
-			}
+		} else {
+			setProfile(null);
 		}
-
-		setProfile(null);
 
 		const loadProfile = async () => {
 			try {

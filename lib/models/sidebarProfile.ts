@@ -6,7 +6,7 @@ export default interface SidebarProfile {
     userDir?: string | null
     followers: string[]
     following: string[]
-    bio?: string | null
+    bioHtml?: string | null
     postCount: number
     urls: string[]
 }
