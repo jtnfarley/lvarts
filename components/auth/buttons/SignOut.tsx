@@ -2,7 +2,7 @@
 
 import { signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
-import { BiSolidArrowToLeft } from "react-icons/bi";
+import { BiExit } from "react-icons/bi";
  
 export default function SignOut() {
     const router = useRouter();
@@ -16,7 +16,7 @@ export default function SignOut() {
 
     return (
         <button onClick={signOutUser} className='text-lg flex flex-row items-center cursor-pointer' title='Sign out'>
-            <BiSolidArrowToLeft className="leftIcon"/>
+            <BiExit className="leftIcon"/>
             <div className='hidden md:block'></div>
         </button>
     )

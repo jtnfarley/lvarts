@@ -1,10 +1,8 @@
 'use client'
 
-import { BiSolidHomeAlt2, BiSolidSearch, BiSolidUser, BiSolidBell, BiSolidCalendar } from "react-icons/bi";
+import { BiSolidHomeAlt2, BiSolidSearch, BiSolidUser, BiSolidBell, BiSolidCalendar,  BiArrowFromLeft, BiSolidCircle } from "react-icons/bi";
 import Link from "next/link"
 import User from "@/lib/models/user";
-import { BiSolidCircle } from "react-icons/bi";
-import { BiArrowFromLeft } from "react-icons/bi";
 import { useEffect, useState } from "react";
 import SignOut from '@/components/auth/buttons/SignOut';
 
