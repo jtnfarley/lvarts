@@ -169,10 +169,11 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 						</div>
 				}
 				{ cleanContent && 
-					<>
+					<div>
+						<div className='flex justify-end text-xs mb-2 me-2 italic'>{post.createdAt.toDateString()}</div>
 						<div>{parse(cleanContent)}</div>
 						<div className='text-sm pt-2 italic text-gray-1'>{(post.edited) ? 'edited' : ''}</div>
-					</>
+					</div>
 				}
 			</div>
 

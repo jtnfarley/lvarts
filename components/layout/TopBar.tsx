@@ -6,7 +6,7 @@ const TopBar = () => {
                 className="flex items-center gap-4"
             >
                 <img
-                    src='/logos/lvarts-paths.svg'
+                    src='/logos/lvarts-artsy-paths.svg'
                     alt="Lehigh Valley Arts & Music"
                     className="max-w-762 w-full"
                 />

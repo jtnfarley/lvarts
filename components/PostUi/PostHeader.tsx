@@ -16,16 +16,15 @@ export default function PostHeader(props:{postData:Post, user:User, currentUserP
 		'/images/melty-man.png';
 
     return (
-		<div className='flex flex-row p-3'>
+		<div className='flex flex-row xl:px-3 pt-3'>
 			<Link href={`/user/${post.user?.id}`} title={`${profileLabel}'s profile`} className='flex flex-row gap-3'>
 				<div><img src={avatar} className='rounded-md border-2 border-orange-300 w-[60px] h-[60px]'/></div>
 				<div>
 					<div className='text-lg font-bold'>{profileLabel}</div>
-					<div className='flex items-center gap-1 text-sm sm:text-md'>
+					<div className='text-sm sm:text-md'>
 						{post.userDetails?.handle && post.userDetails?.displayName && <span>@{post.userDetails.handle}</span>}
-						{post.userDetails?.handle && post.userDetails?.displayName && <span>&bull;</span>}
-						<div>{post.createdAt.toDateString()}</div>
 					</div>
+					{/* <div className='text-xs'>{post.createdAt.toDateString()}</div> */}
 				</div>
 			</Link>
 			{!currentUserPost && 

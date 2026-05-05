@@ -26,7 +26,7 @@ export default function Profile(props:{profile:SidebarProfile, user:User}) {
 	}, [profile.bioHtml]);
 
 	return (	
-        <div className="flex min-h-0 flex-1 flex-col px-5 py-8 bg-gray-700/30 rounded-tr-md">
+        <div className="flex min-h-0 flex-1 flex-col px-5 py-8 bg-gray-700/30 rounded-tr-md w-full">
             {profile && user && profile.userId === user.id && 
                 <div className="w-full flex justify-center mb-8 text-gray-400">
                     <button onClick={() => redirect(`/profile`)}><BiEdit className="inline"/> Edit Profile</button>
@@ -41,8 +41,8 @@ export default function Profile(props:{profile:SidebarProfile, user:User}) {
                     className='avatar-profile'
                 />
             </div>
-            <div className="mb-6 flex flex-col items-center text-gray-400">
-                <div className="flex justify-center text-xl font-bold uppercase">
+            <div className="mb-6 flex flex-col items-center text-[#c9c9c9]">
+                <div className="flex justify-center text-xl font-bold uppercase text-center">
                     {profile.displayName || (profile.handle ? `@${profile.handle}` : '')}
                 </div>
                 {profile.handle &&
@@ -50,13 +50,13 @@ export default function Profile(props:{profile:SidebarProfile, user:User}) {
                 }
             </div>
             <div className="flex-1 min-h-0 relative pe-2 text-gray-400">
-                <div className="h-full custom-scrollbar overflow-y-auto pb-20">
+                <div className="h-full custom-scrollbar overflow-y-auto xl:pb-20">
                     <div className="w-full flex flex-col items-center justify-center mb-5">
                         <div className="text-2xl"><strong>{profile.postCount || 0}</strong></div>
                         <div className="uppercase text-sm">posts</div>
                     </div>
                     <div className="flex mb-10">
-                        <div className="w-1/2 flex flex-col items-center justify-center border-e-2">
+                        <div className="w-1/2 flex flex-col items-center justify-center border-e-1 border-e-gray-400">
                             <div className="text-2xl"><strong>{profile.followers.length || 0}</strong></div>
                             <div className="uppercase text-sm">followers</div>
                         </div>
@@ -81,7 +81,7 @@ export default function Profile(props:{profile:SidebarProfile, user:User}) {
                         </div>
                     }
                 </div>
-                <div className="absolute bottom-2 w-full">
+                <div className="hidden xl:absolute bottom-2 w-full">
                     <div className="w-full flex justify-center">
                         <div className="rounded-full bg-orange/70 p-3 shadow-md backdrop-blur-[1px]">
                             <BiArrowBack className="rotate-270 text-2xl text-white"/>
