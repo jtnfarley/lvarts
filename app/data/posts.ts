@@ -23,6 +23,7 @@ export const getInitFeed = async (user:User):Promise<Array<Post>> => {
 		include: {
 			user:true,
 			userDetails: true,
+			venue: true,
 			parentPost: {
 				include: {
                     userDetails: true
@@ -57,6 +58,7 @@ export const getNewPosts = async (user:User, lastChecked:Date):Promise<Array<Pos
 		include: {
 			user:true,
 			userDetails: true,
+			venue: true,
 			parentPost: {
 				include: {
 					userDetails: true
@@ -90,6 +92,7 @@ export const getOldPosts = async (user:User, skip?:number):Promise<Array<Post>> 
 		include: {
 			user:true,
 			userDetails: true,
+			venue: true,
 			parentPost: {
 				include: {
 					userDetails: true
@@ -117,6 +120,7 @@ export const getPost = async (postId:string):Promise<any> => {
         include: {
             user:true,
             userDetails: true,
+            venue: true,
             parentPost: {
                 include: {
                     userDetails: true
@@ -139,6 +143,7 @@ export const getInitComments = async (postId:string):Promise<any> => {
         include: {
             user:true,
             userDetails: true,
+            venue: true,
             parentPost: {
                 include: {
                     userDetails: true
@@ -168,6 +173,7 @@ export const getNewComments = async (postId:string, lastChecked:Date):Promise<an
         include: {
             user:true,
             userDetails: true,
+            venue: true,
             parentPost: {
                 include: {
                     userDetails: true
@@ -195,6 +201,7 @@ export const getOldComments = async (postId:string, skip?:number):Promise<any> =
         include: {
             user:true,
             userDetails: true,
+            venue: true,
             parentPost: {
                 include: {
                     userDetails: true
@@ -224,15 +231,17 @@ export const savePost = async (postData:any) => {
         parentPostId, 
         edited,
         eventTitle,
-        eventDate,
+        eventDate,    
         town,
         neighborhood,
         venueName,
-        locationLabel,
+        address,
         tags,
         seeking,
         status
     } = postData
+
+    let {venueId} = postData
 
     const date = new Date()
     const createdAt = date
@@ -263,6 +272,18 @@ export const savePost = async (postData:any) => {
         })
     }
 
+    if (postType === 'event' && !venueId && venueName) {
+        const vid = await saveVenue({
+            neighborhood,
+            venueName,
+            address
+        });
+
+        if (vid) {
+            venueId = vid.id
+        }
+    }
+
     const postDataCreate: Prisma.PostsUncheckedCreateInput = {
         content,
         lexical: lexical ?? null,
@@ -278,10 +299,7 @@ export const savePost = async (postData:any) => {
         updatedAt,
         eventTitle: eventTitle ?? null,
         eventDate: eventDate ?? null,
-        town: town ?? null,
-        neighborhood: neighborhood ?? null,
-        venueName: venueName ?? null,
-        locationLabel: locationLabel ?? null,
+        venueId: venueId ?? null,
         tags: tags ?? null,
         seeking: seeking ?? null,
         status: status ?? null,
@@ -510,4 +528,16 @@ export const deletePost = async (postId:string) => {
     }
 
     return deletedPost
+}
+
+const saveVenue = async (venueData:{neighborhood?: string, venueName: string, address?: string}) => {
+    const {neighborhood, venueName, address} = venueData;
+    
+    return await prisma.venue.create({
+        data: {
+            neighborhood: neighborhood ?? null, 
+            venueName, 
+            address: address ?? null
+        }
+    })
 }

@@ -19,7 +19,8 @@ const getPost = async (postId:string, userId:string):Promise<any> => {
                 include: {
                     userDetails: true
                 }
-            }
+            },
+            venue: true
         }
     })
 
@@ -42,7 +43,8 @@ const editPost = async (postData:any) => {
         town,
         neighborhood,
         venueName,
-        locationLabel,
+        venueId,
+        address,
         tags,
         seeking,
         status
@@ -78,10 +80,7 @@ const editPost = async (postData:any) => {
             eventTitle: eventTitle ?? null,
             eventDate: eventDate ?? null,
             headline: headline ?? null,
-            town: town ?? null,
-            neighborhood: neighborhood ?? null,
-            venueName: venueName ?? null,
-            locationLabel: locationLabel ?? null,
+            venueId: venueId ?? null,
             tags: tags ?? null,
             seeking: seeking ?? null,
             status: status ?? null,

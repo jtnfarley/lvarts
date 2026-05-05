@@ -18,6 +18,7 @@ import Post from "@/lib/models/post";
 import imageUrl from "@/constants/imageUrl";
 import { getPostTypeLabel, isSceneCommunityPostType, isSceneScheduledPostType } from "@/lib/scenePosts";
 import { BiCalendar } from "react-icons/bi";
+import { searchVenues, type VenueSuggestion } from "@/app/actions/venues";
 
 interface Props {
     savePost:Function,
@@ -41,10 +42,9 @@ const PostValidation = z.object({
     headline: z.string().optional(),
     eventTitle: z.string().optional(),
     eventDate: z.date().nullable().optional(),
-    town: z.string().optional(),
-    neighborhood: z.string().optional(),
     venueName: z.string().optional(),
-    locationLabel: z.string().optional(),
+    venueId: z.string().optional(),
+    address: z.string().optional(),
     tags: z.string().optional(),
     seeking: z.string().optional(),
     status: z.string().optional(),
@@ -56,6 +56,10 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
     const [tempImage, setTempImage] = useState<OptimizedFile | undefined>();
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [saved, setSaved] = useState<boolean>(false);
+    const [venueQuery, setVenueQuery] = useState(post?.venue?.venueName ?? post?.venueName ?? '');
+    const [venueSuggestions, setVenueSuggestions] = useState<VenueSuggestion[]>([]);
+    const [isVenueSearchOpen, setIsVenueSearchOpen] = useState(false);
+    const [isVenueSearching, setIsVenueSearching] = useState(false);
     const editorRef: any = useRef(null);
 
     const parentPostId = post?.parentPostId ?? undefined;
@@ -80,10 +84,9 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
         headline: post?.headline ?? '',
         eventTitle: post?.eventTitle ?? '',
         eventDate: post?.eventDate ?? (isScheduledPost ? new Date() : null),
-        town: post?.town ?? '',
-        neighborhood: post?.neighborhood ?? '',
-        venueName: post?.venueName ?? '',
-        locationLabel: post?.locationLabel ?? '',
+        venueName: post?.venue?.venueName ?? post?.venueName ?? '',
+        venueId: post?.venueId ?? undefined,
+        address: post?.venue?.address ?? post?.address ?? '',
         tags: post?.tags ?? '',
         seeking: post?.seeking ?? '',
         status: post?.status ?? ''
@@ -93,6 +96,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
         resolver: zodResolver(PostValidation),
         defaultValues
     })
+    const venueNameRegistration = register('venueName')
 
     const sendFile = async (filedata:{file:File, userDir:string}) => {
         const {file, userDir} = filedata;
@@ -126,10 +130,9 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
 
         values.headline = normalizeOptionalValue(values.headline)
         values.eventTitle = normalizeOptionalValue(values.eventTitle)
-        values.town = normalizeOptionalValue(values.town)
-        values.neighborhood = normalizeOptionalValue(values.neighborhood)
         values.venueName = normalizeOptionalValue(values.venueName)
-        values.locationLabel = normalizeOptionalValue(values.locationLabel)
+        values.venueId = normalizeOptionalValue(values.venueId)
+        values.address = normalizeOptionalValue(values.address)
         values.tags = normalizeOptionalValue(
             values.tags
                 ?.split(',')
@@ -224,8 +227,52 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
     useEffect(() => {
         if (isSubmitSuccessful && !post?.id) {
             reset(defaultValues);
+            setVenueQuery('');
+            setVenueSuggestions([]);
+            setIsVenueSearchOpen(false);
         }
     }, [defaultValues, isSubmitSuccessful, post?.id, reset, errors]);
+
+    useEffect(() => {
+        const trimmedQuery = venueQuery.trim()
+
+        if (!isScheduledPost || trimmedQuery.length < 2) {
+            setVenueSuggestions([]);
+            setIsVenueSearching(false);
+            return;
+        }
+
+        let isCurrentSearch = true;
+        setIsVenueSearching(true);
+
+        const timeout = window.setTimeout(async () => {
+            try {
+                const venues = await searchVenues(trimmedQuery);
+
+                if (isCurrentSearch) {
+                    setVenueSuggestions(venues);
+                }
+            } finally {
+                if (isCurrentSearch) {
+                    setIsVenueSearching(false);
+                }
+            }
+        }, 250);
+
+        return () => {
+            isCurrentSearch = false;
+            window.clearTimeout(timeout);
+        }
+    }, [isScheduledPost, venueQuery]);
+
+    const selectVenue = (venue:VenueSuggestion) => {
+        setValue('venueName', venue.venueName, { shouldDirty: true });
+        setValue('venueId', venue.id, { shouldDirty: true });
+        setValue('address', venue.address ?? '', { shouldDirty: true });
+        setVenueQuery(venue.venueName);
+        setVenueSuggestions([]);
+        setIsVenueSearchOpen(false);
+    }
 
     const handleEditorUpdated = () => {
         setClearEditor(false);
@@ -303,33 +350,54 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
                 {(isScenePost || isScheduledPost) &&
                     <div className="mb-4 grid gap-4 md:grid-cols-2">
                         <div>
-                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Town</div>
-                            <input
-                                {...register('town')}
-                                className="w-full rounded-xl border border-gray-300 px-3 py-2"
-                                placeholder="Bethlehem"
-                            />
-                        </div>
-                        <div>
-                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Neighborhood</div>
-                            <input
-                                {...register('neighborhood')}
-                                className="w-full rounded-xl border border-gray-300 px-3 py-2"
-                                placeholder="South Side"
-                            />
-                        </div>
-                        <div>
                             <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Venue</div>
-                            <input
-                                {...register('venueName')}
-                                className="w-full rounded-xl border border-gray-300 px-3 py-2"
-                                placeholder="ArtsQuest, The Funhouse, SteelStacks"
-                            />
+                            <div className="relative">
+                                <input
+                                    {...venueNameRegistration}
+                                    className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                    placeholder="ArtsQuest, The Funhouse, SteelStacks"
+                                    autoComplete="off"
+                                    onChange={(event) => {
+                                        venueNameRegistration.onChange(event);
+                                        setValue('venueId', undefined, { shouldDirty: true });
+                                        setVenueQuery(event.target.value);
+                                        setIsVenueSearchOpen(true);
+                                    }}
+                                    onFocus={() => setIsVenueSearchOpen(true)}
+                                    onBlur={() => {
+                                        window.setTimeout(() => setIsVenueSearchOpen(false), 150);
+                                    }}
+                                />
+                                <input type="hidden" {...register('venueId')} />
+                                {isScheduledPost && isVenueSearchOpen && (venueSuggestions.length > 0 || isVenueSearching) &&
+                                    <div className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-gray-200 bg-white shadow-lg">
+                                        {isVenueSearching &&
+                                            <div className="px-3 py-2 text-sm text-gray-500">Searching venues...</div>
+                                        }
+                                        {!isVenueSearching && venueSuggestions.map((venue) => (
+                                            <button
+                                                key={venue.id}
+                                                type="button"
+                                                className="block w-full px-3 py-2 text-left hover:bg-orange/10"
+                                                onMouseDown={(event) => event.preventDefault()}
+                                                onClick={() => selectVenue(venue)}
+                                            >
+                                                <div className="text-sm font-semibold text-gray-900">{venue.venueName}</div>
+                                                {(venue.address || venue.neighborhood) &&
+                                                    <div className="text-xs text-gray-500">
+                                                        {[venue.address, venue.neighborhood].filter(Boolean).join(' | ')}
+                                                    </div>
+                                                }
+                                            </button>
+                                        ))}
+                                    </div>
+                                }
+                            </div>
                         </div>
                         <div>
                             <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Map Address</div>
                             <input
-                                {...register('locationLabel')}
+                                {...register('address')}
                                 className="w-full rounded-xl border border-gray-300 px-3 py-2"
                                 placeholder="101 Founders Way, Bethlehem, PA"
                             />

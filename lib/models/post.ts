@@ -1,5 +1,6 @@
 import UserDetails from "./userDetails"
 import User from "./user"
+import Venue from "./venue"
 
 export default interface Post {
     id: string
@@ -29,7 +30,9 @@ export default interface Post {
 	town?: string | null
 	neighborhood?: string | null
 	venueName?: string | null
-	locationLabel?: string | null
+	venueId?: string | null
+	venue?: Venue | null
+	address?: string | null
 	tags?: string | null
 	seeking?: string | null
 	status?: string | null

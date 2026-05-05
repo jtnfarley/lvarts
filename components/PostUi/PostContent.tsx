@@ -21,6 +21,9 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
     const displayTitle = post.headline || post.eventTitle
     const postTags = splitPostTags(post.tags)
     const sceneTypeLabel = isSceneCommunityPostType(post.postType) ? getPostTypeLabel(post.postType) : null
+    const venueName = post.venue?.venueName ?? post.venueName
+    const venueNeighborhood = post.venue?.neighborhood ?? post.neighborhood
+    const venueAddress = post.venue?.address ?? post.address
 
 	const parseTemplateTags = (post:string) => {
 		let placeholder = post;
@@ -140,13 +143,13 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 						</div>
 				}
 				{
-					(post.town || post.neighborhood || post.venueName || post.locationLabel) &&
+					(post.town || venueNeighborhood || venueName || venueAddress) &&
 						<div className='mb-4 rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-700'>
 							<div className='flex flex-wrap gap-x-4 gap-y-1'>
 								{post.town && <div>Town: <strong>{post.town}</strong></div>}
-								{post.neighborhood && <div>Neighborhood: <strong>{post.neighborhood}</strong></div>}
-								{post.venueName && <div>Venue: <strong>{post.venueName}</strong></div>}
-								{post.locationLabel && <div>Address: <strong>{post.locationLabel}</strong></div>}
+								{venueNeighborhood && <div>Neighborhood: <strong>{venueNeighborhood}</strong></div>}
+								{venueName && <div>Venue: <strong>{venueName}</strong></div>}
+								{venueAddress && <div>Address: <strong>{venueAddress}</strong></div>}
 							</div>
 						</div>
 				}

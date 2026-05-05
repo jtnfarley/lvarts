@@ -23,23 +23,26 @@ const getPosts = async (queryString:string):Promise<Array<Post>> => {
                     }
                 },
                 {
-                    town: {
-                        contains: queryString
-                    }
-                },
-                {
-                    neighborhood: {
-                        contains: queryString
-                    }
-                },
-                {
-                    venueName: {
-                        contains: queryString
-                    }
-                },
-                {
-                    locationLabel: {
-                        contains: queryString
+                    venue: {
+                        is: {
+                            OR: [
+                                {
+                                    neighborhood: {
+                                        contains: queryString
+                                    }
+                                },
+                                {
+                                    venueName: {
+                                        contains: queryString
+                                    }
+                                },
+                                {
+                                    address: {
+                                        contains: queryString
+                                    }
+                                }
+                            ]
+                        }
                     }
                 },
                 {
@@ -55,6 +58,7 @@ const getPosts = async (queryString:string):Promise<Array<Post>> => {
         include: {
             user:true,
             userDetails: true,
+            venue: true,
             parentPost: {
                 include: {
                     userDetails: true

@@ -28,6 +28,7 @@ export interface SceneHubData {
 const fullPostInclude = {
     user: true,
     userDetails: true,
+    venue: true,
     parentPost: {
         include: {
             userDetails: true
@@ -57,13 +58,19 @@ const getTopCounts = (values:Array<string>, limit = 5): TrendItem[] => {
         }))
 }
 
-const buildTrendRadar = (posts:Array<Pick<Post, 'postType' | 'town' | 'tags'>>): TrendRadar => {
+const buildTrendRadar = (posts:Array<{
+    postType?: string | null
+    tags?: string | null
+    venue?: {
+        neighborhood?: string | null
+    } | null
+}>): TrendRadar => {
     const postTypes = posts
         .map((post) => getPostTypeLabel(post.postType))
         .filter(Boolean)
 
     const towns = posts
-        .map((post) => post.town || '')
+        .map((post) => post.venue?.neighborhood || '')
         .filter(Boolean)
 
     const tags = posts.flatMap((post) => splitPostTags(post.tags))
@@ -120,8 +127,12 @@ export const getSceneHubData = async (): Promise<SceneHubData> => {
                 postType: {
                     in: [...SCENE_COMMUNITY_POST_TYPES]
                 },
-                locationLabel: {
-                    not: null
+                venue: {
+                    is: {
+                        address: {
+                            not: null
+                        }
+                    }
                 }
             },
             include: fullPostInclude,
@@ -141,8 +152,12 @@ export const getSceneHubData = async (): Promise<SceneHubData> => {
             },
             select: {
                 postType: true,
-                town: true,
-                tags: true
+                tags: true,
+                venue: {
+                    select: {
+                        neighborhood: true
+                    }
+                }
             }
         })
     ])

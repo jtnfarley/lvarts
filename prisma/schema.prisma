@@ -109,16 +109,14 @@ model Posts {
   chatId        String?
   likes         Int?
   eventTitle    String?
-  eventDate     DateTime?        @db.Date
-  town          String?
-  neighborhood  String?
-  venueName     String?
-  locationLabel String?
+  eventDate     DateTime?       @db.Date
   tags          String?
   seeking       String?
   status        String?
   commentCount  Int?
   notifications Notifications[]
+  venueId       String?         @db.ObjectId
+  venue         Venue?          @relation(fields: [venueId], references: [id])
 }
 
 model UserDetails {
@@ -144,4 +142,13 @@ model UserDetails {
   suspended     Boolean?
   posts         Posts[]
   notifications Notifications[]
+}
+
+model Venue {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  venueName    String
+  neighborhood String?
+  address      String?
+  image        String?
+  posts        Posts[]
 }

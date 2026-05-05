@@ -11,7 +11,7 @@ type MarkerPost = {
     id: string
     title: string
     postType?: string | null
-    locationLabel: string
+    address: string
     formattedAddress: string
     town?: string | null
     venueName?: string | null
@@ -31,7 +31,7 @@ export default function SceneMap(props:{posts:Post[], googleMapsApiKey:string | 
     useEffect(() => {
         let cancelled = false
 
-        const geocodeLocation = async (locationLabel:string) => {
+        const geocodeLocation = async (address:string) => {
             const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
                 method: 'POST',
                 headers: {
@@ -40,7 +40,7 @@ export default function SceneMap(props:{posts:Post[], googleMapsApiKey:string | 
                     'X-Goog-FieldMask': 'places.location,places.formattedAddress'
                 },
                 body: JSON.stringify({
-                    textQuery: locationLabel
+                    textQuery: address
                 })
             })
 
@@ -56,7 +56,7 @@ export default function SceneMap(props:{posts:Post[], googleMapsApiKey:string | 
             }
 
             return {
-                formattedAddress: place.formattedAddress || locationLabel,
+                formattedAddress: place.formattedAddress || address,
                 lat: place.location.latitude,
                 lng: place.location.longitude
             }
@@ -68,30 +68,30 @@ export default function SceneMap(props:{posts:Post[], googleMapsApiKey:string | 
                 return
             }
 
-            const postsWithLocations = posts.filter((post) => post.locationLabel)
+            const postsWithLocations = posts.filter((post) => post.venue?.address || post.address)
             const locationCache = new Map<string, Awaited<ReturnType<typeof geocodeLocation>>>()
 
             await Promise.all(
                 postsWithLocations.map(async (post) => {
-                    const locationLabel = post.locationLabel?.trim()
+                    const address = (post.venue?.address ?? post.address)?.trim()
 
-                    if (!locationLabel || locationCache.has(locationLabel)) {
+                    if (!address || locationCache.has(address)) {
                         return
                     }
 
-                    const geocodedLocation = await geocodeLocation(locationLabel)
-                    locationCache.set(locationLabel, geocodedLocation)
+                    const geocodedLocation = await geocodeLocation(address)
+                    locationCache.set(address, geocodedLocation)
                 })
             )
 
             const nextMarkers = postsWithLocations.flatMap((post) => {
-                const locationLabel = post.locationLabel?.trim()
+                const address = (post.venue?.address ?? post.address)?.trim()
 
-                if (!locationLabel) {
+                if (!address) {
                     return []
                 }
 
-                const geocodedLocation = locationCache.get(locationLabel)
+                const geocodedLocation = locationCache.get(address)
 
                 if (!geocodedLocation) {
                     return []
@@ -101,10 +101,10 @@ export default function SceneMap(props:{posts:Post[], googleMapsApiKey:string | 
                     id: post.id,
                     title: post.headline || post.eventTitle || post.content.slice(0, 60),
                     postType: post.postType,
-                    locationLabel,
+                    address,
                     formattedAddress: geocodedLocation.formattedAddress,
-                    town: post.town,
-                    venueName: post.venueName,
+                    town: post.town ?? post.venue?.neighborhood,
+                    venueName: post.venue?.venueName ?? post.venueName,
                     lat: geocodedLocation.lat,
                     lng: geocodedLocation.lng
                 }]
