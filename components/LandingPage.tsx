@@ -71,11 +71,11 @@ export default function LandingPage() {
 
                 <div className="flex flex-col my-5 justify-center items-center">
                     <button onClick={() => signInUser('google')} className='bg-white w-72 flex justify-center px-3 py-3 rounded-full my-5'>
-                        Sign Up/In with Google 
+                        Sign Up/Sign In with Google 
                         <div className='ms-3'><img src='/images/goog.png' alt='Google Icon' className='w-[30px] h-[30px]'/></div>
                     </button>
                     <div className="flex justify-center my-3 border-b-1 border-gray-600 w-2/3"></div>
-                    <div className="my-2 text-white">Sign Up/In with Email</div>
+                    <div className="my-2 text-white">Sign Up/Sign In with Email</div>
                     <div className="flex items-center mb-2">
                         <input type='text' name='email' id='email' placeholder='Email' className="border-2 px-2 py-2 me-2 rounded-md bg-white" 
                             onFocus={() => setShowAlert(true)}
