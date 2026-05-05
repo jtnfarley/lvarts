@@ -24,9 +24,11 @@ const UserCard = ({currentUser, recUserId, displayName, handle, avatar, bioHtml}
     }
 
     const bio = bioHtml ? bioHtml.replace(/<[^>]*>/g, '') : '';
-    const truncateBio = (bio:string) => {
-        return (bio.length > 100) ? `${bio.substring(0, 100)}...` : bio;
+
+    const truncateText = (text:string, length:number) => {
+        return (text.length > length) ? `${text.substring(0, length)}...` : text;
     } 
+    
     useEffect(() => {
         if (currentUser.userDetails?.following?.includes(recUserId)) {
             setFollowing(true)
@@ -41,9 +43,9 @@ const UserCard = ({currentUser, recUserId, displayName, handle, avatar, bioHtml}
                         <img src={avatar} className='rounded-sm border-1 border-gray-400 w-[45px] h-[45px]'/>
                     </div>
 
-                    <div className='hidden xl:block'>
-                        <div className='xl:text-gray-400 xl:text-[16px] font-bold'>{displayName || (handle ? `@${handle}` : 'Artist')}</div>
-                        {handle && <div className='hidden xl:block text-sm lowercase tracking-[0.18em] text-gray-400'>@{handle}</div>}
+                    <div className='hidden xl:block text-start'>
+                        <div className='xl:text-gray-400 xl:text-[16px] font-bold'>{truncateText(displayName || '', 17) || (handle ? `@${truncateText(handle, 10)}` : 'Artist')}</div>
+                        {handle && <div className='hidden xl:block text-sm lowercase text-gray-400'>@{truncateText(handle, 17)}</div>}
                     </div>
                 </button>
                 <div className='hidden xl:block'>
@@ -52,7 +54,7 @@ const UserCard = ({currentUser, recUserId, displayName, handle, avatar, bioHtml}
             </div>
             {bio && bio !== '' &&
                 <div className="mt-3">
-                    <div className='hidden xl:block text-sm rounded-sm text-gray-400'>{truncateBio(bio)}</div>
+                    <div className='hidden xl:block text-sm rounded-sm text-gray-400'>{truncateText(bio, 100)}</div>
                 </div>
             }
         </article>

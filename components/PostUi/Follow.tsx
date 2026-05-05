@@ -33,7 +33,7 @@ export default function Follow(props:{followUserId:string, user:User}) {
     return (
 		<div className='flex flex-grow justify-end me-2 align-middle'>
 			{following ? (
-				<button className='text-2xl bg-purple-200 text-gray-300 p-1 rounded-sm max-h-[34px] cursor-pointer' title={isHovered ? 'unfollow' : 'following'}
+				<button className='text-2xl bg-amber-50 text-gray-300 p-1 rounded-sm max-h-[34px] cursor-pointer border-1' title={isHovered ? 'unfollow' : 'following'}
 					onMouseEnter={() => setIsHovered(true)}
 					onMouseLeave={() => setIsHovered(false)}
 					onClick={toggleFollow}
