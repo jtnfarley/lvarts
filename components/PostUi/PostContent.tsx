@@ -122,11 +122,11 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 			<div className='postContent'>
 				{
 					displayTitle &&
-						<div className='text-2xl font-bold'><Link href={`/post/${post.id}`} title={displayTitle}>{displayTitle}</Link></div>
+						<div className='text-2xl font-bold px-3 pt-3'><Link href={`/post/${post.id}`} title={displayTitle}>{displayTitle}</Link></div>
 				}
 				{
 					post.eventDate &&
-						<div className='mb-5 text-lg'>{formatDate(post.eventDate)}</div>
+						<div className='mb-5 text-lg px-3'>{formatDate(post.eventDate)}</div>
 				}
 				{
 					(sceneTypeLabel || post.status) &&
@@ -142,7 +142,6 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 				{
 					(post.town || post.neighborhood || post.venueName || post.locationLabel) &&
 						<div className='mb-4 rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-700'>
-							<div className='mb-1 font-semibold uppercase tracking-wide text-gray-500'>Scene Details</div>
 							<div className='flex flex-wrap gap-x-4 gap-y-1'>
 								{post.town && <div>Town: <strong>{post.town}</strong></div>}
 								{post.neighborhood && <div>Neighborhood: <strong>{post.neighborhood}</strong></div>}
