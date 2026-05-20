@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 
 import { getSceneHubData, type SceneHubData } from '@/app/data/scene'
 import PostUi from '@/components/PostUi/PostUi'
-import type Post from '@/lib/models/post'
+import type { FeedRow } from '@/lib/models/initFeedRow'
 import type User from '@/lib/models/user'
 
 import SceneComposer from './SceneComposer'
@@ -36,7 +36,7 @@ const TrendGroup = (props:{title:string, items:Array<{label:string, count:number
 const SceneSection = (props:{
     title:string
     description:string
-    posts:Post[]
+    posts:FeedRow[]
     emptyMessage:string
     user:User
     googleMapsApiKey:string | undefined
@@ -140,7 +140,7 @@ export default function SceneHub(props: Props) {
                         <div className="grid gap-4">
                             <TrendGroup title="Top Tags" items={sceneData.trendRadar.tags} emptyLabel="No tagged community posts yet."/>
                             <TrendGroup title="Top Towns" items={sceneData.trendRadar.towns} emptyLabel="No location data yet."/>
-                            <TrendGroup title="Top Formats" items={sceneData.trendRadar.postTypes} emptyLabel="No scene post activity yet."/>
+                            <TrendGroup title="Top Formats" items={sceneData.trendRadar.posttypes} emptyLabel="No scene post activity yet."/>
                         </div>
                     </div>
 

@@ -1,12 +1,20 @@
 export default interface SidebarProfile {
-    userId: string
+    id: number
+    userid: number
     handle?: string | null
-    displayName?: string | null
+    displayname?: string | null
     avatar?: string | null
-    userDir?: string | null
+    userdir?: string | null
     followers: string[]
     following: string[]
-    bioHtml?: string | null
-    postCount: number
-    urls: string[]
+    biohtml?: string | null
+    biolexical?: string | null
+    postcount: number
+    followerscount: number
+    followingcount: number
+    urls: {
+        id?: number
+        urlname: string
+        url: string
+    }[]
 }

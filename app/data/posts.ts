@@ -1,370 +1,501 @@
 'use server'
 
-import {prisma} from '@/lib/db/prisma';
-import Post from '@/lib/models/post';
-import User from '@/lib/models/user';
+import {prisma} from '@/prisma';
 import { Prisma } from '@prisma/client';
 import { notifyMentionedUsers } from './postMentions';
 import { generateUniqueHandle } from './handles';
+import { FeedRow } from '@/lib/models/initFeedRow';
+import UserDetails from '@/lib/models/userDetails';
 
-export const getInitFeed = async (user:User):Promise<Array<Post>> => {
-	const posts:Array<Post> = await prisma.posts.findMany({
-		where: {
-			OR: [
-				{ userId: user?.id },
-				{ userId: {
-					in: user?.userDetails?.following
-				}},
-			],
-			postType: {
-				not: 'chat'
-			}
-		},
-		include: {
-			user:true,
-			userDetails: true,
-			venue: true,
-			parentPost: {
-				include: {
-                    userDetails: true
-				}
-			}
-		},
-		orderBy: {
-			createdAt: 'desc'
-		},
-		take: 20,
-	})
+const parentPostJoin = Prisma.sql`
+    LEFT JOIN LATERAL (
+        SELECT
+            cp.postid,
+            parent_ud.id,
+            parent_ud.displayname
+        FROM commentstopost cp
+        JOIN usertoposts parent_utp
+            ON parent_utp.postid = cp.postid
+        JOIN userdetails parent_ud
+            ON parent_ud.id = parent_utp.userdetailsid
+        WHERE cp.commentpostid = p.id
+        ORDER BY parent_utp.id
+        LIMIT 1
+    ) parent_post
+        ON true
+`
 
-	return posts
+const parentPostSelect = Prisma.sql`
+    CASE
+        WHEN parent_post.postid IS NOT NULL THEN json_build_object(
+            'postid', parent_post.postid,
+            'userdetailsid', parent_post.id,
+            'displayName', parent_post.displayname
+        )
+        ELSE NULL
+    END AS "parentPost"
+`
+
+const authorDetailsJoin = Prisma.sql`
+    JOIN LATERAL (
+        SELECT ud.*
+        FROM usertoposts utp
+        JOIN userdetails ud
+            ON ud.id = utp.userdetailsid
+        WHERE utp.postid = p.id
+        ORDER BY utp.id
+        LIMIT 1
+    ) ud
+        ON true
+`
+
+const feedRowSelect = Prisma.sql`
+    SELECT DISTINCT ON (p.id)
+        p.id,
+        p.content,
+        p.lexical,
+        p.createdat,
+        p.updatedat,
+        p.edited,
+        pt.posttype,
+        p.privatepost,
+        p.postfile,
+        json_build_object(
+            'id', ud.id,
+            'userid', ud.userid,
+            'displayname', ud.displayname,
+            'userdir', ud.userdir,
+            'avatar', ud.avatar,
+            'handle', ud.handle,
+            'biohtml', ud.biohtml,
+            'biolexical', ud.biolexical
+        ) AS userdetails,
+        CASE WHEN pt.posttype = 'event' THEN e.id END AS eventid,
+        CASE WHEN pt.posttype = 'event' THEN e.eventname END AS eventname,
+        CASE WHEN pt.posttype = 'event' THEN e.eventdate END AS eventdate,
+        CASE WHEN pt.posttype = 'event' THEN v.id END AS venueid,
+        CASE WHEN pt.posttype = 'event' THEN v.venuename END AS venuename,
+        CASE WHEN pt.posttype = 'event' THEN v.address END AS address,
+        --CASE WHEN pt.posttype = 'event' THEN c.city END AS city,
+        --CASE WHEN pt.posttype = 'event' THEN s.stateabbr END AS state,
+        --CASE WHEN pt.posttype = 'event' THEN z.zipcode END AS zipcode,
+        ft.filetype,
+        (select count(pl.postid)::int from postlikes pl where pl.postid = p.id) as likes,
+        (select count(cp.postid)::int from commentstopost cp where cp.postid = p.id) as comments,
+        ${parentPostSelect}
+`
+
+const feedRowSharedJoins = Prisma.sql`
+    JOIN posttypes pt
+        ON pt.id = p.posttypeid
+    LEFT JOIN filetypes ft
+        ON ft.id = p.postfiletypeid
+    LEFT JOIN events e
+        ON e.id = p.eventid
+    LEFT JOIN venues v
+        ON v.id = e.venueid
+    --LEFT JOIN cities c
+        --ON c.id = v.cityid
+    --LEFT JOIN states s
+       -- ON s.id = v.stateid
+    --LEFT JOIN zipcodes z
+        --ON z.id = v.zipcodeid
+    ${authorDetailsJoin}
+    ${parentPostJoin}
+`
+
+const feedRowInnerQuery = (fromClause: Prisma.Sql, whereClause: Prisma.Sql = Prisma.empty) => Prisma.sql`
+    ${feedRowSelect}
+    ${fromClause}
+    ${feedRowSharedJoins}
+    ${whereClause}
+    ORDER BY p.id, p.createdat DESC
+`
+
+const paginatedFeedQuery = (innerQuery: Prisma.Sql, offset:number) => Prisma.sql`
+    SELECT *
+    FROM (
+        ${innerQuery}
+    ) feed
+    ORDER BY createdat DESC
+    LIMIT 20
+    OFFSET ${offset}
+`
+
+export const getFeedRow = async (userdetails:UserDetails, offset:number = 0, lastChecked:Date = new Date('2024-01-01')):Promise<FeedRow[]> => {
+    const userdetailsid = userdetails?.id
+    const hasLastChecked = !!lastChecked
+
+    if (!userdetailsid) {
+        return []
+    }
+
+    if (!lastChecked) lastChecked = new Date('2024-01-01');
+
+    const eligiblePostsQuery = Prisma.sql`
+        WITH followed AS (
+            SELECT f.followinguserdetailsid
+            FROM followers f
+            WHERE f.userdetailsid = ${userdetailsid}
+        ),
+        scope_userdetails AS (
+            SELECT ${userdetailsid}::int AS userdetailsid
+            UNION
+            SELECT followinguserdetailsid
+            FROM followed
+        ),
+        eligible_posts AS (
+            SELECT p.id
+            FROM posts p
+            WHERE (
+                ${hasLastChecked} = false
+                OR p.createdat > ${lastChecked}
+            )
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM usertoposts utp
+                    WHERE utp.postid = p.id
+                    AND utp.userdetailsid IN (
+                        SELECT userdetailsid
+                        FROM scope_userdetails
+                    )
+                )
+                OR EXISTS (
+                    SELECT 1
+                    FROM postlikes pl
+                    WHERE pl.postid = p.id
+                    AND pl.userdetailsid IN (
+                        SELECT userdetailsid
+                        FROM scope_userdetails
+                    )
+                )
+            )
+        )
+    `
+
+    return await prisma.$queryRaw<FeedRow[]>(
+        Prisma.sql`
+            ${eligiblePostsQuery}
+            ${paginatedFeedQuery(
+                feedRowInnerQuery(
+                    Prisma.sql`
+                        FROM eligible_posts ep
+                        JOIN posts p
+                            ON p.id = ep.id
+                    `
+                ),
+                offset
+            )}
+        `
+    )
 }
 
-export const getNewPosts = async (user:User, lastChecked:Date):Promise<Array<Post>> => {
-	'use server'
-
-	const posts:Array<Post> = await prisma.posts.findMany({
-		where: {
-			OR: [
-				{ userId: user?.id },
-				{ userId: {
-					in: user?.userDetails?.following
-				}},
-			],
-			postType: {
-				not: 'chat'
-			},
-			createdAt: { gt: lastChecked }
-		},
-		include: {
-			user:true,
-			userDetails: true,
-			venue: true,
-			parentPost: {
-				include: {
-					userDetails: true
-				}
-			}
-		},
-		orderBy: {
-			createdAt: 'desc'
-		},
-		take: 20
-	})
-
-	return posts
-}
-
-export const getOldPosts = async (user:User, skip?:number):Promise<Array<Post>> => {
-	'use server'
-
-	const posts:Array<Post> = await prisma.posts.findMany({
-		where: {
-			OR: [
-				{ userId: user?.id },
-				{ userId: {
-					in: user?.userDetails?.following
-				}},
-			],
-			postType: {
-				not: 'chat'
-			}
-		},
-		include: {
-			user:true,
-			userDetails: true,
-			venue: true,
-			parentPost: {
-				include: {
-					userDetails: true
-				}
-			}
-		},
-		orderBy: {
-			createdAt: 'desc'
-		},
-		take: 20,
-		skip: (skip) ? skip + 1 : 0
-	})
-
-	return posts
-}
-
-export const getPost = async (postId:string):Promise<any> => {
-    const post = await prisma.posts.findFirst({
-        where: {
-            id: postId,
-            postType: {
-				not: 'chat'
-			}
-        },
-        include: {
-            user:true,
-            userDetails: true,
-            venue: true,
-            parentPost: {
-                include: {
-                    userDetails: true
-                }
+export const getEvents = async ():Promise<FeedRow[]> => {
+    return await prisma.$queryRaw<FeedRow[]>(
+        Prisma.sql`
+            ${
+                feedRowInnerQuery(
+                    Prisma.sql`
+                        FROM events ev
+                        JOIN posts p
+                            ON p.eventid = ev.id
+                    `,
+                    Prisma.sql`
+                    where ev.eventdate >= now()`
+                )
             }
-        }
-    })
-
-    return post;
+        `
+    )
 }
 
-export const getInitComments = async (postId:string):Promise<any> => {
-    const comments = await prisma.posts.findMany({
-        where: {
-            parentPostId:postId,
-            postType: {
-				not: 'chat'
-			}
-        },
-        include: {
-            user:true,
-            userDetails: true,
-            venue: true,
-            parentPost: {
-                include: {
-                    userDetails: true
-                }
-            }
-        },
-        orderBy: {
-            createdAt: 'desc'
-        },
-        take: 20
-    })
+export const searchPosts = async (queryString:string):Promise<FeedRow[]> => {
+    const trimmedQuery = queryString.trim()
 
-    return comments;
+    if (!trimmedQuery) {
+        return []
+    }
+
+    return await prisma.$queryRaw<FeedRow[]>(
+        paginatedFeedQuery(
+            feedRowInnerQuery(
+                Prisma.sql`
+                    FROM posts p
+                `,
+                Prisma.sql`
+                    WHERE
+                        p.content ILIKE ${`%${trimmedQuery}%`}
+                        OR ud.displayname ILIKE ${`%${trimmedQuery}%`}
+                        OR ud.handle ILIKE ${`%${trimmedQuery}%`}
+                        OR e.eventname ILIKE ${`%${trimmedQuery}%`}
+                        OR v.venuename ILIKE ${`%${trimmedQuery}%`}
+                        OR v.address ILIKE ${`%${trimmedQuery}%`}
+                `
+            ),
+            0
+        )
+    )
 }
 
-export const getNewComments = async (postId:string, lastChecked:Date):Promise<any> => {
-    'use server'
-    
-    const comments = await prisma.posts.findMany({
-        where: {
-            parentPostId:postId,
-            createdAt: { gt: lastChecked },
-            postType: {
-				not: 'chat'
-			}
-        },
-        include: {
-            user:true,
-            userDetails: true,
-            venue: true,
-            parentPost: {
-                include: {
-                    userDetails: true
-                }
-            }
-        },
-        orderBy: {
-            createdAt: 'desc'
-        }
-    })
+export const getPost = async (postid:number):Promise<FeedRow> => {
+    const post = await prisma.$queryRaw<FeedRow[]>(
+        feedRowInnerQuery(
+            Prisma.sql`
+                FROM posts p
+            `,
+            Prisma.sql`
+                WHERE p.id = ${postid}
+            `
+        )
+    )
 
-    return comments;
+    return post[0];
 }
 
-export const getOldComments = async (postId:string, skip?:number):Promise<any> => {
-    'use server'
-    
-    const comments = await prisma.posts.findMany({
-        where: {
-            parentPostId:postId,
-            postType: {
-				not: 'chat'
-			}
-        },
-        include: {
-            user:true,
-            userDetails: true,
-            venue: true,
-            parentPost: {
-                include: {
-                    userDetails: true
-                }
-            }
-        },
-        orderBy: {
-            createdAt: 'desc'
-        },
-        take: 20,
-        skip: (skip) ? skip + 1 : 0
-    })
+export const getCommentFeedRow = async (postid:number, offset:number = 0, lastChecked:Date = new Date('2024-01-01')):Promise<FeedRow[]> => {
+    if (!lastChecked) lastChecked = new Date('2024-01-01');
 
-    return comments;
+    return await prisma.$queryRaw<FeedRow[]>(
+        paginatedFeedQuery(
+            feedRowInnerQuery(
+                Prisma.sql`
+                    FROM commentstopost cp
+                    JOIN posts p
+                        ON p.id = cp.commentpostid
+                `,
+                Prisma.sql`
+                    WHERE cp.postid = ${postid}::int
+                    AND p.createdat >= ${lastChecked}
+                `
+            ),
+            offset
+        )
+    )
 }
+
 
 export const savePost = async (postData:any) => {
     const {
+        id,
         content, 
         lexical, 
-        headline,
-        userId, 
-        postType, 
-        postFile, 
-        postFileType, 
+        // headline,
+        userdetailsid, 
+        posttype, 
+        postfile, 
+        postfiletype, 
         privatePost, 
         parentPostId, 
         edited,
-        eventTitle,
-        eventDate,    
-        town,
-        neighborhood,
-        venueName,
+        eventname,
+        eventdate,  
+        privatepost, 
+        // town,
+        // neighborhood,
+        venuename,
         address,
-        tags,
-        seeking,
-        status
+        // tags,
+        // seeking,
+        // status
     } = postData
 
-    let {venueId} = postData
+    let {venueid, eventid} = postData
 
     const date = new Date()
-    const createdAt = date
-    const updatedAt = date
+    const createdat = date
+    const updatedat = date
 
-    let userDetails = await prisma.userDetails.findFirst({
+    let posttypeid = 1;
+    
+    const postTypeQuery = await prisma.posttypes.findFirst({
         where: {
-            userId: userId
-        }
-    })
-
-    if (!userDetails) {
-        userDetails = await prisma.userDetails.create({
-            data: {
-                userId,
-                handle: await generateUniqueHandle(userId),
-                displayName: '',
-                createdAt,
-                updatedAt,
-                chats: [],
-                comments: [],
-                followers: [],
-                following: [],
-                likedPosts: [],
-                postIds: [],
-                urls: []
-            }
-        })
-    }
-
-    if (postType === 'event' && !venueId && venueName) {
-        const vid = await saveVenue({
-            neighborhood,
-            venueName,
-            address
-        });
-
-        if (vid) {
-            venueId = vid.id
-        }
-    }
-
-    const postDataCreate: Prisma.PostsUncheckedCreateInput = {
-        content,
-        lexical: lexical ?? null,
-        headline: headline ?? null,
-        userId,
-        userDetailsId: userDetails.id,
-        postType: postType ?? null,
-        edited,
-        postFile: postFile ?? null,
-        privatePost: privatePost ?? null,
-        parentPostId: parentPostId ?? null,
-        createdAt,
-        updatedAt,
-        eventTitle: eventTitle ?? null,
-        eventDate: eventDate ?? null,
-        venueId: venueId ?? null,
-        tags: tags ?? null,
-        seeking: seeking ?? null,
-        status: status ?? null,
-        ...(postFileType !== undefined ? { postFileType } : {}),
-    }
-
-    const post = await prisma.posts.create({
-        data: postDataCreate,
-    })
-
-    await prisma.userDetails.update({
-        where: {
-            id: userDetails.id
+            posttype
         },
-        data: {
-            updatedAt: new Date(),
-            postIds: [...userDetails.postIds, post.id]
+        select: {
+            id: true
         }
     })
 
-    if (postType === 'comment' && parentPostId) {
-        const parentPost = await prisma.posts.findFirst({
-            where: {
-                id: parentPostId
-            }
-        })
-        
-        await prisma.posts.update({
-            where: {
-                id: parentPostId
-            },
-            data: {
-                commentCount: ((parentPost?.commentCount) ? parentPost.commentCount : 0) + 1
-            }
-        })
+    if ((posttype && posttype === 'event') || (posttypeid && posttypeid === 3)) {
+        if (!venueid && venuename) {
+            const vid = await saveVenue({
+                venuename,
+                address
+            });
 
-        if (parentPost && parentPost.userId && userId !== parentPost.userId) {
-            const noti = await prisma.notifications.create({
-                data: {
-                    createdAt: new Date(),
-                    type: 'comment',
-                    read: false,
-                    userId: parentPost.userId, 
-                    notiUserId: userId,
-                    notiUserDetailsId: userDetails.id,
-                    postId: parentPost.id
-                },
+            if (vid) {
+                venueid = vid.id
+            }
+        }
+
+        if (venueid) {
+            eventid = await saveEvent({
+                eventdate,
+                eventname,
+                venueid,
+                eventid,
             })
         }
     }
 
+    let postfiletypeid;
+    if (postfile && postfiletype) {
+        postfiletypeid = await prisma.filetypes.findFirst({
+            where:{
+                filetype: postfiletype
+            }
+        })
+    }
+
+    if (postTypeQuery && postTypeQuery.id) posttypeid = postTypeQuery.id;
+
+    const postDataCreate = {
+        content,
+        lexical: lexical ?? null,
+        posttypeid,
+        edited, 
+        createdat,
+        updatedat,
+        privatepost,
+        eventid: (eventid) ? eventid : null,
+        postfiletypeid: (postfiletypeid && postfiletypeid.id) ? postfiletypeid.id : null,
+        postfile
+    }
+
+    let post;
+    if (id) {
+        post = await prisma.posts.update({
+            where: {
+                id
+            },
+            data: postDataCreate,
+        })
+    } else {
+        post = await prisma.posts.create({
+            data: postDataCreate,
+        })
+    }
+
+    if (post && post.id) {
+        await prisma.usertoposts.create({
+            data: {
+                postid: post.id,
+                userdetailsid
+            },
+        })
+    }
+
+    if (posttype === 'comment' && parentPostId) {
+        await prisma.commentstopost.create({
+            data: {
+                postid: Number.parseInt(parentPostId),
+                commentpostid: post.id
+            }
+        })
+
+        await notifyParentPostAuthor(Number.parseInt(parentPostId), userdetailsid);
+    }
+
     await notifyMentionedUsers({
-        postId: post.id,
-        authorUserId: userId,
-        authorUserDetailsId: userDetails.id,
-        lexical,
+        postid: post.id,
+        authorUserDetailsId: userdetailsid,
+        lexical
     })
     
     return post
 }
 
-export const likePost = async (postId:string, userId:string) => {
+const notifyParentPostAuthor = async (postid:number, senderuserdetailsid:number) => {
+    const postAuthor = await prisma.$queryRaw<Array<{ userdetailsid: number }>>`
+        select userdetailsid
+        from usertoposts
+        where postid = ${postid}
+    `
+
+    if (postAuthor && postAuthor.length) {
+        const notificationid = await prisma.notifications.create({
+            data: {
+                notificationtypeid: 2,
+                createdat: new Date(),
+                postid
+            }
+        })
+
+        console.log(notificationid)
+
+        if (notificationid && notificationid.id) {
+            await prisma.userstonotifications.create({
+                data: {
+                    notificationid: notificationid.id,
+                    senderuserdetailsid,
+                    receiveruserdetailsid: postAuthor[0].userdetailsid
+                }
+            })
+        }
+    }
+}
+
+export const likePostDAL = async (postid:number, userdetailsid:number) => {
+    const userAlreadyLiked = await prisma.postlikes.findFirst({
+        where: {
+            postid,
+            userdetailsid
+        }
+    })
+
+    if (userAlreadyLiked) return;
+
+    await prisma.postlikes.create({
+        data: {
+            postid,
+            userdetailsid
+        }
+    })
+
+    /***** notify post author */
+
+    const postAuthor = await prisma.usertoposts.findFirst({
+        where: {
+            postid
+        }
+    })
+
+    if (postAuthor) {
+        const notification = await prisma.notifications.create({
+            data: {
+                notificationtypeid: 1,
+                read: false,
+                createdat: new Date(),
+                postid
+            }
+        })
+
+        if (notification) {
+            await prisma.userstonotifications.create({
+                data: {
+                    notificationid: notification.id,
+                    senderuserdetailsid: userdetailsid,
+                    receiveruserdetailsid: postAuthor.userdetailsid
+                }
+            })
+        }
+    }
+}
+
+export const unlikePostDAL = async  (postid:number, userdetailsid:number) => {
+    await prisma.postlikes.deleteMany({
+        where: {
+            postid,
+            userdetailsid
+        }
+    })
+}
+
+export const deletePost = async (postid:number) => {
+
     const post = await prisma.posts.findFirst({
         where: {
-            id: postId
+            id: postid
         }
     })
 
@@ -372,172 +503,107 @@ export const likePost = async (postId:string, userId:string) => {
         return null
     }
 
-    const userDetails = await prisma.userDetails.findFirst({
+    await prisma.commentstopost.deleteMany({
         where: {
-            userId: userId
+            commentpostid: postid
+        }
+    });
+
+    await prisma.commentstopost.deleteMany({
+        where: {
+            postid
+        }
+    });
+
+    await prisma.usertoposts.deleteMany({
+        where: {
+            postid
         }
     })
 
-    if (!userDetails) {
-        return null
-    }
-
-    const updatedPost = await prisma.posts.update({
-        where: {
-            id: postId
-        },
-        data: {
-            likes: ((post.likes) ? post.likes : 0) + 1
-        }
-    })
-
-    await prisma.userDetails.update({
-        where: {
-            id: userDetails.id
-        },
-        data: {
-            likedPosts: [...userDetails.likedPosts, postId]
-        }
-    })
-
-    if (userDetails && userId !== post.userId) {
-        await prisma.notifications.create({
-            data: {
-                createdAt: new Date(),
-                type: 'like',
-                read: false,
-                userId: post.userId, 
-                notiUserId: userId,
-                notiUserDetailsId: userDetails.id,
-                postId
-            },
+    if (post.posttypeid === 3 && post.eventid) {
+        await prisma.events.deleteMany({
+            where: {
+                id: post.eventid
+            }
         })
     }
 
-    return updatedPost
-}
-
-export const unlikePost = async (postId:string, userId:string) => {
-    const post = await prisma.posts.findFirst({
+    const postNotifications = await prisma.notifications.findMany({
         where: {
-            id: postId
+            postid
         }
     })
 
-    if (!post) {
-        return null
-    }
-
-    const userDetails = await prisma.userDetails.findFirst({
-        where: {
-            userId: userId
-        }
-    })
-
-    if (!userDetails) {
-        return null
-    }
-
-    const updatedPost = await prisma.posts.update({
-        where: {
-            id: postId
-        },
-        data: {
-            likes: ((post.likes)) ? post.likes - 1 : 0
-        }
-    })
-
-    const likedPosts = userDetails.likedPosts.filter((likedPostId:string) => {
-        return likedPostId !== postId
-    })
-
-    await prisma.userDetails.update({
-        where: {
-            id: userDetails.id
-        },
-        data: {
-            likedPosts
-        }
-    })
-
-    return updatedPost
-}
-
-export const deletePost = async (postId:string) => {
-
-    const post = await prisma.posts.findFirst({
-        where: {
-            id: postId
-        }
-    })
-
-    if (!post) {
-        return null
-    }
-
-    const userDetails = await prisma.userDetails.findFirst({
-        where: {
-            userId: post.userId
-        }
-    })
-
-    if (!userDetails) {
-        return null
-    }
-
-    await prisma.userDetails.update({
-        where: {
-            id: userDetails.id
-        },
-        data: {
-            postIds: userDetails.postIds.filter((id:string) => {
-                return id !== postId
+    if (postNotifications) {
+        for (const noti of postNotifications) {
+            await prisma.userstonotifications.deleteMany({
+                where: {
+                    notificationid: noti.id
+                }
             })
+        }
+
+        await prisma.notifications.deleteMany({
+            where: {
+                postid
+            }
+        })
+    }
+
+    await prisma.postlikes.deleteMany({
+        where: {
+            postid
         }
     })
 
     await prisma.posts.deleteMany({
         where: {
-            parentPostId: postId,
-        }
-    });
-
-    const deletedPost = await prisma.posts.delete({
-        where: {
-            id: postId
+            id: postid
         }
     })
 
-    if (post.parentPostId) {
-        const parentPost = await prisma.posts.findFirst({
-            where: {
-                id: post.parentPostId
-            }
-        })
-
-        if (parentPost) {
-            await prisma.posts.update({
-                where: {
-                    id: parentPost.id
-                },
-                data: {
-                    commentCount: (parentPost.commentCount && parentPost.commentCount > 0) ? parentPost.commentCount - 1 : 0
-                }
-            })
-        }
-    }
-
-    return deletedPost
+    return true;
 }
 
-const saveVenue = async (venueData:{neighborhood?: string, venueName: string, address?: string}) => {
-    const {neighborhood, venueName, address} = venueData;
-    
-    return await prisma.venue.create({
+const saveVenue = async (venueData:{venuename: string, address?: string}) => {
+    const {venuename, address} = venueData;
+
+    return await prisma.venues.create({
         data: {
-            neighborhood: neighborhood ?? null, 
-            venueName, 
+            venuename, 
             address: address ?? null
         }
     })
+}
+
+const saveEvent = async (eventData:{eventname:string, eventdate:Date, venueid:number, eventid?:number}) => {
+    const {eventdate, eventname, venueid} = eventData;
+
+    let {eventid} = eventData;
+
+    if (eventid) {
+        await prisma.events.update({
+            where: {
+                id: eventid
+            },
+            data:{
+                eventdate,
+                eventname,
+                venueid
+            }
+        })
+    } else {
+        const event = await prisma.events.create({
+            data:{
+                eventdate,
+                eventname,
+                venueid
+            }
+        })
+
+        if (event) eventid = event.id;
+    }
+
+    return eventid;
 }

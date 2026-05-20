@@ -1,154 +1,219 @@
-datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id                    String          @id @default(auto()) @map("_id") @db.ObjectId
-  name                  String?
-  email                 String?         @unique
-  emailVerified         DateTime?
-  image                 String?
-  accounts              Account[]
-  sessions              Session[]
-  createdAt             DateTime        @default(now())
-  updatedAt             DateTime        @updatedAt
-  Posts                 Posts[]
-  UserDetails           UserDetails[]
-  notifications         Notifications[] @relation("User")
-  notiUserNotifications Notifications[] @relation("NotiUser")
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Account {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String  @db.ObjectId
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.String
-  access_token      String? @db.String
+  id                Int      @default(autoincrement())
+  userId            Int
+  type              String?  @db.VarChar
+  provider          String?  @db.VarChar
+  providerAccountId String?  @unique(map: "provider_unique") @db.VarChar
+  access_token      String?  @db.VarChar
   expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.String
-  session_state     String?
+  token_type        String?  @db.VarChar
+  scope             String?  @db.VarChar
+  id_token          String   @db.VarChar
+  session_state     String?  @db.VarChar
+  refresh_token     String?  @db.VarChar
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime @default(now()) @db.Timestamptz(6)
+  user              User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usersFK")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  @@id([id, id_token], map: "accounts_pkey")
   @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  sessionToken String   @unique
-  userId       String   @db.ObjectId
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           BigInt   @id @default(autoincrement())
+  sessionToken String   @unique(map: "sessionTokenUnique") @db.VarChar
+  userId       Int
+  expires      DateTime @db.Timestamptz(6)
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @db.Timestamptz(6)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usersFK")
 }
 
-model VerificationToken {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  identifier String
-  token      String
-  expires    DateTime
-
-  @@unique([identifier, token])
+model User {
+  id            Int          @id(map: "users_pkey") @default(autoincrement())
+  name          String?      @db.VarChar
+  email         String       @unique(map: "emailUnique") @db.VarChar
+  image         String?      @db.VarChar
+  createdAt     DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime     @default(now()) @db.Timestamptz(6)
+  emailVerified DateTime?    @db.Timestamptz(6)
+  accounts       Account[]
+  sessions       Session[]
+  userdetails   userdetails?
 }
 
-model InvitationCodes {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  code String
+model cities {
+  id     Int      @id @default(autoincrement())
+  city   String   @db.VarChar
+  venues venues[]
 }
 
-model Notifications {
-  id                String       @id @default(auto()) @map("_id") @db.ObjectId
-  type              String
-  read              Boolean
-  userId            String       @db.ObjectId
-  user              User         @relation("User", fields: [userId], references: [id])
-  notiUserId        String       @db.ObjectId
-  notiUser          User         @relation("NotiUser", fields: [notiUserId], references: [id])
-  notiUserDetailsId String?      @db.ObjectId
-  notiUserDetails   UserDetails? @relation(fields: [notiUserDetailsId], references: [id])
-  createdAt         DateTime     @db.Date
-  postId            String?      @db.ObjectId
-  post              Posts?       @relation(fields: [postId], references: [id])
+model commentstopost {
+  id                                        Int   @id(map: "commentsToPost_pkey") @default(autoincrement())
+  postid                                    Int
+  commentpostid                             Int
+  posts_commentstopost_commentpostidToposts posts @relation("commentstopost_commentpostidToposts", fields: [commentpostid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "commentFK")
+  posts_commentstopost_postidToposts        posts @relation("commentstopost_postidToposts", fields: [postid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postFK")
 }
 
-model Posts {
-  id            String          @id @default(auto()) @map("_id") @db.ObjectId
-  content       String
-  lexical       String?
-  headline      String?
-  userId        String          @db.ObjectId
-  user          User            @relation(fields: [userId], references: [id])
-  userDetailsId String?         @db.ObjectId
-  userDetails   UserDetails?    @relation(fields: [userDetailsId], references: [id])
-  createdAt     DateTime        @db.Date
-  updatedAt     DateTime        @db.Date
-  edited        Boolean
-  parentPostId  String?         @db.ObjectId
-  parentPost    Posts?          @relation("Comments", fields: [parentPostId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  comments      Posts[]         @relation("Comments")
-  postType      String?
-  postFile      String?
-  postFileType  String?
-  privatePost   Boolean?
-  tempFile      String?
-  userDir       String?
-  chatId        String?
-  likes         Int?
-  eventTitle    String?
-  eventDate     DateTime?       @db.Date
-  tags          String?
-  seeking       String?
-  status        String?
-  commentCount  Int?
-  notifications Notifications[]
-  venueId       String?         @db.ObjectId
-  venue         Venue?          @relation(fields: [venueId], references: [id])
+model events {
+  id        Int       @id @default(autoincrement())
+  eventname String?   @db.VarChar
+  eventdate DateTime? @db.Timestamptz(6)
+  venueid   Int?
+  venues    venues?   @relation(fields: [venueid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "venueFK")
+  posts     posts[]
 }
 
-model UserDetails {
-  id            String          @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String          @db.ObjectId
-  user          User?           @relation(fields: [userId], references: [id])
-  handle        String          @unique
-  displayName   String?
-  userDir       String?
-  createdAt     DateTime        @db.Date
-  updatedAt     DateTime        @db.Date
-  bioHtml       String?
-  bioLexical    String?
-  avatar        String?
-  chats         String[]        @db.ObjectId
-  comments      String[]        @db.ObjectId
-  followers     String[]        @db.ObjectId
-  following     String[]        @db.ObjectId
-  image         String?
-  likedPosts    String[]        @db.ObjectId
-  postIds       String[]        @db.ObjectId
-  urls          String[]
-  suspended     Boolean?
-  posts         Posts[]
-  notifications Notifications[]
+model filetypes {
+  id       Int     @id @default(autoincrement())
+  filetype String  @db.VarChar
+  posts    posts[]
 }
 
-model Venue {
-  id           String  @id @default(auto()) @map("_id") @db.ObjectId
-  venueName    String
-  neighborhood String?
-  address      String?
-  image        String?
-  posts        Posts[]
+model followers {
+  id                                                        Int         @id @default(autoincrement())
+  followinguserdetailsid                                    Int
+  userdetailsid                                             Int
+  userdetails_followers_followinguserdetailsidTouserdetails userdetails @relation("followers_followinguserdetailsidTouserdetails", fields: [followinguserdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "followeeUserDetailsFK")
+  userdetails_followers_userdetailsidTouserdetails          userdetails @relation("followers_userdetailsidTouserdetails", fields: [userdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "followerUserDetailsFK")
+}
+
+model notifications {
+  id                   Int                    @id @default(autoincrement())
+  notificationtypeid   Int
+  read                 Boolean?               @default(false)
+  createdat            DateTime               @db.Timestamptz(6)
+  postid               Int?
+  notificationtypes    notificationtypes      @relation(fields: [notificationtypeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notificationTypeFK")
+  userstonotifications userstonotifications[]
+}
+
+model notificationtypes {
+  id               Int             @id(map: "notificationTypes_pkey") @default(autoincrement())
+  notificationtype String          @db.VarChar
+  notifications    notifications[]
+}
+
+model postlikes {
+  id            Int         @id @default(autoincrement())
+  userdetailsid Int
+  postid        Int
+  posts         posts       @relation(fields: [postid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postidFK")
+  userdetails   userdetails @relation(fields: [userdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "userdetailsidFK")
+}
+
+model posts {
+  id                                                 Int              @id @default(autoincrement())
+  content                                            String?          @db.VarChar
+  lexical                                            String?          @db.VarChar
+  createdat                                          DateTime         @db.Timestamptz(6)
+  updatedat                                          DateTime         @db.Timestamptz(6)
+  edited                                             Boolean?         @default(false)
+  posttypeid                                         Int
+  postfile                                           String?          @db.VarChar
+  privatepost                                        Boolean?         @default(false)
+  eventid                                            Int?
+  postfiletypeid                                     Int?
+  commentstopost_commentstopost_commentpostidToposts commentstopost[] @relation("commentstopost_commentpostidToposts")
+  commentstopost_commentstopost_postidToposts        commentstopost[] @relation("commentstopost_postidToposts")
+  postlikes                                          postlikes[]
+  events                                             events?          @relation(fields: [eventid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "eventsFK")
+  posttypes                                          posttypes        @relation(fields: [posttypeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postTypeFK")
+  filetypes                                          filetypes?       @relation(fields: [postfiletypeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postfiletypeFK")
+  usertoposts                                        usertoposts[]
+}
+
+model posttypes {
+  id       Int     @id(map: "postTypes_pkey") @default(autoincrement())
+  posttype String  @db.VarChar
+  posts    posts[]
+}
+
+model states {
+  id            Int      @id @default(autoincrement())
+  stateabbr     String   @db.VarChar
+  statefullname String?  @db.VarChar
+  venues        venues[]
+}
+
+model userdetails {
+  id                                                                           Int                    @id(map: "userDetails_pkey") @default(autoincrement())
+  userid                                                                       Int                    @unique(map: "user")
+  displayname                                                                  String?                @db.VarChar
+  userdir                                                                      String?                @db.VarChar
+  createdat                                                                    DateTime               @db.Timestamptz(6)
+  updatedat                                                                    DateTime?              @db.Timestamptz(6)
+  avatar                                                                       String?                @db.VarChar
+  handle                                                                       String?                @db.VarChar
+  biohtml                                                                      String?                @db.VarChar
+  biolexical                                                                   String?                @db.VarChar
+  suspended                                                                    Boolean?               @default(false)
+  followers_followers_followinguserdetailsidTouserdetails                      followers[]            @relation("followers_followinguserdetailsidTouserdetails")
+  followers_followers_userdetailsidTouserdetails                               followers[]            @relation("followers_userdetailsidTouserdetails")
+  postlikes                                                                    postlikes[]
+  User                                                                         User                   @relation(fields: [userid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usersFK")
+  userdetailsurls                                                              userdetailsurls[]
+  userstonotifications_userstonotifications_receiveruserdetailsidTouserdetails userstonotifications[] @relation("userstonotifications_receiveruserdetailsidTouserdetails")
+  userstonotifications_userstonotifications_senderuserdetailsidTouserdetails   userstonotifications[] @relation("userstonotifications_senderuserdetailsidTouserdetails")
+  usertoposts                                                                  usertoposts[]
+
+  @@index([displayname, handle], map: "name_IX")
+}
+
+model userdetailsurls {
+  id            Int         @id(map: "userDetailsUrls_pkey") @default(autoincrement())
+  userdetailsid Int
+  url           String      @db.VarChar
+  urlname       String?     @db.VarChar
+  userdetails   userdetails @relation(fields: [userdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "userDetailsFK")
+}
+
+model userstonotifications {
+  id                                                                  Int           @id(map: "usersToNotifications_pkey") @default(autoincrement())
+  notificationid                                                      Int
+  senderuserdetailsid                                                 Int
+  receiveruserdetailsid                                               Int
+  notifications                                                       notifications @relation(fields: [notificationid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notificationFK")
+  userdetails_userstonotifications_receiveruserdetailsidTouserdetails userdetails   @relation("userstonotifications_receiveruserdetailsidTouserdetails", fields: [receiveruserdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "receiverUserDetailsFK")
+  userdetails_userstonotifications_senderuserdetailsidTouserdetails   userdetails   @relation("userstonotifications_senderuserdetailsidTouserdetails", fields: [senderuserdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "senderUserDetailsId")
+}
+
+model usertoposts {
+  id            Int         @id(map: "userToPosts_pkey") @default(autoincrement())
+  userdetailsid Int
+  postid        Int
+  posts         posts       @relation(fields: [postid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postFK")
+  userdetails   userdetails @relation(fields: [userdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "userDetailFK")
+}
+
+model venues {
+  id        Int       @id @default(autoincrement())
+  venuename String    @db.VarChar
+  address   String?   @db.VarChar
+  cityid    Int?
+  stateid   Int?
+  zipcodeid Int?
+  events    events[]
+  cities    cities?   @relation(fields: [cityid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "citiesFK")
+  states    states?   @relation(fields: [stateid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "statesFK")
+  zipcodes  zipcodes? @relation(fields: [zipcodeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "zipcodeFK")
+
+  @@index([venuename], map: "venueName_IX")
+}
+
+model zipcodes {
+  id      Int      @id @default(autoincrement())
+  zipcode String   @db.VarChar
+  venues  venues[]
 }

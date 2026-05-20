@@ -2,6 +2,8 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import User from "./models/user";
 import SidebarProfile from "./models/sidebarProfile";
+import UserDetails from "./models/userDetails";
+import {getUserDetailsByHandleDAL} from '@/app/data/user'
 
 export function cn(...inputs: ClassValue[]) {
   	return twMerge(clsx(inputs))
@@ -85,21 +87,25 @@ export const getProfileUserIdFromPath = (pathname:string) => {
 	return match ? match[1] : null
 }
 
-export const toSidebarProfile = (user:User): SidebarProfile | null => {
-	if (!user.userDetails) {
+export const toSidebarProfile = (userdetails?:UserDetails | null): SidebarProfile | null => {
+	if (!userdetails) {
 		return null
 	}
 
 	return {
-		userId: user.userDetails.userId,
-		handle: user.userDetails.handle,
-		displayName: user.userDetails.displayName,
-		avatar: user.userDetails.avatar,
-		userDir: user.userDetails.userDir,
-		followers: user.userDetails.followers,
-		following: user.userDetails.following,
-		bioHtml: user.userDetails.bioHtml,
-		postCount: user.userDetails.postCount || 0,
-		urls: user.userDetails.urls || []
+		id: userdetails.id,
+		userid: userdetails.userid,
+		handle: userdetails.handle,
+		displayname: userdetails.displayname,
+		avatar: userdetails.avatar,
+		userdir: userdetails.userdir,
+		followers: [],
+		following: [],
+		biohtml: userdetails.biohtml,
+		biolexical: userdetails.biolexical,
+		postcount: 0,
+		followerscount: 0,
+		followingcount: 0,
+		urls: []
 	}
 }

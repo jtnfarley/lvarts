@@ -6,6 +6,9 @@ function PostMediaEmbed(props:{post:Post}) {
     let iframeContainer:HTMLDivElement | undefined | null
 
     const extractMedia = (post:Post) => {
+        if (!post.content) {
+            return false
+        }
 
         const linkSearch = post.content.match(/http/);
 

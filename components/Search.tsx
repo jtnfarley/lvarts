@@ -3,12 +3,12 @@
 import {APIProvider} from '@vis.gl/react-google-maps';
 import { useState } from 'react';
 import User from '@/lib/models/user';
-import Post from '@/lib/models/post';
 import PostUi from '@/components/PostUi/PostUi';
+import type { FeedRow } from '@/lib/models/initFeedRow';
 
-export default function Search(props:{query:string, user:User, posts:Post[], googleMapsApiKey:string}) {
+export default function Search(props:{query:string, user:User, posts:FeedRow[], googleMapsApiKey:string}) {
     const {query, user, googleMapsApiKey} = props;
-    const [posts, setPosts] = useState<Post[] | undefined>(props.posts)
+    const [posts, setPosts] = useState<FeedRow[] | undefined>(props.posts)
     const [renderKey, setRenderKey] = useState(0);
 
 	return (
@@ -23,7 +23,7 @@ export default function Search(props:{query:string, user:User, posts:Post[], goo
                             </div>
                             {
                                 (user && posts && posts.length) &&
-                                    posts.map((post:Post, index:number) => {
+                                    posts.map((post:FeedRow, index:number) => {
                                         return (
                                             <PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={user} googleMapsApiKey={googleMapsApiKey} />
                                         )

@@ -11,17 +11,17 @@ import { searchMentionUsers } from "@/app/actions/mentions";
 import imageUrl from "@/constants/imageUrl";
 
 interface MentionsPluginProps {
-  currentUserId: string;
+  currentUserDetailsId: number;
 }
 
 type MentionMenuItemComponentProps = BeautifulMentionsMenuItemProps & {
   avatar?: string | null;
   bio?: string | null;
-  displayName?: string | null;
+  displayname?: string | null;
   itemValue?: string;
   label?: string;
-  userDir?: string | null;
-  userId?: string | null;
+  userdir?: string | null;
+  userdetailsid?: number | null;
 };
 
 const MentionMenu = forwardRef<HTMLUListElement, BeautifulMentionsMenuProps>(
@@ -48,25 +48,24 @@ const MentionMenuItem = forwardRef<HTMLLIElement, MentionMenuItemComponentProps>
       className,
       avatar: _avatar,
       bio: _bio,
-      displayName: _displayName,
+      displayname: _displayname,
       itemValue: _itemValue,
       label: _label,
-      userDir: _userDir,
-      userId: _userId,
+      userdir: _userdir,
+      userdetailsid: _userdetailsid,
       ...props
     },
     ref,
   ) => {
     const avatar =
       typeof item.data?.avatar === "string" ? item.data.avatar : null;
-    const userDir =
-      typeof item.data?.userDir === "string" ? item.data.userDir : null;
-    const bio = typeof item.data?.bio === "string" ? item.data.bio : null;
-    const displayName =
-      typeof item.data?.displayName === "string" ? item.data.displayName : null;
+    const userdir =
+      typeof item.data?.userdir === "string" ? item.data.userdir : null;
+    const displayname =
+      typeof item.data?.displayname === "string" ? item.data.displayname : null;
     const avatarSrc =
-      avatar && userDir
-        ? `${imageUrl}/${userDir}/${avatar}`
+      avatar && userdir
+        ? `${imageUrl}/${userdir}/${avatar}`
         : "/images/melty-man.png";
 
     return (
@@ -88,8 +87,7 @@ const MentionMenuItem = forwardRef<HTMLLIElement, MentionMenuItemComponentProps>
         />
         <div className="mention-menu-copy">
           <div className="mention-menu-name">@{item.value}</div>
-          {displayName && <div className="mention-menu-display">{displayName}</div>}
-          {bio && <div className="mention-menu-bio">{bio}</div>}
+          {displayname && <div className="mention-menu-display">{displayname}</div>}
         </div>
       </li>
     );
@@ -103,7 +101,7 @@ const EmptyMentions = () => {
 };
 
 export default function MentionsPlugin({
-  currentUserId,
+  currentUserDetailsId,
 }: MentionsPluginProps) {
   return (
     <BeautifulMentionsPlugin
@@ -111,7 +109,7 @@ export default function MentionsPlugin({
       onSearch={(_, queryString) =>
         searchMentionUsers({
           query: queryString ?? "",
-          currentUserId,
+          currentUserDetailsId,
         })
       }
       allowSpaces={false}

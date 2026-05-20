@@ -1,6 +1,6 @@
-export const HANDLE_MIN_LENGTH = 3;
+export const HANDLE_MIN_LENGTH = 1;
 export const HANDLE_MAX_LENGTH = 30;
-export const HANDLE_REGEX = /^[a-z0-9_]{3,30}$/;
+export const HANDLE_REGEX = /^[a-z0-9_]{1,30}$/;
 
 const HANDLE_FIRST = [
   "Ash", "Basil", "Bear",  "Brook", "Canyon",

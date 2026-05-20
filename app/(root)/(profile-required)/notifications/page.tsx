@@ -9,22 +9,15 @@ export const metadata: Metadata = {
   description: 'Alerts',
 };
 
-const getNotifications = async (userId:string):Promise<Array<Notification>> => {
-	const notifications:Array<Notification> = await prisma.notifications.findMany({
-		where: {
-			userId,
-		},
-		include: {
-			user:true,
-			notiUser: true,
-			notiUserDetails: true,
-			post:true
-		},
-		orderBy: {
-			createdAt: 'desc'
-		},
-		take: 50
-	})
+const getNotifications = async (userdetailsid:number):Promise<Notification[]> => {
+	const notifications = await prisma.$queryRaw<Notification[]>`
+		select n.id as notiid, notificationtype, ud.id as senderuserdetailsid, postid, read, displayname, userdir, avatar, handle, biohtml from notifications n
+		join userstonotifications un on n.id = un.notificationid
+		join userdetails ud on ud.id = un.senderuserdetailsid
+		join notificationtypes nt on nt.id = n.notificationtypeid
+		where receiveruserdetailsid = ${userdetailsid}
+		order by n.createdat desc
+	`
 
 	return notifications
 }
@@ -36,7 +29,7 @@ const updateNotis = async (notis:Notification[] | undefined) => {
         notis.forEach(async noti => {
             await prisma.notifications.update({
                 where: {
-                    id: noti.id
+                    id: noti.notiid
                 },
                 data: {
                     read: true
@@ -49,7 +42,9 @@ const updateNotis = async (notis:Notification[] | undefined) => {
 export default async function Notifications() {
 	const user = await currentUser();
 
-	const notis = await getNotifications(user.id);
+	if (!user || !user.userdetails) return null;
+
+	const notis = await getNotifications(user.userdetails.id);
 
 	return (
 		<div className='rounded-box'>

@@ -1,47 +1,57 @@
-import {prisma} from '@/lib/db/prisma'
+import {prisma} from '@/prisma'
 import UserDetails from '@/lib/models/userDetails'
 import { generateUniqueHandle, resolveHandle } from './handles'
 import { normalizeHandle } from '@/lib/handles'
+import User from '@/lib/models/user'
 
 export interface UpdateUserParams {
-    id?: string,
-    userId: string,
-    handle?: string,
-    bioLexical?: string
-	bioHtml?: string,
-    displayName?: string,
+    id?: number
+    userid: number
+    handle?: string
+    biolexical?: string
+	biohtml?: string
+    displayname?: string
     avatar?: string
-    userDir?: string,
-    urls: string[]
+    userdir?: string
+    urls: {
+        urlname: string,
+        url: string
+    }[]
+    urlsUpdated: boolean
 }
 
 export const updateUser = async ({
     id,
-    userId,
+    userid,
     handle,
-    bioLexical,
-    bioHtml,
-    displayName,
+    biolexical,
+    biohtml,
+    displayname,
     avatar,
-    userDir,
-    urls
+    userdir,
+    urls,
+    urlsUpdated
 }:UpdateUserParams): Promise<UserDetails> => {
     const date = new Date()
-    const createdAt = date
-    const updatedAt = date
+    const createdat = date
+    const updatedat = date
 
-    let userDetails: UserDetails;
+    let userdetails: UserDetails;
     try {
-        const existingUserDetails = await prisma.userDetails.findFirst({
-            where: id ? { id } : { userId },
-            select: {
-                id: true,
-                userId: true,
-                handle: true
-            }
-        })
+        const existingUserDetails = id === undefined
+            ? null
+            : await prisma.userdetails.findFirst({
+                where: {
+                    id
+                },
+                select: {
+                    id: true,
+                    userid: true,
+                    handle: true
+                }
+            })
 
-        if (existingUserDetails && existingUserDetails.userId !== userId) {
+        if (existingUserDetails && existingUserDetails.userid !== userid) {
             throw new Error('Cannot update another user profile.')
         }
 
@@ -49,8 +59,8 @@ export const updateUser = async ({
         const resolvedHandle = existingUserDetails?.handle
             ? existingUserDetails.handle
             : await resolveHandle({
-                requestedHandle: normalizedRequestedHandle || await generateUniqueHandle(userId),
-                excludeUserId: userId
+                requestedHandle: normalizedRequestedHandle || await generateUniqueHandle(userid),
+                excludeUserId: userid
             })
 
         if (
@@ -62,51 +72,194 @@ export const updateUser = async ({
         }
 
         if (existingUserDetails) {
-            userDetails = await prisma.userDetails.update({
+            userdetails = await prisma.userdetails.update({
                 where: {
                     id: existingUserDetails.id
                 },
                 data: {
                     ...(!existingUserDetails.handle ? { handle: resolvedHandle } : {}),
-                    bioLexical,
-                    bioHtml,
-                    displayName,
-                    updatedAt,
-                    urls,
+                    biolexical,
+                    biohtml,
+                    displayname,
+                    updatedat,
                     ...(avatar !== undefined ? { avatar } : {}),
-                    ...(userDir ? { userDir } : {})
+                    ...(userdir ? { userdir } : {})
                 }
             })
         } else {
-            userDetails = await prisma.userDetails.create({
+            userdetails = await prisma.userdetails.create({
                 data: {
-                    user: {
-                        connect: { id: userId }
+                    User: {
+                        connect: { id: userid }
                     },
                     handle: resolvedHandle,
-                    bioLexical,
-                    bioHtml,
-                    displayName,
+                    biolexical,
+                    biohtml,
+                    displayname,
                     avatar,
-                    userDir,
-                    createdAt,
-                    updatedAt,
-                    chats: [],
-                    comments: [],
-                    followers: [],
-                    following: ['6939e1895a3da4a39985c95a'],
-                    likedPosts: [],
-                    postIds: [],
-                    urls
+                    userdir,
+                    createdat,
+                    updatedat,
                 }
             })
         }
 
-        return userDetails;
+        if (urlsUpdated) {
+            await prisma.userdetailsurls.deleteMany({
+                where: {
+                    userdetailsid: userdetails.id
+                }
+            })
+            
+            for (const url of urls || []) {
+                if (url.url === '') continue;
+
+                await prisma.userdetailsurls.create({
+                    data: {
+                        userdetailsid: userdetails.id,
+                        url: url.url,
+                        urlname: url.urlname
+                    }
+                })
+            }
+        }
+
+        return userdetails;
 
         // if (path === '/profile/edit') revalidatePath(path)
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Unknown error'
         throw new Error(`Failed to update user: ${message}`)
     }   
+}
+
+interface FollowUserParams {
+    userdetailsid: number,
+    followinguserdetailsid: number
+}
+
+export const followUserDAL = async ({userdetailsid, followinguserdetailsid}:FollowUserParams) => {
+    const alreadyFollowing = await prisma.followers.findFirst({
+        where: {
+            userdetailsid, 
+            followinguserdetailsid
+        }
+    })
+
+    if (alreadyFollowing) return;
+
+    await prisma.followers.create({
+        data: {
+            userdetailsid, 
+            followinguserdetailsid
+        }
+    })
+
+    const noti = await prisma.notifications.create({
+        data: {
+           notificationtypeid: 3,
+           read: false,
+           createdat: new Date()
+        }
+    })
+
+    if (noti) {
+        await prisma.userstonotifications.create({
+            data: {
+                notificationid: noti.id,
+                senderuserdetailsid: userdetailsid,
+                receiveruserdetailsid: followinguserdetailsid
+            }
+        })
+    }
+}
+
+export const unfollowUserDAL = async ({userdetailsid, followinguserdetailsid}:FollowUserParams) => {
+    await prisma.followers.deleteMany({
+        where: {
+            userdetailsid, 
+            followinguserdetailsid
+        }
+    })
+}
+
+
+export const getUserFollowsDAL = async (userdetailsid:number) => {
+    const following = await prisma.followers.findMany({
+        where: {
+            userdetailsid
+        },
+        select: {
+            followinguserdetailsid: true
+        }
+    })
+
+    const followers = await prisma.followers.findMany({
+        where: {
+            followinguserdetailsid: userdetailsid
+        },
+        select: {
+            userdetailsid: true
+        }
+    })
+
+    return {
+        followers: followers.map(follower => follower.userdetailsid),
+        following: following.map(following => following.followinguserdetailsid)
+    }
+}
+
+export const getUserLikesDAL = async (userdetailsid:number) => {
+    const postids = await prisma.postlikes.findMany({
+        where: {
+            userdetailsid
+        },
+        select: {
+            postid: true
+        }
+    })
+
+    return postids.map(postid => postid.postid)
+}
+
+export const getUserDAL = async (handle:string): Promise<UserDetails | null> => {
+    const user = await prisma.userdetails.findFirst({
+        where: {
+            handle
+        }
+    })
+
+    if (!user) {
+        return null
+    }
+
+    return user;
+}
+
+export const getUserDetailsDAL = async (userid:number): Promise<UserDetails | null> => {
+    const userdetails = await prisma.userdetails.findFirst({
+        where: {
+            userid
+        }
+    })
+
+    if (!userdetails) {
+        return null
+    }
+
+    return userdetails;
+}
+
+export const getUserDetailsByHandleDAL = async (handle:string): Promise<UserDetails | null> => {
+    const userdetails = await prisma.userdetails.findFirst({
+        where: {
+            handle
+        }
+    })
+
+    if (!userdetails) {
+        return null
+    }
+
+    return userdetails;
 }

@@ -23,8 +23,8 @@ type LexicalParagraphNode = {
 type BotPost = {
     content: string;
     lexical: string;
-    postType: string;
-    userId: string;
+    posttype: string;
+    userid: string;
     edited: boolean;
 }
 
@@ -69,7 +69,7 @@ const getPostByBotName = (botName:string):BotPost | null => {
 }
 
 const getHdPost = ():BotPost | null => {
-    const userId = '69f7ad802f33441ec3cc373d';
+    const userid = '69f7ad802f33441ec3cc373d';
     const hdPoems = hd;
     const hdPoem = hdPoems[Math.floor(Math.random() * hdPoems.length)]
 
@@ -89,8 +89,8 @@ const getHdPost = ():BotPost | null => {
     return {
         content: formattedPost.content,
         lexical: JSON.stringify(formattedPost.lexical),
-        postType: 'post',
-        userId,
+        posttype: 'post',
+        userid,
         edited: false,
     };
 }

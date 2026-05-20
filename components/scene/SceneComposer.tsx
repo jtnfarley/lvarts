@@ -36,8 +36,8 @@ interface Props {
 
 export default function SceneComposer(props: Props) {
     const { savePost, user } = props
-    const [postType, setPostType] = useState<typeof composerOptions[number]['id']>('collab')
-    const activeOption = composerOptions.find((option) => option.id === postType)
+    const [posttype, setPostType] = useState<typeof composerOptions[number]['id']>('collab')
+    const activeOption = composerOptions.find((option) => option.id === posttype)
 
     return (
         <div className="rounded-box border border-orange/20 bg-white/95 p-5">
@@ -52,7 +52,7 @@ export default function SceneComposer(props: Props) {
                         type="button"
                         onClick={() => setPostType(option.id)}
                         className={`rounded-2xl border px-4 py-3 text-left transition ${
-                            postType === option.id
+                            posttype === option.id
                                 ? 'border-orange bg-orange/10 text-orange-800'
                                 : 'border-gray-200 bg-white text-gray-700 hover:border-orange/40'
                         }`}
@@ -68,9 +68,9 @@ export default function SceneComposer(props: Props) {
                 </div>
             }
             <PostForm
-                key={postType}
+                key={posttype}
                 user={user}
-                post={{ postType } as Post}
+                post={{ posttype } as Post}
                 edited={false}
                 savePost={savePost}
             />

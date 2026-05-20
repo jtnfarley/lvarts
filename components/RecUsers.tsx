@@ -4,28 +4,32 @@ import imageUrl from '@/constants/imageUrl';
 import { prisma } from '@/prisma';
 import {currentUser} from "@/app/data/currentUser";
 
-const getRandoUsers = async (userId:string):Promise<UserDetails[]> => {
+const getRandoUsers = async (userdetailsid?:number):Promise<UserDetails[]> => {
 	'use server'
+
+	if (!userdetailsid) {
+		return [];
+	}
 	
-	const userDetailsCount = await prisma.userDetails.count();
-	if (userDetailsCount) {	
-		const lessLocalUser = userDetailsCount - 1;	//remove logged-in user
+	const userdetailsCount = await prisma.userdetails.count();
+	if (userdetailsCount) {	
+		const lessLocalUser = userdetailsCount - 1;	//remove logged-in user
 		let skip = Math.floor(Math.random() * (lessLocalUser)); 
 		const take = lessLocalUser;
 
-		if (skip > userDetailsCount - take) skip = Math.floor(Math.random() * (userDetailsCount - take));
+		if (skip > userdetailsCount - take) skip = Math.floor(Math.random() * (userdetailsCount - take));
 
-		const userDetails = await prisma.userDetails.findMany({
+		const userdetails = await prisma.userdetails.findMany({
 			take,
 			skip, 
 			where: {
-				userId: {
-					not: userId
+				id: {
+					not: userdetailsid
 				}
 			}
 		});
 
-		return userDetails
+		return userdetails
 	}
 
 	return [];
@@ -44,8 +48,11 @@ function shuffle(array:Array<any>):Array<any> {
 
 export default async function RecUsers() {
 	const user = await currentUser();
+	if (!user.userdetails?.id) {
+		return null;
+	}
 
-	const randUsers:Array<UserDetails> = await getRandoUsers(user.id)
+	const randUsers:Array<UserDetails> = await getRandoUsers(user?.userdetails?.id)
 	
 	let recUsers;
 
@@ -61,18 +68,18 @@ export default async function RecUsers() {
 					recUsers.length > 0 ? (
 						<>
 							{
-								recUsers.map((userDetails: any) => (
+								recUsers.map((userdetails: any) => (
 									<UserCard
-										key={ userDetails.id }
+										key={ userdetails.id }
 										currentUser={ user }
-										recUserId={ userDetails.userId }
-										displayName={ userDetails.displayName }
-										handle={ userDetails.handle }
-										avatar={ (userDetails && userDetails.userDir && userDetails.avatar) ?
-											`${imageUrl}/${userDetails.userDir}/${userDetails.avatar}` :
+										recUserId={ userdetails.userid }
+										displayname={ userdetails.displayname }
+										handle={ userdetails.handle }
+										avatar={ (userdetails && userdetails.userdir && userdetails.avatar) ?
+											`${imageUrl}/${userdetails.userdir}/${userdetails.avatar}` :
 											'/images/melty-man.png'
 										}
-										bioHtml={ userDetails.bioHtml }
+										biohtml={ userdetails.biohtml }
 										// userType = 'User'
 									/>
 								))

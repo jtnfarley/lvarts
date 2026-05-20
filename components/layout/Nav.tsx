@@ -1,31 +1,26 @@
 import Link from "next/link"
 import User from "@/lib/models/user";
 import { prisma } from "@/prisma";
-import Notification from "@/lib/models/notification";
 import { BiSolidArrowToRight } from "react-icons/bi";
 import NavClient from "./NavClient";
 
-const hasNewNotifications = async (userId:string):Promise<boolean> => {
+const hasNewNotifications = async (userdetailsid:number):Promise<boolean> => {
 	'use server'
 
-	const notifications:Array<Notification> = await prisma.notifications.findMany({
-		where: {
-			AND: [
-				{userId: userId},
-				{read: false}
-			]
-		}
-	})
-
-	return (notifications.length) ? true : false
+	const notifications = await prisma.$queryRaw<Array<{ count: string }>>`
+		select count(n.id) from notifications n
+		join userstonotifications un on n.id = un.notificationid
+		where read = false and receiveruserdetailsid = ${userdetailsid}
+	`
+	return (notifications && notifications.length && Number.parseInt(notifications[0].count) > 0) ? true : false
 }
 
 export default async function Nav(props: {user?:User}) {
 	const {user} = props;
 	let hasNotis = false;
 
-	if (user) {
-		hasNotis = await hasNewNotifications(user.id);
+	if (user && user.userdetails) {
+		hasNotis = await hasNewNotifications(user.userdetails.id);
 	}
 
 	return (		

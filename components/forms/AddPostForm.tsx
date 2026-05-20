@@ -2,24 +2,25 @@
 
 import PostForm from "./PostForm";
 import User from "@/lib/models/user";
-import Post from "@/lib/models/post";
 
 interface Props {
     user: User
-    postType: string
+    posttype: string
     edited: boolean
     savePost:Function
-    parentPostId?:string
+    parentPostId?:number
 }
 
-const AddPostForm = ({user, postType, edited, parentPostId, savePost}: Props) => {
+const AddPostForm = ({user, posttype, edited, parentPostId, savePost}: Props) => {
     const postData = {
-        postType,
+        posttype,
         parentPostId
-    } as Post
+    }
 
     return (
-        <PostForm user={user} postType={postType} post={postData} edited={edited} savePost={savePost}/>
+        <div className="bg-white p-0 rounded-box mb-10">
+            <PostForm user={user} posttype={posttype} post={postData} edited={edited} savePost={savePost}/>
+        </div>
     )
 }
 

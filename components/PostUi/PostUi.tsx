@@ -1,26 +1,29 @@
 'use client'
 
-import { useState } from 'react';
 import Link from 'next/link';
-import Post from '@/lib/models/post';
 import User from '@/lib/models/user';
 
 import PostHeader from './PostHeader';
 import PostContent from './PostContent';
 import PostActions from './PostActions';
+import { FeedRow } from '@/lib/models/initFeedRow';
 
-export default function PostUi(props:{postData:Post, user:User, googleMapsApiKey:string | undefined}) {
+export default function PostUi(props:{postData:FeedRow, user:User, googleMapsApiKey:string | undefined}) {
 	const post = props.postData;
 	const user = props.user;
-
-	const currentUserParentPost = (post.parentPost && post.parentPost.userId === user?.id);
-	const currentUserPost = (post.userId === user?.id);
+	const currentUserParentPost = post.parentPost?.userid === user?.id;
+	const currentUserPost = (post.userdetails.id === user?.userdetails?.id);
+	const parentPostLabel = currentUserParentPost
+		? 'your'
+		: post.parentPost?.displayName
+			? `${post.parentPost.displayName}'s`
+			: "someone's";
 
     return (
 		<div>
 			<div className='text-sm pb-2 italic text-white'>
-				{post.postType === 'comment' && 
-					<Link href={`/post/${post.parentPostId}`}>commenting on {(currentUserParentPost) ? 'your' : `${post.parentPost?.userDetails?.displayName}'s`} post</Link>
+				{post.posttype === 'comment' && post.parentPost &&
+					<Link href={`/post/${post.parentPost.postid}`}>commenting on {parentPostLabel} post</Link>
 				}
 			</div>
 

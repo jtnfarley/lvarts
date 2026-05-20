@@ -38,13 +38,13 @@ const isHandleReserved = (handle: string) => {
   return RESERVED_HANDLES.has(handle);
 };
 
-const isHandleTaken = async (handle: string, excludeUserId?: string) => {
-  const existingUser = await prisma.userDetails.findFirst({
+const isHandleTaken = async (handle: string, excludeUserId?: number) => {
+  const existingUser = await prisma.userdetails.findFirst({
     where: {
       handle,
     },
     select: {
-      userId: true,
+      userid: true,
     },
   });
 
@@ -52,7 +52,7 @@ const isHandleTaken = async (handle: string, excludeUserId?: string) => {
     return false;
   }
 
-  return existingUser.userId !== excludeUserId;
+  return existingUser.userid !== excludeUserId;
 };
 
 const buildSuffixedHandle = (base: string, suffix: number) => {
@@ -63,7 +63,7 @@ const buildSuffixedHandle = (base: string, suffix: number) => {
 };
 
 export const generateUniqueHandle = async (
-  excludeUserId?: string,
+  excludeUserId?: number,
   avoid: string[] = [],
 ): Promise<string> => {
   const blockedHandles = new Set(avoid.map((handle) => normalizeHandle(handle)));
@@ -106,7 +106,7 @@ export const resolveHandle = async ({
   excludeUserId,
 }: {
   requestedHandle?: string;
-  excludeUserId?: string;
+  excludeUserId?: number;
 }): Promise<string> => {
   if (!requestedHandle) {
     return generateUniqueHandle(excludeUserId);

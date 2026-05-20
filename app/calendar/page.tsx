@@ -6,39 +6,12 @@ import { BiCalendarPlus } from "react-icons/bi";
 import type { Metadata } from 'next';
 import { prisma } from '@/prisma';
 import Post from '@/lib/models/post';
-import { SCENE_SCHEDULED_POST_TYPES } from '@/lib/scenePosts';
+import { getEvents } from '../data/posts';
 
 export const metadata: Metadata = {
   title: 'Event Calendar - Lehigh Vally Art & Music',
   description: "What's goin' on?",
 };
-
-const getEvents = async ():Promise<Array<Post>> => {
-	const posts:Array<Post> = await prisma.posts.findMany({
-		where: {
-			postType: {
-				in: [...SCENE_SCHEDULED_POST_TYPES]
-			},
-			eventDate: {
-				gt: new Date()
-			}
-		},
-		include: {
-			user:true,
-			userDetails: true,
-			parentPost: {
-				include: {
-					userDetails: true
-				}
-			}
-		},
-		orderBy: {
-			eventDate: 'asc'
-		},
-	})
-
-	return posts
-}
 
 export default async function Calendar() {
 	const user = await isLoggedIn();

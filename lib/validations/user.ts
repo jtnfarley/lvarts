@@ -9,5 +9,5 @@ export const UserValidation = z.object({
 
 export const RegisterValidation = z.object({
     email: z.email(),
-    displayName: z.optional(z.string().trim().max(30)),
+    displayname: z.optional(z.string().trim().max(30)),
 })

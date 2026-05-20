@@ -2,19 +2,17 @@
 
 import PostForm from "./PostForm";
 import User from "@/lib/models/user";
-import Post from "@/lib/models/post";
+import { FeedRow } from "@/lib/models/initFeedRow";
 
 interface Props {
-    post:Post
+    post:FeedRow
     user: User
     savePost: Function
 }
 
 const EditPostForm = ({post, user, savePost}: Props) => {
-
-    const editThisPost = async (post:Post) => {
-        const editedPost = await savePost(post);
-        console.log(editedPost)
+    const editThisPost = async (postData:FeedRow) => {
+        await savePost(postData);
     }
 
     return (

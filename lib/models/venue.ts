@@ -1,7 +1,8 @@
 export default interface Venue {
-    id: string
-    venueName: string
+    id: number
+    venuename: string
     address?: string | null
-    image?: string | null
-    neighborhood?: string | null
+    cityid?: number | null
+    stateid?: number | null
+    zipcodeid?: number | null
 }

@@ -19,24 +19,25 @@ import type { UpdateUserParams } from "@/app/data/user";
 import type UserDetails from "@/lib/models/userDetails";
 import { Spinner } from "../layout/Spinner"
 import RTEditor from "./Fields/RichTextEditor/RTEditor";
+import SidebarProfile from "@/lib/models/sidebarProfile";
 
 
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 const UserValidation = z.object({
-    handle: z.string().min(3).max(30).regex(HANDLE_REGEX, 'Use lowercase letters, numbers, or underscores.'),
-    displayName: z.string().min(1).max(100),
+    handle: z.string().min(1).max(30).regex(HANDLE_REGEX, 'Use lowercase letters, numbers, or underscores.'),
+    displayname: z.string().min(1).max(100),
     bio: z.any().optional(),
     avatar: z.any().optional(),   
-    urls: z.array(z.object({ value: z.string() })).optional(), 
+    urls: z.array(z.object({ urlname: z.string(), url: z.string() })).optional(), 
 })
 
-const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Promise<UserDetails>}) => {
-    const [user, setUser] = useState<User>(props.user);
+const AccountInfo = (props:{userdetails: SidebarProfile, saveUser:(user: UpdateUserParams) => Promise<UserDetails>}) => {
+    const [userdetails, setUserDetails] = useState<SidebarProfile>(props.userdetails);
     const saveUser = props.saveUser;
 
-    if (!user) {
+    if (!userdetails) {
         return (
             <h1 className="text-2xl font-bold text-light-1">You shall not pass!</h1>
         )
@@ -47,21 +48,22 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
     const [handleError, setHandleError] = useState<string | null>(null);
     const [tempImage, setTempImage] = useState<OptimizedFile | undefined>();
     const avatarUrlBase = imageUrl;
-    const avatarUrlInit = user.userDetails && user.userDetails.avatar && user.userDetails.userDir ? `${avatarUrlBase}/${user.userDetails.userDir}/${user.userDetails.avatar}` : undefined
+    const avatarUrlInit = userdetails && userdetails.avatar && userdetails.userdir ? `${avatarUrlBase}/${userdetails.userdir}/${userdetails.avatar}` : undefined
 
-    const [userOnboarded, setUserOnboarded] = useState(user.userDetails && user.userDetails.displayName && user.userDetails.displayName !== '')
+    const [userOnboarded, setUserOnboarded] = useState(userdetails && userdetails.displayname && userdetails.displayname !== '')
     const [avatarUrl, setAvatarUrl] = useState<string | undefined>(avatarUrlInit);
-    const hasPermanentHandle = Boolean(user.userDetails?.handle);
+    const hasPermanentHandle = Boolean(userdetails?.handle);
     const editorRef: any = useRef(null);
-    const bio = user.userDetails?.bioLexical || undefined;
+    const bio = userdetails?.biolexical || undefined;
+    const [urlsUpdated, setUrlsUpdated] = useState<boolean>(false);
 
     const { register, handleSubmit, setValue, watch, control, formState: { errors } } = useForm<z.infer<typeof UserValidation>>({
         resolver: zodResolver(UserValidation),
         defaultValues: {
-            handle: user.userDetails?.handle || undefined,
-            displayName: user.userDetails?.displayName || undefined,
+            handle: userdetails?.handle || undefined,
+            displayname: userdetails?.displayname || undefined,
             bio: bio,
-            urls: user.userDetails?.urls?.map((value) => ({ value })) || []
+            urls: userdetails?.urls?.map(url => ({ urlname: url.urlname, url: url.url })) || []
         }
     })
 
@@ -78,8 +80,8 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
 
         try {
             const nextHandle = await getHandleSuggestion({
-                currentHandle: watch('handle') || user.userDetails?.handle,
-                currentUserId: user.id
+                currentHandle: watch('handle') || userdetails?.handle || undefined,
+                currentUserId: userdetails.userid
             });
 
             setValue('handle', nextHandle, {
@@ -93,10 +95,10 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
         }
     }
 
-    const sendFile = async (filedata:{file:File, userDir:string}) => {
-        const {file, userDir} = filedata;
-        await uploadFile({file, userDir});
-        setAvatarUrl(`${avatarUrlBase}/${userDir}/${file.name}`);
+    const sendFile = async (filedata:{file:File, userdir:string}) => {
+        const {file, userdir} = filedata;
+        await uploadFile({file, userdir});
+        setAvatarUrl(`${avatarUrlBase}/${userdir}/${file.name}`);
     }
 
     const setTempFile = async (file:File | undefined) => {
@@ -123,22 +125,21 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
     }
 
     const onSubmit = async (values: z.infer<typeof UserValidation>) => {
-        console.log(values)
         setIsSaving(true);
-        let id = user.userDetails?.id;
-        let userDir = user.userDetails?.userDir || getRandomString(10);
-        let avatarUrl = user.userDetails?.avatar || undefined;
+        let id = userdetails?.id;
+        let userdir = userdetails?.userdir || getRandomString(10);
+        let avatarUrl = userdetails?.avatar || undefined;
 
         try {
-            if (tempImage && userDir) {
+            if (tempImage && userdir) {
                 const res = await fetch(tempImage.url);
                 const blob = await res.blob();
                 const file = new File([blob], tempImage.name, {type: tempImage.type})
                 const formData = new FormData();
                 formData.append('file', file);
-                formData.append('userDir', userDir);
+                formData.append('userdir', userdir);
 
-                sendFile({file, userDir});
+                sendFile({file, userdir});
 
                 avatarUrl = file.name;
             }
@@ -148,26 +149,32 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
                 values.bio.lexical = JSON.stringify(lexical);
             }
 
-            const userDetails = await saveUser({
-                id,
-                userId: user.id,
-                handle: hasPermanentHandle ? user.userDetails?.handle : values.handle,
-                bioHtml: values.bio.html,
-                bioLexical: values.bio.lexical,
-                displayName: values.displayName,
-                userDir,
+            const savedUserdetails = await saveUser({
+                id: id || undefined,
+                userid: userdetails.userid,
+                handle: hasPermanentHandle ? userdetails?.handle || undefined : values.handle,
+                biohtml: values.bio.html,
+                biolexical: values.bio.lexical,
+                displayname: values.displayname,
+                userdir,
                 avatar: avatarUrl,
-                urls: values.urls?.map((url) => url.value.trim()).filter(Boolean) || []
+                urlsUpdated,
+                urls: values.urls?.map((url) => ({urlname: url.urlname.trim(), url: url.url.trim()})).filter(Boolean) || []
             })
 
-            if (values.displayName && values.displayName !== '' && !userOnboarded) {
+            if (values.displayname && values.displayname !== '' && !userOnboarded) {
                 setUserOnboarded(true)
             }
 
             setHandleError(null);
-            user.userDetails = userDetails;
 
-            setUser({...user})
+            setUserDetails((previous) => ({
+                ...previous,
+                ...savedUserdetails,
+                urls: previous.urls
+            }))
+            setUrlsUpdated(false);
+            dispatchEvent(new Event('profileUpdated'));
         } catch (error) {
             console.error(error);
             setHandleError(error instanceof Error ? error.message : 'Could not save your handle.');
@@ -177,15 +184,17 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
     }
 
     const addLinkInput = () => {
-        appendUrl({ value: '' })
+        appendUrl({urlname: '', url: '' });
+        setUrlsUpdated(true);
     }
 
     const deleteLink = (index:number) => {
-        removeUrl(index)
+        removeUrl(index);
+        setUrlsUpdated(true);
     }
 
     useEffect(() => {
-        if (!user.userDetails?.handle) {
+        if (!userdetails?.handle) {
             void refreshHandle();
         }
     }, [])
@@ -269,16 +278,16 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
                         }
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 font-medium mb-2" htmlFor="displayName">
+                        <label className="block text-gray-700 font-medium mb-2" htmlFor="displayname">
                             Display Name
                         </label>
                         <input
                             className="bg-white border border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
-                            id="displayName"
-                            {...register('displayName', { required: true })}
+                            id="displayname"
+                            {...register('displayname', { required: true })}
                         />
                         {
-                        (!userOnboarded || errors.displayName) && 
+                        (!userOnboarded || errors.displayname) && 
                             <div className="text-red-500 text-xs italic mt-2">Please enter a name to get started. You can always change it later.</div>
                         }
                     </div>
@@ -295,7 +304,7 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
                                     onChange={field.onChange}
                                     clearEditor={false}
                                     content={bio}
-                                    currentUserId={user.id}
+                                    currentUserDetailsId={userdetails?.id || 0}
                                 />
                             )}
                         />
@@ -309,11 +318,20 @@ const AccountInfo = (props:{user: User, saveUser:(user: UpdateUserParams) => Pro
                         {urlFields.map((field, index:number) => {
                             return (
                                 <div className="flex w-full" key={field.id}>
-                                    <div className="flex-1">
+                                    <div className="flex w-full gap-3">
                                         <input
                                             className="bg-white border border-gray-200 rounded w-full py-2 px-3 mb-2 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
-                                            id={`urls${index}`}
-                                            {...register(`urls.${index}.value`)}
+                                            id={`urls${index}urlname`}
+                                            placeholder='Link Name, e.g. Instagram'
+                                            onFocus={() => setUrlsUpdated(true)}
+                                            {...register(`urls.${index}.urlname`)}
+                                        />
+                                        <input
+                                            className="bg-white border border-gray-200 rounded w-full py-2 px-3 mb-2 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
+                                            id={`urls${index}url`}
+                                            placeholder='Link URL'
+                                            onFocus={() => setUrlsUpdated(true)}
+                                            {...register(`urls.${index}.url`)}
                                         />
                                     </div>
                                     <div>

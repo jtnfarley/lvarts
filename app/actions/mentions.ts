@@ -7,26 +7,25 @@ import { prisma } from "@/prisma";
 export interface MentionSuggestion {
   [key: string]: string | number | boolean | null;
   value: string;
-  userId: string;
-  displayName: string | null;
+  userdetailsid: number;
+  displayname: string | null;
   avatar: string | null;
-  userDir: string | null;
-  bio: string | null;
+  userdir: string | null;
 }
 
 interface SearchMentionUsersParams {
   query?: string;
-  currentUserId?: string;
+  currentUserDetailsId?: number;
 }
 
 export const searchMentionUsers = async ({
   query = "",
-  currentUserId,
+  currentUserDetailsId,
 }: SearchMentionUsersParams): Promise<MentionSuggestion[]> => {
   const trimmedQuery = query.trim();
   const normalizedQuery = normalizeHandle(query);
 
-  const users = await prisma.userDetails.findMany({
+  const users = await prisma.userdetails.findMany({
     where: {
       AND: [
         {
@@ -34,11 +33,11 @@ export const searchMentionUsers = async ({
             not: "",
           },
         },
-        ...(currentUserId
+        ...(currentUserDetailsId
           ? [
               {
-                userId: {
-                  not: currentUserId,
+                id: {
+                  not: currentUserDetailsId,
                 },
               },
             ]
@@ -60,7 +59,7 @@ export const searchMentionUsers = async ({
                   ...(trimmedQuery
                     ? [
                         {
-                          displayName: {
+                          displayname: {
                             contains: trimmedQuery,
                             mode: Prisma.QueryMode.insensitive,
                           },
@@ -74,13 +73,13 @@ export const searchMentionUsers = async ({
       ],
     },
     select: {
-      userId: true,
+      id: true,
       handle: true,
-      displayName: true,
+      displayname: true,
       avatar: true,
-      userDir: true,
-      bioHtml: true,
-      updatedAt: true,
+      userdir: true,
+      biohtml: true,
+      updatedat: true,
     },
     orderBy: [
       ...(normalizedQuery
@@ -93,12 +92,12 @@ export const searchMentionUsers = async ({
       ...(trimmedQuery
         ? [
             {
-              displayName: "asc" as const,
+              displayname: "asc" as const,
             },
           ]
         : [
             {
-              updatedAt: "desc" as const,
+              updatedat: "desc" as const,
             },
           ]),
     ],
@@ -112,10 +111,9 @@ export const searchMentionUsers = async ({
     )
     .map((user) => ({
       value: user.handle.trim(),
-      userId: user.userId,
-      displayName: user.displayName?.trim() || null,
+      userdetailsid: user.id,
+      displayname: user.displayname?.trim() || null,
       avatar: user.avatar ?? null,
-      userDir: user.userDir ?? null,
-      bio: user.bioHtml ?? null,
+      userdir: user.userdir ?? null
     }));
 };

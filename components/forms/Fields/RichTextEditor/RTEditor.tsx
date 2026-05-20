@@ -59,7 +59,7 @@ export default function RTEditor(props:{
 	onChange: (html:object) => void,
 	clearEditor:boolean,
 	content?:InitialEditorStateType | undefined,
-	currentUserId: string
+	currentUserDetailsId: number
 }) {
 	const initialConfig:InitialConfigType = {
 		namespace: 'MyEditor',
@@ -93,7 +93,7 @@ export default function RTEditor(props:{
 			<ListPlugin/>
 			<HashtagPlugin/>
 			<AutoLinkPlugin/>
-			<MentionsPlugin currentUserId={props.currentUserId}/>
+			<MentionsPlugin currentUserDetailsId={props.currentUserDetailsId}/>
 			<MapPlugin/>
 			<EmojiPlugin/>
 			{/* <CharacterLimitPlugin charset='UTF-16' maxLength={250}/> */}

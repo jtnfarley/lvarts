@@ -2,13 +2,13 @@
 
 import { Prisma } from '@prisma/client'
 
-import { prisma } from '@/lib/db/prisma'
+import { prisma } from '@/prisma'
 
 export interface VenueSuggestion {
-    id: string
-    venueName: string
+    id: number
+    venuename: string
     address: string | null
-    neighborhood: string | null
+    neighborhood?: string | null
 }
 
 export const searchVenues = async (query:string): Promise<VenueSuggestion[]> => {
@@ -18,21 +18,20 @@ export const searchVenues = async (query:string): Promise<VenueSuggestion[]> => 
         return []
     }
 
-    const venues = await prisma.venue.findMany({
+    const venues = await prisma.venues.findMany({
         where: {
-            venueName: {
+            venuename: {
                 contains: trimmedQuery,
                 mode: Prisma.QueryMode.insensitive
             }
         },
         select: {
             id: true,
-            venueName: true,
+            venuename: true,
             address: true,
-            neighborhood: true
         },
         orderBy: {
-            venueName: 'asc'
+            venuename: 'asc'
         },
         take: 8
     })
@@ -40,8 +39,8 @@ export const searchVenues = async (query:string): Promise<VenueSuggestion[]> => 
     const normalizedQuery = trimmedQuery.toLocaleLowerCase()
 
     return venues.sort((a, b) => {
-        const aName = a.venueName.toLocaleLowerCase()
-        const bName = b.venueName.toLocaleLowerCase()
+        const aName = a.venuename.toLocaleLowerCase()
+        const bName = b.venuename.toLocaleLowerCase()
         const aExact = aName === normalizedQuery ? 0 : 1
         const bExact = bName === normalizedQuery ? 0 : 1
         const aStarts = aName.startsWith(normalizedQuery) ? 0 : 1

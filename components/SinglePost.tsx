@@ -2,12 +2,12 @@
 
 import {APIProvider} from '@vis.gl/react-google-maps';
 import User from '@/lib/models/user';
-import Post from '@/lib/models/post';
 import PostUi from '@/components/PostUi/PostUi';
+import type { FeedRow } from '@/lib/models/initFeedRow';
 
 export default function SinglePost(props: {
     user:User,
-    post:Post,
+    post:FeedRow,
     googleMapsApiKey:string
 }) {
     const user = props.user;

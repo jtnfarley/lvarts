@@ -10,45 +10,42 @@ import 'react-datepicker/dist/react-datepicker.css'
 import RTEditor from "./Fields/RichTextEditor/RTEditor";
 import uploadFile from "@/app/actions/fileUploader";
 import User from "@/lib/models/user";
+import Post from "@/lib/models/post";
 import MediaUpload from "@/components/PostUi/MediaUpload"
 import { compressImage } from "@/lib/utils";
 import OptimizedFile from "@/lib/models/optimizedFile";
 import { Spinner } from "../layout/Spinner";
-import Post from "@/lib/models/post";
 import imageUrl from "@/constants/imageUrl";
-import { getPostTypeLabel, isSceneCommunityPostType, isSceneScheduledPostType } from "@/lib/scenePosts";
+import { isSceneScheduledPostType } from "@/lib/scenePosts";
 import { BiCalendar } from "react-icons/bi";
 import { searchVenues, type VenueSuggestion } from "@/app/actions/venues";
 
 interface Props {
     savePost:Function,
     user: User,
-    postType?: string,
+    posttype?: string,
     edited?: boolean,
-    post?:Post
+    post?:Partial<Post>
 }
 
 const PostValidation = z.object({
-    userId: z.string(),
-    postType: z.string().optional(),
+    userdetailsid: z.number(),
+    posttype: z.string().optional(),
     edited: z.boolean().optional(),
     parentPostId: z.string().optional(),
     content: z.any().optional(),
     lexical: z.string().optional(),
-    postId: z.string().optional(),
-    postFile: z.string().optional(),
-    postFileType: z.string().optional(),
-    postFileObj: z.any().optional(),
-    headline: z.string().optional(),
-    eventTitle: z.string().optional(),
-    eventDate: z.date().nullable().optional(),
-    venueName: z.string().optional(),
-    venueId: z.string().optional(),
+    id: z.number().optional(),
+    postfile: z.string().optional(),
+    postfiletype: z.string().optional(),
+    postfileObj: z.any().optional(),
+    eventid: z.number().optional(),
+    eventname: z.string().optional(),
+    eventdate: z.date().nullable().optional(),
+    venuename: z.string().optional(),
     address: z.string().optional(),
-    tags: z.string().optional(),
-    seeking: z.string().optional(),
-    status: z.string().optional(),
-    // privatePost: z.boolean(), 
+    venueid: z.number().optional(),
+    // privatepost: z.boolean().optional(), 
 })
 
 const PostForm = ({user, edited, savePost, post}: Props) => {
@@ -56,51 +53,49 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
     const [tempImage, setTempImage] = useState<OptimizedFile | undefined>();
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [saved, setSaved] = useState<boolean>(false);
-    const [venueQuery, setVenueQuery] = useState(post?.venue?.venueName ?? post?.venueName ?? '');
+    const [venueQuery, setVenueQuery] = useState(post?.venues?.venuename ?? post?.venuename ?? '');
     const [venueSuggestions, setVenueSuggestions] = useState<VenueSuggestion[]>([]);
     const [isVenueSearchOpen, setIsVenueSearchOpen] = useState(false);
     const [isVenueSearching, setIsVenueSearching] = useState(false);
     const editorRef: any = useRef(null);
-
-    const parentPostId = post?.parentPostId ?? undefined;
-    const postId = post?.id ?? undefined;
+    const parentPostId = post?.parentPostId !== undefined ? post.parentPostId.toString() : undefined;
+    const id = post?.id ?? undefined;
     const content = post?.lexical ?? "";
-    const postFile = post?.postFile ?? undefined
-    const resolvedPostType = post?.postType ?? 'post'
-    const isScenePost = isSceneCommunityPostType(resolvedPostType)
+    const postfile = post?.postfile ?? undefined;
+    const resolvedPostType = post?.posttype ?? post?.posttypes?.posttype ?? 'post';
+    const eventid = post?.events?.id ?? post?.eventid ?? undefined;
+    const eventname = post?.events?.eventname ?? post?.eventname ?? '';
+    const eventdate = post?.events?.eventdate ?? post?.eventdate ?? undefined;
+    const venuename = post?.events?.venues?.venuename ?? post?.venuename ?? '';
+    const address = post?.events?.venues?.address ?? post?.address ?? '';
+    const venueid = post?.events?.venueid ?? post?.venueid ?? undefined;
+    // const isScenePost = isSceneCommunityPostType(resolvedPostType)
     const isScheduledPost = isSceneScheduledPostType(resolvedPostType)
-    const statusOptions = resolvedPostType === 'collab'
-        ? ['open', 'reviewing', 'filled']
-        : resolvedPostType === 'recommendation'
-            ? ['seeking tips', 'sorted']
-            : ['open', 'active']
+
     const defaultValues = {
-        userId: user.id,
-        postType: resolvedPostType,
+        userdetailsid: user.userdetails?.id,
+        posttype: resolvedPostType,
         edited: edited ?? false,
         parentPostId,
-        postId,
+        id,
         content,
-        headline: post?.headline ?? '',
-        eventTitle: post?.eventTitle ?? '',
-        eventDate: post?.eventDate ?? (isScheduledPost ? new Date() : null),
-        venueName: post?.venue?.venueName ?? post?.venueName ?? '',
-        venueId: post?.venueId ?? undefined,
-        address: post?.venue?.address ?? post?.address ?? '',
-        tags: post?.tags ?? '',
-        seeking: post?.seeking ?? '',
-        status: post?.status ?? ''
+        eventid,
+        eventname,
+        eventdate,
+        venuename,
+        address,
+        venueid
     }
-
+    
     const { register, handleSubmit, setValue, control, reset, formState: { errors, isSubmitSuccessful } } = useForm<z.infer<typeof PostValidation>>({
         resolver: zodResolver(PostValidation),
         defaultValues
     })
-    const venueNameRegistration = register('venueName')
+    const venuenameRegistration = register('venuename')
 
-    const sendFile = async (filedata:{file:File, userDir:string}) => {
-        const {file, userDir} = filedata;
-        await uploadFile({file, userDir});
+    const sendFile = async (filedata:{file:File, userdir:string}) => {
+        const {file, userdir} = filedata;
+        await uploadFile({file, userdir});
     }
 
     const normalizeOptionalValue = (value?: string) => {
@@ -112,14 +107,12 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
     const onSubmit = async (values: z.infer<typeof PostValidation>) => {
         setIsSaving(true);
 
-        values.postType = resolvedPostType;
-
         if (post && post.id) {
-            values.postId = post.id;
+            values.id = post.id;
         }
 
-        if (post && post.parentPostId) {
-            values.parentPostId = post.parentPostId;
+        if (parentPostId) {
+            values.parentPostId = parentPostId;
         }
 
         if (values.content && values.content.html && values.content.lexical) {
@@ -128,47 +121,47 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
             values.lexical = JSON.stringify(lexical);
         }
 
-        values.headline = normalizeOptionalValue(values.headline)
-        values.eventTitle = normalizeOptionalValue(values.eventTitle)
-        values.venueName = normalizeOptionalValue(values.venueName)
-        values.venueId = normalizeOptionalValue(values.venueId)
+        // values.headline = normalizeOptionalValue(values.headline)
+        values.eventname = normalizeOptionalValue(values.eventname)
+        values.venuename = normalizeOptionalValue(values.venuename)
         values.address = normalizeOptionalValue(values.address)
-        values.tags = normalizeOptionalValue(
-            values.tags
-                ?.split(',')
-                .map((tag) => tag.trim())
-                .filter(Boolean)
-                .join(', ')
-        )
-        values.seeking = normalizeOptionalValue(values.seeking)
-        values.status = normalizeOptionalValue(values.status)
+        // values.tags = normalizeOptionalValue(
+        //     values.tags
+        //         ?.split(',')
+        //         .map((tag) => tag.trim())
+        //         .filter(Boolean)
+        //         .join(', ')
+        // )
+        // values.seeking = normalizeOptionalValue(values.seeking)
+        // values.status = normalizeOptionalValue(values.status)
 
-        let userDir, postFileUrl;
+        let userdir, postfileUrl;
 
-        if (user && user.userDetails)
-            userDir = user.userDetails.userDir;
+        if (user && user.userdetails)
+            userdir = user.userdetails.userdir;
 
-        if (tempImage && userDir) {
+        if (tempImage && userdir) {
             const res = await fetch(tempImage.url);
             const blob = await res.blob();
             const file = new File([blob], tempImage.name, {type: tempImage.type})
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('userDir', userDir);
+            formData.append('userdir', userdir);
 
-            sendFile({file, userDir});
+            sendFile({file, userdir});
 
-            postFileUrl = file.name;
-            values.postFile = postFileUrl;
-            values.postFileType = file.type;
+            postfileUrl = file.name;
+            values.postfile = postfileUrl;
+            values.postfiletype = file.type;
         }
 
         await savePost(values);
+        
         if (post && post.id) {
             dispatchEvent(new CustomEvent("postsUpdated", {
 				detail: {
 					action: `edit`,
-					postId: post.id
+					postid: post.id
 				}
 			}));
         } else {
@@ -215,11 +208,11 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
     }
 
     const setPostFile = () => {
-        if (postFile) {
+        if (postfile && post?.userdetails?.userdir) {
             setTempImage({
-                name: postFile,
-                type: post?.postFileType,
-                url: `${imageUrl}/${user.userDetails?.userDir}/${postFile}`
+                name: postfile,
+                type: post?.filetypes?.filetype ?? post?.filetype,
+                url: `${imageUrl}/${post.userdetails.userdir}/${postfile}`
             } as OptimizedFile);
         }
     }
@@ -266,10 +259,10 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
     }, [isScheduledPost, venueQuery]);
 
     const selectVenue = (venue:VenueSuggestion) => {
-        setValue('venueName', venue.venueName, { shouldDirty: true });
-        setValue('venueId', venue.id, { shouldDirty: true });
+        setValue('venuename', venue.venuename, { shouldDirty: true });
+        setValue('venueid', venue.id, { shouldDirty: true });
         setValue('address', venue.address ?? '', { shouldDirty: true });
-        setVenueQuery(venue.venueName);
+        setVenueQuery(venue.venuename);
         setVenueSuggestions([]);
         setIsVenueSearchOpen(false);
     }
@@ -288,12 +281,10 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
         }
     }, []) 
 
-    const typeLabel = getPostTypeLabel(resolvedPostType)
-
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
 			<div>
-                {isScenePost &&
+                {/* {isScenePost &&
                     <div className="mb-4 rounded-2xl border border-orange/40 bg-orange/5 p-4">
                         <div className="text-lg font-semibold">{typeLabel}</div>
                         <div className="text-sm text-gray-600">
@@ -313,95 +304,6 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
                             className="w-full rounded-xl border border-gray-300 px-3 py-2"
                             placeholder={resolvedPostType === 'collab' ? 'Need a bassist for South Side indie set' : 'Best cozy venue for acoustic nights?'}
                         />
-                    </div>
-                }
-
-                {isScheduledPost &&
-                    <div className="mb-4 grid gap-4 md:grid-cols-2">
-                        <div>
-                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Title</div>
-                            <input
-                                {...register('eventTitle')}
-                                className="w-full rounded-xl border border-gray-300 px-3 py-2"
-                                placeholder={resolvedPostType === 'event' ? 'First Friday Showcase' : `${typeLabel} at The Funhouse`}
-                            />
-                        </div>
-                        <div>
-                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Date & Time</div>
-                            <Controller
-                                control={control}
-                                name='eventDate'
-                                render={({ field }) => (
-                                    <DatePicker
-                                        selected={field.value || null}
-                                        onChange={(date:Date | null) => field.onChange(date)}
-                                        showTimeSelect
-                                        showIcon
-                                        dateFormat="MMMM d, yyyy h:mm aa"
-                                        className="w-full rounded-xl border border-gray-300 px-3 py-2"
-                                        icon={<BiCalendar />}
-                                    />
-                                )}
-                            />
-                        </div>
-                    </div>
-                }
-
-                {(isScenePost || isScheduledPost) &&
-                    <div className="mb-4 grid gap-4 md:grid-cols-2">
-                        <div>
-                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Venue</div>
-                            <div className="relative">
-                                <input
-                                    {...venueNameRegistration}
-                                    className="w-full rounded-xl border border-gray-300 px-3 py-2"
-                                    placeholder="ArtsQuest, The Funhouse, SteelStacks"
-                                    autoComplete="off"
-                                    onChange={(event) => {
-                                        venueNameRegistration.onChange(event);
-                                        setValue('venueId', undefined, { shouldDirty: true });
-                                        setVenueQuery(event.target.value);
-                                        setIsVenueSearchOpen(true);
-                                    }}
-                                    onFocus={() => setIsVenueSearchOpen(true)}
-                                    onBlur={() => {
-                                        window.setTimeout(() => setIsVenueSearchOpen(false), 150);
-                                    }}
-                                />
-                                <input type="hidden" {...register('venueId')} />
-                                {isScheduledPost && isVenueSearchOpen && (venueSuggestions.length > 0 || isVenueSearching) &&
-                                    <div className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-gray-200 bg-white shadow-lg">
-                                        {isVenueSearching &&
-                                            <div className="px-3 py-2 text-sm text-gray-500">Searching venues...</div>
-                                        }
-                                        {!isVenueSearching && venueSuggestions.map((venue) => (
-                                            <button
-                                                key={venue.id}
-                                                type="button"
-                                                className="block w-full px-3 py-2 text-left hover:bg-orange/10"
-                                                onMouseDown={(event) => event.preventDefault()}
-                                                onClick={() => selectVenue(venue)}
-                                            >
-                                                <div className="text-sm font-semibold text-gray-900">{venue.venueName}</div>
-                                                {(venue.address || venue.neighborhood) &&
-                                                    <div className="text-xs text-gray-500">
-                                                        {[venue.address, venue.neighborhood].filter(Boolean).join(' | ')}
-                                                    </div>
-                                                }
-                                            </button>
-                                        ))}
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                        <div>
-                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Map Address</div>
-                            <input
-                                {...register('address')}
-                                className="w-full rounded-xl border border-gray-300 px-3 py-2"
-                                placeholder="101 Founders Way, Bethlehem, PA"
-                            />
-                        </div>
                     </div>
                 }
 
@@ -441,6 +343,95 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
                             placeholder="Drummer who can handle post-punk and late rehearsals"
                         />
                     </div>
+                } */}
+
+                {isScheduledPost &&
+                    <div>
+                        <div className="mb-4 grid gap-4 md:grid-cols-2">
+                            <div>
+                                <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Title</div>
+                                <input
+                                    {...register('eventname')}
+                                    className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                    placeholder={`What's cookin'`}
+                                />
+                            </div>
+                            <div>
+                                <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Date & Time</div>
+                                <Controller
+                                    control={control}
+                                    name='eventdate'
+                                    render={({ field }) => (
+                                        <DatePicker
+                                            selected={field.value || null}
+                                            onChange={(date:Date | null) => field.onChange(date)}
+                                            showTimeSelect
+                                            showIcon
+                                            dateFormat="MMMM d, yyyy h:mm aa"
+                                            className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                            icon={<BiCalendar />}
+                                        />
+                                    )}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="mb-4 grid gap-4 md:grid-cols-2">
+                            <div>
+                                <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Venue</div>
+                                <div className="relative">
+                                    <input
+                                        {...venuenameRegistration}
+                                        className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                        placeholder="ArtsQuest, The Funhouse, Godfrey Daniels, etc."
+                                        autoComplete="off"
+                                        onChange={(event) => {
+                                            venuenameRegistration.onChange(event);
+                                            setValue('venueid', undefined, { shouldDirty: true });
+                                            setVenueQuery(event.target.value);
+                                            setIsVenueSearchOpen(true);
+                                        }}
+                                        onFocus={() => setIsVenueSearchOpen(true)}
+                                        onBlur={() => {
+                                            window.setTimeout(() => setIsVenueSearchOpen(false), 150);
+                                        }}
+                                    />
+                                    <input type="hidden" {...register('venueid')} />
+                                    {isScheduledPost && isVenueSearchOpen && (venueSuggestions.length > 0 || isVenueSearching) &&
+                                        <div className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-gray-200 bg-white shadow-lg">
+                                            {isVenueSearching &&
+                                                <div className="px-3 py-2 text-sm text-gray-500">Searching venues...</div>
+                                            }
+                                            {!isVenueSearching && venueSuggestions.map((venue) => (
+                                                <button
+                                                    key={venue.id}
+                                                    type="button"
+                                                    className="block w-full px-3 py-2 text-left hover:bg-orange/10"
+                                                    onMouseDown={(event) => event.preventDefault()}
+                                                    onClick={() => selectVenue(venue)}
+                                                >
+                                                    <div className="text-sm font-semibold text-gray-900">{venue.venuename}</div>
+                                                    {(venue.address || venue.neighborhood) &&
+                                                        <div className="text-xs text-gray-500">
+                                                            {[venue.address, venue.neighborhood].filter(Boolean).join(' | ')}
+                                                        </div>
+                                                    }
+                                                </button>
+                                            ))}
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div>
+                                <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Map Address</div>
+                                <input
+                                    {...register('address')}
+                                    className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                    placeholder="123 Main St., Bethlehem, PA"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 }
 
                 <Controller
@@ -452,7 +443,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
                             onChange={field.onChange}
                             clearEditor={clearEditor}
                             content={content}
-                            currentUserId={user.id}
+                            currentUserDetailsId={user?.userdetails?.id || 0}
                         />
                     )}
                 />

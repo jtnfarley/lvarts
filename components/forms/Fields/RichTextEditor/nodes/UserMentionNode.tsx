@@ -66,8 +66,8 @@ export class UserMentionNode extends BeautifulMentionNode {
 
   exportDOM(): DOMExportOutput {
     const data = this.getData();
-    const userId = typeof data?.userId === "string" ? data.userId : null;
-    const element = document.createElement(userId ? "a" : "span");
+    const userdetailsid = typeof data?.userdetailsid === "number" ? data.userdetailsid : null;
+    const element = document.createElement(userdetailsid ? "a" : "span");
 
     element.setAttribute("data-lexical-beautiful-mention", "true");
     element.setAttribute(
@@ -87,8 +87,8 @@ export class UserMentionNode extends BeautifulMentionNode {
       );
     }
 
-    if (userId) {
-      element.setAttribute("href", `/user/${userId}`);
+    if (userdetailsid) {
+      element.setAttribute("href", `/user/${userdetailsid}`);
     }
 
     element.textContent = this.getTextContent();

@@ -1,92 +1,60 @@
 import type SidebarProfile from '@/lib/models/sidebarProfile'
-import type UserDetails from '@/lib/models/userDetails'
 import { prisma } from '@/prisma'
 
-export const getSidebarProfile = async (userId:string): Promise<SidebarProfile | null> => {
-    const [profile, postCount] = await prisma.$transaction([
-        prisma.userDetails.findFirst({
-            where: {
-                userId
-            },
-            select: {
-                userId: true,
-                handle: true,
-                displayName: true,
-                avatar: true,
-                userDir: true,
-                followers: true,
-                following: true,
-                bioHtml: true,
-                urls: true
-            }
-        }),
-        prisma.posts.count({
-            where: {
-                userId,
-                postType: {
-                    not: 'chat'
-                }
-            }
-        })
-    ])
+export const getSidebarProfile = async (handle:string): Promise<SidebarProfile | null> => {
+    const profile = await prisma.userdetails.findFirst({
+        where: {
+            handle
+        },
+        select: {
+            id: true,
+            userid: true,
+            handle: true,
+            displayname: true,
+            avatar: true,
+            userdir: true,
+            biohtml: true,
+            biolexical: true
+        }
+    })
 
-    if (!profile) {
-        return null
-    }
+    if (!profile) return null;
+
+    const postcount = await prisma.usertoposts.count({
+        where: {
+            userdetailsid: profile.id
+        }
+    })
+
+    const followingcount = await prisma.followers.count({
+        where: {
+            userdetailsid: profile.id
+        }
+    })
+
+    const followerscount = await prisma.followers.count({
+        where: {
+            followinguserdetailsid: profile.id
+        }
+    })
+
+    const urls = await prisma.userdetailsurls.findMany({
+        where: {
+            userdetailsid: profile.id
+        }
+    })
 
     return {
         ...profile,
-        postCount
-    }
-}
-
-export const getUserDetailsWithPosts = async (userId:string): Promise<UserDetails | null> => {
-    const [userDetails, postCount] = await prisma.$transaction([
-        prisma.userDetails.findFirst({
-            omit: {
-                postIds: true
-            },
-            where: {
-                userId
-            },
-            include: {
-                posts: {
-                    where: {
-                        postType: {
-                            not: 'chat'
-                        }
-                    },
-                    include: {
-                        parentPost: {
-                            include: {
-                                userDetails: true
-                            }
-                        },
-                        userDetails: true
-                    },
-                    orderBy: {
-                        createdAt: 'desc'
-                    },
-                    take: 20
-                }
-            }
-        }),
-        prisma.posts.count({
-            where: {
-                userId,
-                postType: {
-                    not: 'chat'
-                }
-            }
-        })
-    ])
-
-    if (!userDetails) {
-        return null
-    }
-
-    return {
-        ...userDetails,
-        postCount
+        followers: [],
+        following: [],
+        postcount,
+        followerscount,
+        followingcount,
+        urls: urls.map((url) => ({
+            id: url.id,
+            url: url.url,
+            urlname: url.urlname ?? ''
+        }))
     }
 }

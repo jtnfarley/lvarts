@@ -4,10 +4,10 @@ export const PostValidation = z.object({
     content: z.string().min(3, {
         message: 'Minimum 3 characters.'
     }).max(1000),
-    userId: z.string(),
-    postType: z.string(),
+    userid: z.string(),
+    posttype: z.string(),
     edited: z.boolean(),
-    // postFile: z.string(), 
+    // postfile: z.string(), 
     // privatePost: z.boolean(), 
     // parentPostId: z.string()
 })

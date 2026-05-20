@@ -1,13 +1,13 @@
-import { deletePost } from "../actions/posts"
+import { deletePost } from "../data/posts"
 
-export const deleteThisPost = async (postId:string) => {
-    const response = await deletePost(postId)
+export const deleteThisPost = async (postid:number) => {
+    const response = await deletePost(postid)
     
     if (response) {
         window.dispatchEvent(new CustomEvent("postsUpdated", {
             detail: {
                 action: `delete`,
-                postId: postId
+                postid: postid
             }
         }))
     }

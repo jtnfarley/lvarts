@@ -2,47 +2,47 @@
 
 import {prisma} from '@/lib/db/prisma'
 import User from '@/lib/models/user'
-import UserDetails from '@/lib/models/userDetails'
+import UserDetails from '@/lib/models/userdetails'
 
 interface UpdateUserParams {
     id: string,
-    userId: string,
+    userid: string,
     bio?: string,
-    displayName?: string,
+    displayname?: string,
     avatar?: string
-    userDir?: string
+    userdir?: string
 }
 
 interface FollowUserParams {
-    userId: string,
+    userid: string,
     toFollowId: string
 }
 
-export const getUserDetails = async (userId:string) => {
-    const userDetails = await prisma.userDetails.findFirst({
+export const getUserDetails = async (userid:string) => {
+    const userdetails = await prisma.userdetails.findFirst({
         where: {
-            userId
+            userid
         }
     })
 
-    return userDetails
+    return userdetails
 }
 
-export const getRandoUsers = async (userId:string):Promise<UserDetails[]> => {
-    const userDetailsCount = await prisma.userDetails.count();
-    if (userDetailsCount) {
-        const skip = Math.floor(Math.random() * (userDetailsCount - 1)); //remove logged-in user
-        const userDetails = await prisma.userDetails.findMany({
+export const getRandoUsers = async (userid:string):Promise<UserDetails[]> => {
+    const userdetailsCount = await prisma.userdetails.count();
+    if (userdetailsCount) {
+        const skip = Math.floor(Math.random() * (userdetailsCount - 1)); //remove logged-in user
+        const userdetails = await prisma.userdetails.findMany({
             take: 5,
             skip: skip,
             where: {
-                userId: {
-                    not: userId
+                userid: {
+                    not: userid
                 }
             }
         });
 
-        return userDetails
+        return userdetails
     }
 
     return [];
@@ -50,39 +50,39 @@ export const getRandoUsers = async (userId:string):Promise<UserDetails[]> => {
 
 export const updateUser = async ({
     id,
-    userId,
+    userid,
     bio,
-    displayName,
-    userDir
+    displayname,
+    userdir
 }:UpdateUserParams): Promise<void> => {
-console.log(id, userId,
+console.log(id, userid,
     bio,
-    displayName, userDir)
+    displayname, userdir)
     const date = new Date()
-    const createdAt = date
-    const updatedAt = date
+    const createdat = date
+    const updatedat = date
 
     try {
         if (id) {
-            await prisma.userDetails.update({
+            await prisma.userdetails.update({
                 where: {
                     id: id
                 },
                 data: {
                     bio,
-                    displayName,
-                    updatedAt
+                    displayname,
+                    updatedat
                 }
             })
         } else {
-            await prisma.userDetails.create({
+            await prisma.userdetails.create({
                 data: {
-                    userId,
+                    userid,
                     bio,
-                    displayName,
-                    userDir,
-                    createdAt,
-                    updatedAt
+                    displayname,
+                    userdir,
+                    createdat,
+                    updatedat
                 }
             })
         }
@@ -94,10 +94,10 @@ console.log(id, userId,
     }   
 }
 
-export const followUser = async ({userId, toFollowId}:FollowUserParams) => {
-    const user = await prisma.userDetails.findFirst({
+export const followUser = async ({userid, toFollowId}:FollowUserParams) => {
+    const user = await prisma.userdetails.findFirst({
         where: {
-            userId
+            userid
         }
     })
 
@@ -108,7 +108,7 @@ export const followUser = async ({userId, toFollowId}:FollowUserParams) => {
 
     following.push(toFollowId)
 
-    await prisma.userDetails.update({
+    await prisma.userdetails.update({
         where: {
             id: user.id
         },
@@ -118,10 +118,10 @@ export const followUser = async ({userId, toFollowId}:FollowUserParams) => {
     })
 }
 
-export const unfollowUser = async ({userId, toFollowId}:FollowUserParams) => {
-    const user = await prisma.userDetails.findFirst({
+export const unfollowUser = async ({userid, toFollowId}:FollowUserParams) => {
+    const user = await prisma.userdetails.findFirst({
         where: {
-            userId
+            userid
         }
     })
 
@@ -133,7 +133,7 @@ export const unfollowUser = async ({userId, toFollowId}:FollowUserParams) => {
     following.splice(index, 1)
     if (index === -1) return
 
-    await prisma.userDetails.update({
+    await prisma.userdetails.update({
         where: {
             id: user.id
         },

@@ -9,21 +9,20 @@ import PostMedia from './PostMedia';
 import PostTemplateTags from './PostTemplateTags';
 import { formatDate } from '@/lib/utils';
 import { getPostTypeLabel, isSceneCommunityPostType, splitPostTags } from '@/lib/scenePosts';
+import { FeedRow } from '@/lib/models/initFeedRow';
 
-export default function PostContent(props:{post:Post, googleMapsApiKey:string | undefined}) {
-	const post = props.post;
-	const [cleanContent, setCleanContent] = useState<string>(post.content);
+export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string | undefined}) {
+    const post = props.post;
+	const [cleanContent, setCleanContent] = useState<string>(post.content || '');
 	const [templateTagArr, setTemplateTagArr] = useState<Array<{
 				tag: string,
 				index: number,
 				tagText: string
 			}>>();
-    const displayTitle = post.headline || post.eventTitle
-    const postTags = splitPostTags(post.tags)
-    const sceneTypeLabel = isSceneCommunityPostType(post.postType) ? getPostTypeLabel(post.postType) : null
-    const venueName = post.venue?.venueName ?? post.venueName
-    const venueNeighborhood = post.venue?.neighborhood ?? post.neighborhood
-    const venueAddress = post.venue?.address ?? post.address
+    const displayTitle = post.eventname
+    // const postTags = splitPostTags(post.tags)
+    const venuename = post.venuename
+    const address = post.address
 
 	const parseTemplateTags = (post:string) => {
 		let placeholder = post;
@@ -76,7 +75,7 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 					linkLength = placeholder.substring(linkIndex, linkEnd).length;
 					linkText = placeholder.slice(linkIndex);
 					linkText = linkText.slice(0, linkEnd)
-					linkText = linkText.substring((fullLink.match(/http:/)) ? 7 : 8,30)+'...'
+					linkText = linkText.substring((fullLink.match(/http:/)) ? 7 : 8,50)+'...'
 
 					placeholder = `${placeholder.slice(0, linkIndex)}${linkText}${placeholder.slice(linkIndex + linkLength)}`
 					placeholder = placeholder.slice(0, placeholder.indexOf('>',editorLinks[i].index)) + " target='_blank'" + placeholder.slice(placeholder.indexOf('>',editorLinks[i].index)) 
@@ -116,8 +115,12 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 		return post;
 	}
 
+	const getMapLink = (address:string):string => {
+		return `https://www.google.com/maps/place/${address.replaceAll(' ', '+')}`;
+	}
+
 	useEffect(() => {
-		parseLinks(createDOMPurify(window).sanitize(post.content));
+		parseLinks(createDOMPurify(window).sanitize(post.content || ''));
 	},[])
 
     return (
@@ -128,53 +131,24 @@ export default function PostContent(props:{post:Post, googleMapsApiKey:string | 
 						<div className='text-2xl font-bold px-3 pt-3'><Link href={`/post/${post.id}`} title={displayTitle}>{displayTitle}</Link></div>
 				}
 				{
-					post.eventDate &&
-						<div className='mb-5 text-lg px-3'>{formatDate(post.eventDate)}</div>
+					post.eventdate &&
+						<div className='mb-5 text-lg px-3'>{formatDate(post.eventdate)}</div>
 				}
+
 				{
-					(sceneTypeLabel || post.status) &&
-						<div className='mb-4 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-wide'>
-							{sceneTypeLabel &&
-								<div className='rounded-full bg-orange/10 px-3 py-1 text-orange-700'>{sceneTypeLabel}</div>
-							}
-							{post.status &&
-								<div className='rounded-full bg-slate-100 px-3 py-1 text-slate-700'>{post.status}</div>
-							}
-						</div>
-				}
-				{
-					(post.town || venueNeighborhood || venueName || venueAddress) &&
+					(venuename || address) &&
 						<div className='mb-4 rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-700'>
-							<div className='flex flex-wrap gap-x-4 gap-y-1'>
-								{post.town && <div>Town: <strong>{post.town}</strong></div>}
-								{venueNeighborhood && <div>Neighborhood: <strong>{venueNeighborhood}</strong></div>}
-								{venueName && <div>Venue: <strong>{venueName}</strong></div>}
-								{venueAddress && <div>Address: <strong>{venueAddress}</strong></div>}
+							<div className='flex flex-col gap-x-4 gap-y-1'>
+								{venuename && <div className='text-lg'>At <strong>{venuename}</strong></div>}
+								{address && <div><strong><a href={getMapLink(address)} target='_blank' className='text-blue-600'>Map</a></strong></div>}
 							</div>
-						</div>
-				}
-				{
-					post.seeking &&
-						<div className='mb-4 rounded-2xl bg-orange/5 px-4 py-3 text-sm'>
-							<div className='mb-1 font-semibold uppercase tracking-wide text-orange-700'>Seeking</div>
-							<div>{post.seeking}</div>
-						</div>
-				}
-				{
-					postTags.length > 0 &&
-						<div className='mb-4 flex flex-wrap gap-2 text-sm'>
-							{postTags.map((tag) => (
-								<Link key={tag} href={`/search/${encodeURIComponent(tag)}`} className='rounded-full bg-blue-50 px-3 py-1 text-blue-600'>
-									#{tag}
-								</Link>
-							))}
 						</div>
 				}
 				{ cleanContent && 
 					<div>
-						<div className='flex justify-end text-xs mb-2 me-2 italic'>{post.createdAt.toDateString()}</div>
+						<div className='flex justify-end text-xs mb-2 me-2 italic'>{post.createdat.toDateString()}</div>
 						<div>{parse(cleanContent)}</div>
-						<div className='text-sm pt-2 italic text-gray-1'>{(post.edited) ? 'edited' : ''}</div>
+						<div className='text-sm pt-2 italic text-gray-1 px-[13px]'>{(post.edited) ? 'edited' : ''}</div>
 					</div>
 				}
 			</div>

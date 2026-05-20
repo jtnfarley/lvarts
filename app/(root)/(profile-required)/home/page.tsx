@@ -2,9 +2,8 @@ import {currentUser} from "@/app/data/currentUser";
 import AddPostForm from "@/components/forms/AddPostForm"
 import Feed from "@/components/Feed";
 import RecUsers from '@/components/RecUsers';
-import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getInitFeed, getNewPosts, getOldPosts, savePost } from "@/app/data/posts";
+import { getFeedRow, savePost } from "@/app/data/posts";
 
 export const metadata: Metadata = {
   title: 'Home - Lehigh Vally Arts & Music',
@@ -13,12 +12,8 @@ export const metadata: Metadata = {
 
 export default async function Home() {
 	const user = await currentUser();
-	
-	if (!user.userDetails || !user.userDetails.displayName || user.userDetails.displayName === '' || !user.userDetails.handle || user.userDetails.handle === '') {
-		return redirect('/profile')
-	}
 
-	const feed = await getInitFeed(user)
+	const feed = await getFeedRow(user.userdetails!);
 
 	const googleMapsApiKey = process.env.GOOGLE_MAPS; //has to be handled on the server
 
@@ -27,11 +22,11 @@ export default async function Home() {
 			<div className='xl:hidden'>
 				<RecUsers/>	
 			</div>
-			<div className="bg-white p-0 rounded-box mb-10">
-				<AddPostForm user={user} postType='post' edited={false} savePost={savePost} />
+			<div>
+				<AddPostForm user={user} posttype='post' edited={false} savePost={savePost} />
 			</div>
 			<div>
-				<Feed feed={feed} user={user} getNewPosts={getNewPosts} getOldPosts={getOldPosts} googleMapsApiKey={googleMapsApiKey}/>
+				<Feed feed={feed} user={user} getFeedRow={getFeedRow} googleMapsApiKey={googleMapsApiKey}/>
 			</div>
 		</div>
 	);

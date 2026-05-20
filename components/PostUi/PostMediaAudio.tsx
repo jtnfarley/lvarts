@@ -7,7 +7,7 @@ function PostMediaAudio(props:{post:Post}) {
 
     // const [imageLoaded, setImageLoaded] = useState(false);
 
-    const audioFile = imageUrl+"/"+post.userDetails!.userDir+"/"+post.postFile;
+    const audioFile = imageUrl+"/"+post.userdetails!.userdir+"/"+post.postfile;
 
     // const imageLoad = () => {
     //     setImageLoaded(true)

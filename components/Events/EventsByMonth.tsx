@@ -1,24 +1,24 @@
 'use client'
 
-import Post from '@/lib/models/post';
+import type { FeedRow } from '@/lib/models/initFeedRow';
 import EventUi from './EventUi';
 import EventsByMonthHeader from './EventsByMonthHeader';
 import { useRef, useState } from 'react';
 
-export default function EventsByMonth(props:{events:Post[]}) {
+export default function EventsByMonth(props:{events:FeedRow[]}) {
 	const events = props.events;
 	const monthsRef = useRef<HTMLDivElement | null>(null);
 	const [currentMonthIndex, setCurrentMonthIndex] = useState(0);
 
 	const months = ["January", "February", "March", 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-	const eventsByMonth:Array<{name:string,events:Post[]}> = [];
+	const eventsByMonth:Array<{name:string,events:FeedRow[]}> = [];
 
 	const getEventsByMonth = () => {
 		months.map((month, i) => {
 			eventsByMonth.push({
 				name: month,
-				events: events.filter(event => event.eventDate?.getMonth() === i)
+				events: events.filter(event => event.eventdate?.getMonth() === i)
 			})
 		})
 	}
@@ -49,7 +49,7 @@ export default function EventsByMonth(props:{events:Post[]}) {
 	};
 
 	const getYear = (events:any[] | undefined):string => {
-		return (events && events.length) ? events[0].eventDate?.getFullYear().toString() : new Date().getFullYear().toString()
+		return (events && events.length) ? events[0].eventdate?.getFullYear().toString() : new Date().getFullYear().toString()
 	}
 	
     return (
@@ -68,7 +68,7 @@ export default function EventsByMonth(props:{events:Post[]}) {
 										<EventsByMonthHeader month={name} year={getYear(events)} forward={forward} back={back}/>
 										<div  className="lg:grid lg:grid-cols-3 md:flex md:flex-col gap-4">
 										{
-											events.map((post:Post) => {
+											events.map((post:FeedRow) => {
 												return (
 													<EventUi key={post.id} post={post} />
 												)

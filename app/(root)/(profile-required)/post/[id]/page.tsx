@@ -4,7 +4,8 @@ import CommentFeed from "@/components/Comments/CommentFeed";
 import SinglePost from '@/components/SinglePost';
 import { redirect } from 'next/navigation';
 import {currentUser} from "@/app/data/currentUser";
-import { getPost, getInitComments, getNewComments, getOldComments, savePost } from "@/app/data/posts";
+import { getPost, getCommentFeedRow, savePost } from "@/app/data/posts";
+import type { FeedRow } from '@/lib/models/initFeedRow';
 
 export default async function SinglePostPage({
   params,
@@ -14,14 +15,16 @@ export default async function SinglePostPage({
     const user = await currentUser();
 
     const { id } = await params;
+    const postId = typeof id === 'string' ? Number.parseInt(id, 10) : NaN;
 
     const googleMapsApiKey = process.env.GOOGLE_MAPS;
 
-    let post, comments;
-    
-    if (id) {
-        post = await getPost(id.toString());
-        comments = await getInitComments(id.toString());
+    let post: FeedRow | null = null;
+    let comments: FeedRow[] = [];
+
+    if (!Number.isNaN(postId)) {
+        post = await getPost(postId);
+        comments = await getCommentFeedRow(postId);
     }
 
     if (!post) return redirect('/home');
@@ -29,16 +32,16 @@ export default async function SinglePostPage({
 	return (
         <>
         {(user) ?
-            (post && id && googleMapsApiKey) &&           
+            (post && !Number.isNaN(postId) && googleMapsApiKey) &&           
                 <div className='py-5 flex flex-col'>
                     <div className='mb-4'>
                         <SinglePost post={post} user={user} googleMapsApiKey={googleMapsApiKey} />
                     </div>
                     <div className='mt-2'>
-                        <AddPostForm user={user} postType='comment' edited={false} parentPostId={id.toString()} savePost={savePost}/>
+                        <AddPostForm user={user} posttype='comment' edited={false} parentPostId={postId} savePost={savePost}/>
                     </div>
                     <div>
-                        <CommentFeed comments={comments} parentPostId={id.toString()} user={user} getNewComments={getNewComments} getOldComments={getOldComments} googleMapsApiKey={googleMapsApiKey}/>
+                        <CommentFeed comments={comments} parentPostId={postId.toString()} user={user} getNewComments={getCommentFeedRow} getOldComments={getCommentFeedRow} googleMapsApiKey={googleMapsApiKey}/>
                     </div>
                 </div>
                 :

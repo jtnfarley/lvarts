@@ -1,18 +1,17 @@
 import Image from 'next/image';
-import Post from '@/lib/models/post';
-import {useState} from 'react'
 import imageUrl from '@/constants/imageUrl';
+import { FeedRow } from '@/lib/models/initFeedRow';
 
-function PostMediaImage(props:{post:Post}) {
+function PostMediaImage(props:{post:FeedRow}) {
     const post = props.post;
 
-    const imageFile = imageUrl+"/"+post.userDetails!.userDir+"/"+post.postFile;
+    const imageFile = imageUrl+"/"+post.userdetails!.userdir+"/"+post.postfile;
 
     return (
         <div className='flex justify-center post-img relative'> 
             <Image
                 src={imageFile}
-                alt={`Image associated with ${post.userDetails?.displayName}'s post`}
+                alt={`Image associated with ${post.userdetails?.displayname}'s post`}
                 fill={true}
             />
         </div>

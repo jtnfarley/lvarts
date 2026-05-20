@@ -7,7 +7,7 @@ export const getHandleSuggestion = async ({
   currentUserId,
 }: {
   currentHandle?: string;
-  currentUserId?: string;
+  currentUserId?: number;
 } = {}) => {
   return generateUniqueHandle(
     currentUserId,

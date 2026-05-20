@@ -1,15 +1,14 @@
 'use client'
 
-import Post from '@/lib/models/post';
-import User from '@/lib/models/user';
+import type { FeedRow } from '@/lib/models/initFeedRow';
 import imageUrl from '@/constants/imageUrl';
 import { formatDate } from '@/lib/utils';
 
-export default function EventHeader(props:{post:Post}) {
+export default function EventHeader(props:{post:FeedRow}) {
 	const post = props.post;
 
-	const avatar = (post && post.userDetails && post.userDetails.userDir && post.userDetails.avatar) ?
-		`${imageUrl}/${post.userDetails.userDir}/${post.userDetails.avatar}` :
+	const avatar = (post && post.userdetails && post.userdetails.userdir && post.userdetails.avatar) ?
+		`${imageUrl}/${post.userdetails.userdir}/${post.userdetails.avatar}` :
 		'/images/melty-man.png';
 
     return (
@@ -18,11 +17,11 @@ export default function EventHeader(props:{post:Post}) {
 				{/* <div><img src={avatar} className='rounded-full w-[50px] h-[50px]'/></div> */}
 				<div>
 					<div className='text-2xl font-bold'>
-						<a href={`/event/${post.id}`} title={`${post.eventTitle}`}>
-							{post.eventTitle}
+						<a href={`/event/${post.id}`} title={`${post.eventname}`}>
+							{post.eventname}
 						</a>
 					</div>
-					<div className=''>{formatDate(post.eventDate)}</div>
+					<div className=''>{formatDate(post.eventdate)}</div>
 				</div>
 			</div>
 		</div>		

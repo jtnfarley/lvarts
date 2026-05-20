@@ -4,17 +4,17 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { AdvancedMarker, Map as GoogleMap, Pin } from '@vis.gl/react-google-maps'
 
-import type Post from '@/lib/models/post'
+import type { FeedRow } from '@/lib/models/initFeedRow'
 import { getPostTypeLabel } from '@/lib/scenePosts'
 
 type MarkerPost = {
     id: string
     title: string
-    postType?: string | null
+    posttype?: string | null
     address: string
     formattedAddress: string
     town?: string | null
-    venueName?: string | null
+    venuename?: string | null
     lat: number
     lng: number
 }
@@ -24,7 +24,7 @@ const defaultCenter = {
     lng: -75.4902
 }
 
-export default function SceneMap(props:{posts:Post[], googleMapsApiKey:string | undefined}) {
+export default function SceneMap(props:{posts:FeedRow[], googleMapsApiKey:string | undefined}) {
     const { googleMapsApiKey, posts } = props
     const [markers, setMarkers] = useState<MarkerPost[]>([])
 
@@ -68,12 +68,12 @@ export default function SceneMap(props:{posts:Post[], googleMapsApiKey:string | 
                 return
             }
 
-            const postsWithLocations = posts.filter((post) => post.venue?.address || post.address)
+            const postsWithLocations = posts.filter((post) => post.address)
             const locationCache = new Map<string, Awaited<ReturnType<typeof geocodeLocation>>>()
 
             await Promise.all(
                 postsWithLocations.map(async (post) => {
-                    const address = (post.venue?.address ?? post.address)?.trim()
+                    const address = post.address?.trim()
 
                     if (!address || locationCache.has(address)) {
                         return
@@ -85,7 +85,7 @@ export default function SceneMap(props:{posts:Post[], googleMapsApiKey:string | 
             )
 
             const nextMarkers = postsWithLocations.flatMap((post) => {
-                const address = (post.venue?.address ?? post.address)?.trim()
+                const address = post.address?.trim()
 
                 if (!address) {
                     return []
@@ -98,13 +98,13 @@ export default function SceneMap(props:{posts:Post[], googleMapsApiKey:string | 
                 }
 
                 return [{
-                    id: post.id,
-                    title: post.headline || post.eventTitle || post.content.slice(0, 60),
-                    postType: post.postType,
+                    id: post.id.toString(),
+                    title: post.eventname || (post.content || '').slice(0, 60) || 'Scene post',
+                    posttype: post.posttype,
                     address,
                     formattedAddress: geocodedLocation.formattedAddress,
-                    town: post.town ?? post.venue?.neighborhood,
-                    venueName: post.venue?.venueName ?? post.venueName,
+                    town: null,
+                    venuename: post.venuename,
                     lat: geocodedLocation.lat,
                     lng: geocodedLocation.lng
                 }]
@@ -169,14 +169,14 @@ export default function SceneMap(props:{posts:Post[], googleMapsApiKey:string | 
                 {markers.map((marker) => (
                     <div key={marker.id} className="rounded-2xl border border-gray-200 bg-white px-4 py-3">
                         <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-orange-700">
-                            {getPostTypeLabel(marker.postType)}
+                            {getPostTypeLabel(marker.posttype)}
                         </div>
                         <Link href={`/post/${marker.id}`} className="block text-lg font-semibold text-slate-900 hover:text-orange-700">
                             {marker.title}
                         </Link>
                         <div className="mt-1 text-sm text-gray-600">{marker.formattedAddress}</div>
                         <div className="mt-2 text-xs uppercase tracking-wide text-gray-500">
-                            {[marker.venueName, marker.town].filter(Boolean).join(' | ')}
+                            {[marker.venuename, marker.town].filter(Boolean).join(' | ')}
                         </div>
                     </div>
                 ))}

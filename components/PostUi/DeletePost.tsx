@@ -24,7 +24,7 @@ export default function DeletePost(props:{postData:Post}) {
     setMessage('Are you sure you want to delete this post?');
     setPostContent(post.content);
     setAction('deleteThisPost');
-		setActionData({postId: post.id});
+		setActionData({postid: post.id});
 	}
 
     return (

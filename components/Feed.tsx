@@ -1,26 +1,25 @@
 'use client'
 
 import {APIProvider} from '@vis.gl/react-google-maps';
-import Post from '@/lib/models/post';
 import User from '@/lib/models/user';
 import { useEffect, useRef, useState } from 'react';
 import PostUi from './PostUi/PostUi';
 import { LoadOldPosts } from './PostUi/LoadOldPosts';
 import { BiRefresh } from "react-icons/bi";
+import { FeedRow } from '@/lib/models/initFeedRow';
 
-export default function Feed(props:{feed:Post[], user:User, getNewPosts:Function, getOldPosts:Function, googleMapsApiKey:string | undefined}) {
-	const [feed, setFeed] = useState<Post[]>(props.feed);
+export default function Feed(props:{feed:FeedRow[], user:User, getFeedRow:Function, googleMapsApiKey:string | undefined}) {
+	const [feed, setFeed] = useState<FeedRow[]>(props.feed);
 	const user = props.user;
-	const getNewPosts = props.getNewPosts;
-	const getOldPosts = props.getOldPosts;
+	const getFeedRow = props.getFeedRow;
 	const googleMapsApiKey = props.googleMapsApiKey;
 	const [hasQueuedPosts, setHasQueuedPosts] = useState(false);
 	const [endOfPosts, setEndOfPosts] = useState(false);
 	const [renderKey, setRenderKey] = useState(0);
 
-	const queuedPostsRef = useRef<Post[]>([]);
+	const queuedPostsRef = useRef<FeedRow[]>([]);
 	const updatingRef = useRef(false);
-	const tempFeedRef = useRef<Post[]>(props.feed);
+	const tempFeedRef = useRef<FeedRow[]>(props.feed);
 	const lastCheckedRef = useRef<Date | undefined>(new Date());
 
 	const handlePostsUpdated = async (ev?:Event) => {
@@ -30,7 +29,7 @@ export default function Feed(props:{feed:Post[], user:User, getNewPosts:Function
 
 		if (ev && ev instanceof CustomEvent && ev.detail) {
 			if (ev.detail.action && ev.detail.action === 'delete') {
-				tempFeedRef.current = tempFeedRef.current.filter(post => post.id !== ev.detail.postId)
+				tempFeedRef.current = tempFeedRef.current.filter(post => post.id !== ev.detail.postid)
 			}
 
 			if (ev.detail.action && ev.detail.action === 'edit') {
@@ -39,7 +38,7 @@ export default function Feed(props:{feed:Post[], user:User, getNewPosts:Function
 			}
 		}
 
-		const newPosts = await getNewPosts(user, lastCheckedRef.current);
+		const newPosts = await getFeedRow(user.userdetails, 0, lastCheckedRef.current);
 
 		if (newPosts && newPosts.length) {
 			queuedPostsRef.current = [];
@@ -62,8 +61,7 @@ export default function Feed(props:{feed:Post[], user:User, getNewPosts:Function
 	}
 
 	const getNewPostsFromServer = async () => {
-		
-		const newPosts = await getNewPosts(user, lastCheckedRef.current);
+		const newPosts = await getFeedRow(user.userdetails, 0, lastCheckedRef.current);
 		lastCheckedRef.current = new Date();
 
 		if (newPosts && newPosts.length && queuedPostsRef.current && queuedPostsRef.current.length) {
@@ -86,7 +84,7 @@ export default function Feed(props:{feed:Post[], user:User, getNewPosts:Function
 	}
 
 	const getOldPostsFromServer = async () => {
-		const oldPosts = await getOldPosts(user, feed.length);
+		const oldPosts = await getFeedRow(user.userdetails, feed.length);
 	
 		if (oldPosts && oldPosts.length && tempFeedRef.current && tempFeedRef.current.length) {
 			tempFeedRef.current = [...tempFeedRef.current, ...oldPosts];
@@ -124,7 +122,7 @@ export default function Feed(props:{feed:Post[], user:User, getNewPosts:Function
             {
 				(user && feed && feed.length) ?
 				<>
-                	{feed.map((post:Post, index:number) => {
+                	{feed.map((post:FeedRow, index:number) => {
 						return (
 							<PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={user} googleMapsApiKey={googleMapsApiKey} />
 						)
@@ -132,7 +130,7 @@ export default function Feed(props:{feed:Post[], user:User, getNewPosts:Function
 					<LoadOldPosts getOldPosts={getOldPostsFromServer} endOfPosts={endOfPosts}/>
 				</>
 				:
-				<div className='rounded-box flex-row'>It's quiet. <em>Too quiet.</em> Follow some folks to get in on the action.</div>
+				<div className='rounded-box flex-row bg-white'>It's quiet. <em>Too quiet.</em> Follow some folks to get in on the action.</div>
 			}
 			</APIProvider>
         </div>

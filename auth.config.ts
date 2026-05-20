@@ -6,33 +6,33 @@ import type { DefaultSession, NextAuthConfig } from "next-auth"
 import { prisma } from '@/prisma';
 import UserDetails from "./lib/models/userDetails";
 
-const getUserDetails = async (userId:string):Promise<UserDetails | null> => {
-  const [userDetails, postCount] = await prisma.$transaction([
-    prisma.userDetails.findFirst({
-      omit: {
-        postIds: true
-      },
+const getUserDetails = async (userid:number):Promise<any> => {
+  const userdetails = await prisma.userdetails.findFirst({
+    where: {
+      userid
+    }
+  });
+
+  let postCount = 0;
+
+  if (userdetails) {
+    postCount = await prisma.usertoposts.count({
       where: {
-        userId
-      }
-    }),
-    prisma.posts.count({
-      where: {
-        userId,
-        postType: {
-          not: 'chat'
-        }
+        userdetailsid: userdetails.id,
+        // posttype: {
+        //   not: 'chat'
+        // }
       }
     })
-  ])
+  }
 
-  if (!userDetails) {
+  if (!userdetails) {
     return null
   }
 
   return {
-    ...userDetails,
-    postCount
+    ...userdetails,
+    postcount: postCount
   }
 }
 
@@ -43,7 +43,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       /** The user's postal address. */
-      userDetails: UserDetails | null
+      userdetails: UserDetails | null
       /**
        * By default, TypeScript merges new interface properties and overwrites existing ones.
        * In this case, the default session user properties will be overwritten,
@@ -68,13 +68,13 @@ export default {
     async jwt({ token, user }) {
       if (user) { // User is available during sign-in
         token.id = user.id
-        token.userDetails = await getUserDetails(token.id as string);
+        token.userdetails = await getUserDetails(token.id as number);
       }
       return token
     },
     async session({ session, token }) {
       session.user.id = token.id as string
-      session.user.userDetails = await getUserDetails(token.id as string);
+      session.user.userdetails = await getUserDetails(token.id as number);
       return session
     },
   },

@@ -12,29 +12,23 @@ import Profile from "./Cards/Profile"
 import { LoadOldPosts } from './PostUi/LoadOldPosts';
 import { usePathname } from 'next/navigation';
 import SidebarProfile from '@/lib/models/sidebarProfile';
+import { FeedRow } from '@/lib/models/initFeedRow';
 
-export default function UserProfile(props:{currentUser:User, userDetails:UserDetails, getOldPosts:Function, googleMapsApiKey:string}) {
-	const {currentUser, getOldPosts, googleMapsApiKey, userDetails} = props;
+export default function UserProfile(props:{currentUser:User, userProfile:UserDetails, posts:FeedRow[], getOldPosts:Function, googleMapsApiKey:string}) {
+	const {currentUser, getOldPosts, googleMapsApiKey, userProfile} = props;
 	const pathname = usePathname();
-	const loggedInProfile = toSidebarProfile(currentUser);
+	const loggedInProfile = toSidebarProfile(userProfile);
 	const viewedUserId = getProfileUserIdFromPath(pathname);
-	const targetUserId = viewedUserId || currentUser.id;
+	const targetUserId = viewedUserId || userProfile.handle || null;
+	const [profile, setProfile] = useState(loggedInProfile);
 
-	const [profile, setProfile] = useState<SidebarProfile | null>(() => {
-		if (targetUserId === currentUser.id) {
-			return loggedInProfile;
-		}
-
-		return null;
-	})
-
-	const [posts, setPosts] = useState<Post[]>(userDetails.posts || []);
+	const [posts, setPosts] = useState<FeedRow[]>(props.posts || []);
 	const [renderKey, setRenderKey] = useState(0);
-	const tempFeedRef = useRef<Post[]>(userDetails.posts);
+	const tempFeedRef = useRef<FeedRow[]>(props.posts || []);
 	const [endOfPosts, setEndOfPosts] = useState(false);
 
 	const getOldPostsFromServer = async () => {
-		const oldPosts = await getOldPosts(profile?.userId, posts.length);
+		const oldPosts = await getOldPosts(profile?.userid, posts.length);
 	
 		if (oldPosts && oldPosts.length && tempFeedRef.current && tempFeedRef.current.length) {
 			tempFeedRef.current = [...tempFeedRef.current, ...oldPosts];
@@ -48,20 +42,26 @@ export default function UserProfile(props:{currentUser:User, userDetails:UserDet
 	useEffect(() => {
 		let cancelled = false;
 
-		if (targetUserId === currentUser.id && loggedInProfile) {
+		if (targetUserId === userProfile.handle && loggedInProfile) {
 			setProfile(loggedInProfile);
 		} else {
 			setProfile(null);
 		}
 
 		const loadProfile = async () => {
+			if (!targetUserId) {
+				setProfile(loggedInProfile);
+				return;
+			}
+
 			try {
 				const nextProfile = await getSidebarUserProfile(targetUserId);
 
 				if (!cancelled) {
 					setProfile(nextProfile || loggedInProfile);
 				}
-			} catch {
+			} catch(err) {
+				console.log(err)
 				if (!cancelled) {
 					setProfile(loggedInProfile);
 				}
@@ -85,9 +85,9 @@ export default function UserProfile(props:{currentUser:User, userDetails:UserDet
 						}
 					</div>
 
-					{userDetails && posts &&
+					{userProfile && posts &&
 						<div className='flex flex-col gap-5'>
-							{posts.map((post:Post, index:number) => {
+							{posts.map((post:FeedRow, index:number) => {
 								return (
 									<PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={currentUser} googleMapsApiKey={googleMapsApiKey} />
 								)

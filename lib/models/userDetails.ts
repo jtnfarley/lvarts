@@ -1,25 +1,13 @@
-import { AnyMxRecord } from "dns"
-import Post from "./post"
-
 export default interface UserDetails {
-	id: string
-	userId: string
-	handle: string
-	bioLexical?: string | null
-	bioHtml?: string | null
-	chatIds?: string[]
-	comments: string[]
-	createdAt: Date
-	displayName?: string | null
-	userDir?: string | null
-	followers: string[]
-	following: string[]
+	id: number
+	userid: number
+	handle?: string | null
+	biolexical?: string | null
+	biohtml?: string | null
+	createdat: Date
+	displayname?: string | null
+	userdir?: string | null
 	avatar?: string | null
-	likedPosts: string[]
-	postIds?: string[]
-	postCount?: number
-	posts?: Post[]
 	suspended?: boolean | null
-	updatedAt: Date,
-	urls: string[]
+	updatedat?: Date | null
 }

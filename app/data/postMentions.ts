@@ -2,16 +2,14 @@ import { extractMentionedUserIdsFromLexical } from "@/lib/mentions";
 import { prisma } from "@/prisma";
 
 interface NotifyMentionedUsersParams {
-  postId: string;
-  authorUserId: string;
-  authorUserDetailsId: string;
+  postid: number;
+  authorUserDetailsId: number;
   lexical?: string | null;
   previousLexical?: string | null;
 }
 
 export const notifyMentionedUsers = async ({
-  postId,
-  authorUserId,
+  postid,
   authorUserDetailsId,
   lexical,
   previousLexical,
@@ -23,52 +21,32 @@ export const notifyMentionedUsers = async ({
     ...new Set(extractMentionedUserIdsFromLexical(lexical)),
   ].filter(
     (mentionedUserId) =>
-      mentionedUserId !== authorUserId &&
+      mentionedUserId !== authorUserDetailsId &&
       !previousMentionedUserIds.has(mentionedUserId),
   );
 
-  if (!nextMentionedUserIds.length) {
-    return;
-  }
+	if (!nextMentionedUserIds.length) {
+		return;
+	}
 
-  const existingNotifications = await prisma.notifications.findMany({
-    where: {
-      postId,
-      type: "mention",
-      notiUserId: authorUserId,
-      userId: {
-        in: nextMentionedUserIds,
-      },
-    },
-    select: {
-      userId: true,
-    },
-  });
+	for (const mentionedUserId of nextMentionedUserIds) {
+		console.log(authorUserDetailsId, mentionedUserId)
+		const notification = await prisma.notifications.create({
+			data: {
+				notificationtypeid: 4, //mention
+				createdat: new Date(),
+				postid
+			}
+		})
 
-  const existingUserIds = new Set(
-    existingNotifications.map((notification) => notification.userId),
-  );
-  const notificationsToCreate = nextMentionedUserIds.filter(
-    (mentionedUserId) => !existingUserIds.has(mentionedUserId),
-  );
-
-  if (!notificationsToCreate.length) {
-    return;
-  }
-
-  await Promise.all(
-    notificationsToCreate.map((mentionedUserId) =>
-      prisma.notifications.create({
-        data: {
-          createdAt: new Date(),
-          type: "mention",
-          read: false,
-          userId: mentionedUserId,
-          notiUserId: authorUserId,
-          notiUserDetailsId: authorUserDetailsId,
-          postId,
-        },
-      }),
-    ),
-  );
+		if (notification && notification.id) {
+			await prisma.userstonotifications.create({
+				data: {
+					notificationid: notification.id,
+					senderuserdetailsid: authorUserDetailsId,
+					receiveruserdetailsid: mentionedUserId
+				}
+			})
+		}
+	}
 };

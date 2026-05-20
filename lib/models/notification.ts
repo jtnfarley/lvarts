@@ -1,18 +1,15 @@
-import Post from "./post"
-import User from "./user"
-import UserDetails from "./userDetails"
-
 export default interface Notification {
-    id: string
-    createdAt: Date
-    type: string
+    notiid?: number
+    id: number
+    createdat: Date
+    notificationtypeid: number
     read: boolean
-    userId: string 
-    user?: User
-    notiUserId?: string 
-    notiUser?: User
-    notiUserDetailsId?: string | null
-    notiUserDetails?: UserDetails | null
-    postId?: string | null
-    post?: Post | null
+    notificationtype?: string
+    senderuserdetailsid?: number
+    postid?: number | null
+    displayname?: string | null
+    userdir?: string | null
+    avatar?: string | null
+    handle?: string | null
+    biohtml?: string | null
 }
