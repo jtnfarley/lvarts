@@ -9,4 +9,5 @@ export default interface User {
     name?: string | null
     updatedat: Date
     userdetails?: UserDetails | null
+    anonymous?: boolean | null
 }

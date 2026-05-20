@@ -3,6 +3,7 @@ import {isLoggedIn} from "@/app/data/currentUser";
 import TopBar from "@/components/layout/TopBar";
 import LeftSidebar from "@/components/layout/LeftSidebar";
 import BottomBar from "@/components/layout/BottomBar";
+import UserDetails from "@/lib/models/userDetails";
 
 export const metadata: Metadata = {
   title: "Lehigh Valley Arts & Music",
@@ -18,7 +19,7 @@ export default async function RootLayout({
 
 	if (!user) {
 		user = {
-			userdetails:'',
+			userdetails:{} as UserDetails,
 			anonymous: true
 		}
 	}
