@@ -11,6 +11,8 @@ export const metadata: Metadata = {
 export default async function AddEvent() {
 	const user = await currentUser();
 
+	if (!user || !user.userdetails) return;
+
 	return (
 		<div>
 			{user &&

@@ -1,6 +1,5 @@
-import { Inter } from "next/font/google";
 import { Metadata } from "next";
-import {currentUser} from "@/app/data/currentUser";
+import {isLoggedIn} from "@/app/data/currentUser";
 import TopBar from "@/components/layout/TopBar";
 import LeftSidebar from "@/components/layout/LeftSidebar";
 import BottomBar from "@/components/layout/BottomBar";
@@ -10,15 +9,19 @@ export const metadata: Metadata = {
   description: "Lehigh Valley Arts Community Social Media",
 };
 
-const inter = Inter({ subsets: ["latin"] });
-
 export default async function RootLayout({
   	children,
 }: Readonly<{
   	children: React.ReactNode;
 }>) {
-	const user = await currentUser();
+	let user = await isLoggedIn();
 
+	if (!user) {
+		user = {
+			userdetails:'',
+			anonymous: true
+		}
+	}
 	return (
 		<div>
 			<TopBar/>

@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation"
 import User from "@/lib/models/user"
-import { useEffect, useState } from "react"
 import Follow from '../PostUi/Follow';
 
 interface Props {
