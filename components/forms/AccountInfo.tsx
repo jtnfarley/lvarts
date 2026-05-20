@@ -174,7 +174,11 @@ const AccountInfo = (props:{userdetails: SidebarProfile, saveUser:(user: UpdateU
                 urls: previous.urls
             }))
             setUrlsUpdated(false);
-            dispatchEvent(new Event('profileUpdated'));
+            dispatchEvent(new CustomEvent('profileUpdated', {
+                detail: {
+                    handle: savedUserdetails.handle
+                }
+            }));
         } catch (error) {
             console.error(error);
             setHandleError(error instanceof Error ? error.message : 'Could not save your handle.');

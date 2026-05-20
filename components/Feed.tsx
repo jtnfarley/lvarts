@@ -7,6 +7,7 @@ import PostUi from './PostUi/PostUi';
 import { LoadOldPosts } from './PostUi/LoadOldPosts';
 import { BiRefresh } from "react-icons/bi";
 import { FeedRow } from '@/lib/models/initFeedRow';
+import Link from 'next/link';
 
 export default function Feed(props:{feed:FeedRow[], user:User, getFeedRow:Function, googleMapsApiKey:string | undefined}) {
 	const [feed, setFeed] = useState<FeedRow[]>(props.feed);
@@ -130,7 +131,7 @@ export default function Feed(props:{feed:FeedRow[], user:User, getFeedRow:Functi
 					<LoadOldPosts getOldPosts={getOldPostsFromServer} endOfPosts={endOfPosts}/>
 				</>
 				:
-				<div className='rounded-box flex-row bg-white'>It's quiet. <em>Too quiet.</em> Follow some folks to get in on the action.</div>
+				<div className='rounded-box flex-row bg-white'>It's quiet. <em>Too quiet.</em> Follow some folks, like <Link href='/user/atown_clown' className='text-blue-500'>this clown</Link>, to get in on the action.</div>
 			}
 			</APIProvider>
         </div>

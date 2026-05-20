@@ -17,7 +17,7 @@ export default function LeftSidebar(props:{currentUser:User}) {
 
 	const pathname = usePathname();
 	const loggedInProfile = toSidebarProfile(userdetails);
-	const hasUserDetails = Boolean(userdetails && loggedInProfile);
+	const [hasUserDetails, setHasUserDetails] = useState<boolean>(Boolean(userdetails && loggedInProfile));
 	const profileLabel = currentUser.name || currentUser.email || 'Your account';
 	const targetUserId = hasUserDetails
 		? getProfileUserIdFromPath(pathname) || userdetails?.handle || null
@@ -35,7 +35,7 @@ export default function LeftSidebar(props:{currentUser:User}) {
 
 	const loadProfile = async (handle:string, cancelled:boolean) => {
 			try {
-				const nextProfile = await getSidebarUserProfile(handle)
+				const nextProfile = await getSidebarUserProfile(handle);
 				if (!cancelled) {
 					setProfile(nextProfile || loggedInProfile)
 				}
@@ -65,9 +65,14 @@ export default function LeftSidebar(props:{currentUser:User}) {
 		}
 	}, [currentUser.id, hasUserDetails, targetUserId])
 
-	const handleProfileUpdated = async () => {
+	const handleProfileUpdated = async (ev:Event) => {
+		const cev = ev as CustomEvent;
+
 		if (targetUserId) {
         	loadProfile(targetUserId, cancelled);
+		} else if (cev.detail && cev.detail.handle) {
+			setHasUserDetails(true);
+			loadProfile(cev.detail.handle, cancelled);
 		}
     }
 

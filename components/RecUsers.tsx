@@ -6,10 +6,6 @@ import {currentUser} from "@/app/data/currentUser";
 
 const getRandoUsers = async (userdetailsid?:number):Promise<UserDetails[]> => {
 	'use server'
-
-	if (!userdetailsid) {
-		return [];
-	}
 	
 	const userdetailsCount = await prisma.userdetails.count();
 	if (userdetailsCount) {	
@@ -48,9 +44,6 @@ function shuffle(array:Array<any>):Array<any> {
 
 export default async function RecUsers() {
 	const user = await currentUser();
-	if (!user.userdetails?.id) {
-		return null;
-	}
 
 	const randUsers:Array<UserDetails> = await getRandoUsers(user?.userdetails?.id)
 	
