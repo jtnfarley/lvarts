@@ -20,7 +20,10 @@ export default async function RootLayout({
 	if (!user) {
 		user = {
 			userdetails:{} as UserDetails,
-			anonymous: true
+			anonymous: true,
+			id: 0,
+			createdat: new Date(),
+			updatedat: new Date()
 		}
 	}
 	return (
