@@ -279,7 +279,6 @@ export const savePost = async (postData:any) => {
         id,
         content, 
         lexical, 
-        // headline,
         userdetailsid, 
         posttype, 
         postfile, 
@@ -290,13 +289,8 @@ export const savePost = async (postData:any) => {
         eventname,
         eventdate,  
         privatepost, 
-        // town,
-        // neighborhood,
         venuename,
-        address,
-        // tags,
-        // seeking,
-        // status
+        address
     } = postData
 
     let {venueid, eventid} = postData
@@ -420,8 +414,6 @@ const notifyParentPostAuthor = async (postid:number, senderuserdetailsid:number)
                 postid
             }
         })
-
-        console.log(notificationid)
 
         if (notificationid && notificationid.id) {
             await prisma.userstonotifications.create({

@@ -17,21 +17,15 @@ export default async function uploadFile(params:{file:File, userdir:string}) {
     const fileBuffer = Buffer.from(await file.arrayBuffer());
 
     try {
-    const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-            'AccessKey': ACCESS_KEY,
-            'Content-Type': 'application/octet-stream',
-        },
-        body: fileBuffer
-    });
-
-    // if (response.ok) {
-    //   console.log('File uploaded successfully!');
-    // } else {
-    //   console.error('File upload failed:', response.statusText);
-    // }
+        await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'AccessKey': ACCESS_KEY,
+                'Content-Type': 'application/octet-stream',
+            },
+            body: fileBuffer
+        });
   } catch (error) {
-    console.error('Error during file upload:', error);
+    // console.error('Error during file upload:', error);
   }
 };

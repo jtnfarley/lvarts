@@ -1,10 +1,11 @@
 
 import { prisma } from '@/prisma';
-import { getTextResponse } from '@/app/data/openAI';
+import { getImageResponse } from '@/app/data/openAI';
+import uploadFile from '@/app/actions/fileUploader';
 import { getBotPost } from '@/app/data/botHelper';
 import { savePost } from '@/app/data/posts';
 
-export const hdBot = async (postid:number) => {
+export const baumBot = async (postid:number) => {
     const post = await prisma.posts.findFirst({
         where: {
             id: postid
@@ -21,21 +22,33 @@ export const hdBot = async (postid:number) => {
         text = parsed.root.children[0].children[0].text;
     }
 
-    const prompt = `You are the imagist poet H. D. from Bethlehem, PA. Write a 10-line poem about ${text}`;
+    const prompt = `You are the painter Walter Emerson Baum who founded the Baum School of Art and the Allentown Art Museum. Create a  painting about ${text}`;
 
-    const response = await getTextResponse(prompt, "gpt-5.4-nano");
+    const response = await getImageResponse(prompt);
 
-    const formattedPost = getBotPost(response);
-    const postCreate = {
-        content: formattedPost.content, 
-        lexical: JSON.stringify(formattedPost.lexical), 
-        userdetailsid: 12, 
-        posttype: 'comment', 
-        parentPostId: postid, 
-        edited: false
+    if (response) {
+
+        const name = `${Math.random().toString(36).substring(2, 10)}.png`;
+
+        const file = new File([response], name, {type: 'image/png'})
+
+        await uploadFile({file, userdir: 'baum'})
+
+        const formattedPost = getBotPost('');
+        
+        const postCreate = {
+            content: formattedPost.content, 
+            lexical: JSON.stringify(formattedPost.lexical), 
+            userdetailsid: 13, 
+            posttype: 'comment', 
+            parentPostId: postid, 
+            edited: false,
+            postfile: file.name,
+            postfiletype: file.type
+        }
+
+        await savePost(postCreate);
     }
-
-    await savePost(postCreate);
 }
 
 

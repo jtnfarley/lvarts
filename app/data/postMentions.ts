@@ -1,4 +1,6 @@
 import { extractMentionedUserIdsFromLexical } from "@/lib/mentions";
+import { hdBot } from "@/lib/bots/hd";
+import { baumBot } from "@/lib/bots/baum";
 import { prisma } from "@/prisma";
 
 interface NotifyMentionedUsersParams {
@@ -9,28 +11,36 @@ interface NotifyMentionedUsersParams {
 }
 
 export const notifyMentionedUsers = async ({
-  postid,
-  authorUserDetailsId,
-  lexical,
-  previousLexical,
+	postid,
+	authorUserDetailsId,
+	lexical,
+	previousLexical,
 }: NotifyMentionedUsersParams) => {
-  const previousMentionedUserIds = new Set(
-    extractMentionedUserIdsFromLexical(previousLexical),
-  );
-  const nextMentionedUserIds = [
-    ...new Set(extractMentionedUserIdsFromLexical(lexical)),
-  ].filter(
-    (mentionedUserId) =>
-      mentionedUserId !== authorUserDetailsId &&
-      !previousMentionedUserIds.has(mentionedUserId),
-  );
+	const previousMentionedUserIds = new Set(
+		extractMentionedUserIdsFromLexical(previousLexical),
+	);
+	const nextMentionedUserIds = [
+		...new Set(extractMentionedUserIdsFromLexical(lexical)),
+	].filter(
+		(mentionedUserId) =>
+		mentionedUserId !== authorUserDetailsId &&
+		!previousMentionedUserIds.has(mentionedUserId),
+	);
 
 	if (!nextMentionedUserIds.length) {
 		return;
 	}
 
 	for (const mentionedUserId of nextMentionedUserIds) {
-		console.log(authorUserDetailsId, mentionedUserId)
+		switch (mentionedUserId) {
+			case 12:
+				hdBot(postid).then();
+				return;
+			case 13:
+				baumBot(postid).then();
+				return;
+		}
+
 		const notification = await prisma.notifications.create({
 			data: {
 				notificationtypeid: 4, //mention

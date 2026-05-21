@@ -1,5 +1,4 @@
-import hd from "@/lib/bots/hd";
-import Post from "@/lib/models/post";
+const disclaimer = "This is AI-generated, and has little basis in actual reality. Please don't take it seriously.";
 
 type LexicalTextNode = {
     detail: number;
@@ -54,46 +53,45 @@ const escapeHtml = (text:string) => {
         .replace(/'/g, "&#039;");
 }
 
-export const getBotPost = (botName:string):BotPost | null => {
-    const post = getPostByBotName(botName);
-    return post;
+export const getBotPost = (content:string) => {
+    return getFormattedPost(content);
 }
 
-const getPostByBotName = (botName:string):BotPost | null => {
-    switch(botName) {
-        case 'hd':
-            return getHdPost();
-        default:
-            return null;
-    }
-}
+// const getPostByBotName = (botName:string):BotPost | null => {
+//     switch(botName) {
+//         case 'hd':
+//             return getHdPost();
+//         default:
+//             return null;
+//     }
+// }
 
-const getHdPost = ():BotPost | null => {
-    const userid = '69f7ad802f33441ec3cc373d';
-    const hdPoems = hd;
-    const hdPoem = hdPoems[Math.floor(Math.random() * hdPoems.length)]
+// const getHdPost = ():BotPost | null => {
+//     const userid = '69f7ad802f33441ec3cc373d';
+//     const hdPoems = 'hd';
+//     const hdPoem = hdPoems[Math.floor(Math.random() * hdPoems.length)]
 
-    if (!hdPoem) {
-        return null;
-    }
+//     if (!hdPoem) {
+//         return null;
+//     }
 
-    const formattedPost = getFormattedPost(hdPoem.lines);
+//     const formattedPost = getFormattedPost(hdPoem.lines);
 
-    if (hdPoem) {
-        if (hdPoem.title) {
-            formattedPost.content = `<p class="editor-paragraph"><b><strong class="editor-text-bold" style="white-space: pre-wrap;">${escapeHtml(hdPoem.title)}</strong></b></p>${formattedPost.content}`;
-            formattedPost.lexical.root.children.unshift(createParagraphNode(hdPoem.title, 1));
-        }
-    }
+//     if (hdPoem) {
+//         if (hdPoem.title) {
+//             formattedPost.content = `<p class="editor-paragraph"><b><strong class="editor-text-bold" style="white-space: pre-wrap;">${escapeHtml(hdPoem.title)}</strong></b></p>${formattedPost.content}`;
+//             formattedPost.lexical.root.children.unshift(createParagraphNode(hdPoem.title, 1));
+//         }
+//     }
 
-    return {
-        content: formattedPost.content,
-        lexical: JSON.stringify(formattedPost.lexical),
-        posttype: 'post',
-        userid,
-        edited: false,
-    };
-}
+//     return {
+//         content: formattedPost.content,
+//         lexical: JSON.stringify(formattedPost.lexical),
+//         posttype: 'post',
+//         userid,
+//         edited: false,
+//     };
+// }
 
 const getFormattedPost = (text:string) => {
     const lines:{
@@ -134,6 +132,8 @@ const getFormattedPost = (text:string) => {
 
         return `<p class="editor-paragraph">${paragraphLines.join('<br>')}</p>`;
     }).join('');
+
+    lines.content += `<p class="editor-paragraph"><em>${disclaimer}</em></p>`;
 
     lines.lexical.root.children = paragraphs.map((paragraph) => createParagraphNode(
         paragraph
