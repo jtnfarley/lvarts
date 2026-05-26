@@ -1,6 +1,6 @@
 import { extractMentionedUserIdsFromLexical } from "@/lib/mentions";
 import { hdBot } from "@/lib/bots/hd";
-import { baumBot } from "@/lib/bots/baum";
+import { imageBot } from "@/lib/bots/imageBot";
 import { prisma } from "@/prisma";
 
 interface NotifyMentionedUsersParams {
@@ -37,7 +37,12 @@ export const notifyMentionedUsers = async ({
 				hdBot(postid).then();
 				return;
 			case 13:
-				baumBot(postid).then();
+				const prompt = `You are the painter Walter Emerson Baum who founded the Baum School of Art and the Allentown Art Museum. Create a painting about`;
+				imageBot({postid, prompt, userdetailsid: 13, userdir: 'baum'}).then();
+				return;
+			case 14:
+				const prompt2 = `You are the painter Ella Sophonisba Hergesheimer. Create a painting about`;
+				imageBot({postid, prompt: prompt2, userdetailsid: 14, userdir: 'hergesheimer'}).then();
 				return;
 		}
 

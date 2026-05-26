@@ -55,7 +55,7 @@ export default function LandingPage() {
 	}
 
     return (
-        <div className="flex items-center justify-center h-screen bg-gray-900/25">
+        <div className="flex items-center justify-center h-screen ">
             <div className="p-5 gap-2 bg-gray-900/25 backdrop-blur-sm rounded-2xl xl:w-[600px]">
                 <div className="flex justify-center">
                     <Image

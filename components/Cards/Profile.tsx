@@ -38,7 +38,7 @@ export default function Profile(props:{profile:SidebarProfile, user:User, getUpd
 	}, [profile.biohtml]);
 
 	return (	
-        <div className="flex min-h-0 flex-1 flex-col px-5 py-8 bg-gray-700/30 rounded-tr-md w-full">
+        <div className="flex min-h-0 flex-1 flex-col px-5 py-8 bg-gray-900/40 rounded-tr-md w-full">
             {profile && user && user.userdetails && profile.id === user.userdetails.id && 
                 <div className="w-full flex justify-center mb-8 text-gray-400">
                     <button onClick={() => redirect(`/profile`)} className="cursor-pointer"><BiEdit className="inline"/> Edit Profile</button>

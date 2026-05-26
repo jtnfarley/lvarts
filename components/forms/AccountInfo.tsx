@@ -113,8 +113,8 @@ const AccountInfo = (props:{userdetails: SidebarProfile, saveUser:(user: UpdateU
 
             if (file.type.match(/image/)) {
                 fileUrl = await compressImage(file, 100, 100);
-                fileObj.type = 'image/png';
-                fileObj.name = file.name.split('.')[0] +'.png';
+                fileObj.type = 'image/webp';
+                fileObj.name = file.name.split('.')[0] +'.webp';
             } 
 
             fileObj.url = fileUrl || '';

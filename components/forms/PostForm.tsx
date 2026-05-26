@@ -12,13 +12,15 @@ import uploadFile from "@/app/actions/fileUploader";
 import User from "@/lib/models/user";
 import Post from "@/lib/models/post";
 import MediaUpload from "@/components/PostUi/MediaUpload"
-import { compressImage } from "@/lib/utils";
+import { compressImage, subjects, objects, adjectives } from "@/lib/utils";
 import OptimizedFile from "@/lib/models/optimizedFile";
 import { Spinner } from "../layout/Spinner";
 import imageUrl from "@/constants/imageUrl";
 import { isSceneScheduledPostType } from "@/lib/scenePosts";
 import { BiCalendar } from "react-icons/bi";
 import { searchVenues, type VenueSuggestion } from "@/app/actions/venues";
+import { getAITextResponse } from "@/app/actions/openAIBridge";
+import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
 
 interface Props {
     savePost:Function,
@@ -53,11 +55,13 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
     const [tempImage, setTempImage] = useState<OptimizedFile | undefined>();
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [saved, setSaved] = useState<boolean>(false);
+    const [isAIIfied, setIsAIIfied] = useState<boolean>(false);
     const [venueQuery, setVenueQuery] = useState(post?.venues?.venuename ?? post?.venuename ?? '');
     const [venueSuggestions, setVenueSuggestions] = useState<VenueSuggestion[]>([]);
     const [isVenueSearchOpen, setIsVenueSearchOpen] = useState(false);
     const [isVenueSearching, setIsVenueSearching] = useState(false);
-    const editorRef: any = useRef(null);
+    const contentBackup = useRef<string[]>([]);
+    const editorRef:any = useRef(null);
     const parentPostId = post?.parentPostId !== undefined ? post.parentPostId.toString() : undefined;
     const id = post?.id ?? undefined;
     const content = post?.lexical ?? "";
@@ -70,7 +74,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
     const address = post?.events?.venues?.address ?? post?.address ?? '';
     const venueid = post?.events?.venueid ?? post?.venueid ?? undefined;
     // const isScenePost = isSceneCommunityPostType(resolvedPostType)
-    const isScheduledPost = isSceneScheduledPostType(resolvedPostType)
+    const isScheduledPost = isSceneScheduledPostType(resolvedPostType);
 
     const defaultValues = {
         userdetailsid: user.userdetails?.id,
@@ -86,7 +90,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
         address,
         venueid
     }
-    
+
     const { register, handleSubmit, setValue, control, reset, formState: { errors, isSubmitSuccessful } } = useForm<z.infer<typeof PostValidation>>({
         resolver: zodResolver(PostValidation),
         defaultValues
@@ -121,19 +125,9 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
             values.lexical = JSON.stringify(lexical);
         }
 
-        // values.headline = normalizeOptionalValue(values.headline)
         values.eventname = normalizeOptionalValue(values.eventname)
         values.venuename = normalizeOptionalValue(values.venuename)
         values.address = normalizeOptionalValue(values.address)
-        // values.tags = normalizeOptionalValue(
-        //     values.tags
-        //         ?.split(',')
-        //         .map((tag) => tag.trim())
-        //         .filter(Boolean)
-        //         .join(', ')
-        // )
-        // values.seeking = normalizeOptionalValue(values.seeking)
-        // values.status = normalizeOptionalValue(values.status)
 
         let userdir, postfileUrl;
 
@@ -193,8 +187,8 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
 
             if (file.type.match(/image/)) {
                 fileUrl = await compressImage(file);
-                fileObj.type = 'image/png';
-                fileObj.name = file.name.split('.')[0] +'.png';
+                fileObj.type = 'image/webp';
+                fileObj.name = file.name.split('.')[0] +'.webp';
             } else if (file.type.match(/audio/)){
                 fileUrl = URL.createObjectURL(file);
                 fileObj.type = file.type;
@@ -267,6 +261,93 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
         setIsVenueSearchOpen(false);
     }
 
+    const aiIfy = async () => {
+        if (!editorRef.current) {
+            return;
+        }
+
+        const text = editorRef.current.getEditorState().read(() => $getRoot().getTextContent().trim());
+
+        if (!text) {
+            return;
+        }
+
+        setIsSaving(true);
+        contentBackup.current.push(text);
+        const subject = subjects[Math.floor(Math.random() * subjects.length)];
+        const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+        const object = objects[Math.floor(Math.random() * objects.length)];
+        const adjective2 = adjectives[Math.floor(Math.random() * adjectives.length)];
+        const adjective3 = adjectives[Math.floor(Math.random() * adjectives.length)];
+        const article = /^[aeiou]/i.test(adjective) ? 'an' : 'a';
+        const article2 = /^[aeiou]/i.test(adjective2) ? 'an' : 'a';
+        const prompt = `You are a ${adjective} ${subject} with a ${adjective2} ${object}. Write a ${adjective3} tweet about ${text}. Do not use emojis.`
+
+        try {
+            const res = await getAITextResponse(prompt);
+
+            editorRef.current.update(() => {
+                const root = $getRoot();
+                const lines = res.split(/\r?\n/);
+
+                root.clear();
+
+                lines.forEach((line) => {
+                    const paragraph = $createParagraphNode();
+
+                    if (line.length > 0) {
+                        paragraph.append($createTextNode(line));
+                    }
+
+                    root.append(paragraph);
+                });
+                const paragraph = $createParagraphNode();
+                const note = $createTextNode(`Post formatted by AI pretending to be ${article} ${adjective} ${subject} with ${article2} ${adjective2} ${object}.`);
+                note.setFormat('italic');
+                paragraph.append(note);
+
+                root.append(paragraph);
+
+                if (lines.length === 0) {
+                    root.append($createParagraphNode());
+                }
+
+                root.selectEnd();
+            });
+
+            setIsAIIfied(true);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsSaving(false);
+        }
+    }
+
+    const resetPost = () => {
+        if (!editorRef.current) {
+            return;
+        }
+
+        try {
+            editorRef.current.update(() => {
+                const root = $getRoot();
+                root.clear();
+
+                if (contentBackup.current && contentBackup.current && contentBackup.current.length) {
+                    const paragraph = $createParagraphNode();
+                    const note = $createTextNode(contentBackup.current[0]);
+                    paragraph.append(note);
+
+                    root.append(paragraph);
+                }
+            });
+        } catch (error) {
+            console.error(error);
+        }
+
+        setIsAIIfied(false);
+    }
+
     const handleEditorUpdated = () => {
         setClearEditor(false);
     }
@@ -284,67 +365,6 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
 			<div>
-                {/* {isScenePost &&
-                    <div className="mb-4 rounded-2xl border border-orange/40 bg-orange/5 p-4">
-                        <div className="text-lg font-semibold">{typeLabel}</div>
-                        <div className="text-sm text-gray-600">
-                            {resolvedPostType === 'collab' && 'Post a call for bandmates, artists, vendors, volunteers, or collaborators.'}
-                            {resolvedPostType === 'recommendation' && 'Ask the Valley where to go, who to book, or what to check out.'}
-                            {resolvedPostType === 'openmic' && 'Track an upcoming open mic with time, place, and the vibe people should expect.'}
-                            {resolvedPostType === 'jam' && 'Share an upcoming jam session so people can find it on the tracker and scene map.'}
-                        </div>
-                    </div>
-                }
-
-                {isScenePost && !isScheduledPost &&
-                    <div className="mb-4">
-                        <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Headline</div>
-                        <input
-                            {...register('headline')}
-                            className="w-full rounded-xl border border-gray-300 px-3 py-2"
-                            placeholder={resolvedPostType === 'collab' ? 'Need a bassist for South Side indie set' : 'Best cozy venue for acoustic nights?'}
-                        />
-                    </div>
-                }
-
-                {isScenePost &&
-                    <div className="mb-4 grid gap-4 md:grid-cols-2">
-                        <div>
-                            <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Tags</div>
-                            <input
-                                {...register('tags')}
-                                className="w-full rounded-xl border border-gray-300 px-3 py-2"
-                                placeholder="indie, synth, diy, jazz"
-                            />
-                        </div>
-                        {(resolvedPostType === 'collab' || resolvedPostType === 'recommendation') &&
-                            <div>
-                                <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Status</div>
-                                <select
-                                    {...register('status')}
-                                    className="w-full rounded-xl border border-gray-300 px-3 py-2"
-                                >
-                                    <option value="">Select a status</option>
-                                    {statusOptions.map((status) => (
-                                        <option key={status} value={status}>{status}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        }
-                    </div>
-                }
-
-                {resolvedPostType === 'collab' &&
-                    <div className="mb-4">
-                        <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Seeking</div>
-                        <input
-                            {...register('seeking')}
-                            className="w-full rounded-xl border border-gray-300 px-3 py-2"
-                            placeholder="Drummer who can handle post-punk and late rehearsals"
-                        />
-                    </div>
-                } */}
-
                 {isScheduledPost &&
                     <div>
                         <div className="mb-4 grid gap-4 md:grid-cols-2">
@@ -477,6 +497,17 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
                                 Post Saved
                             </div>
                         }
+
+                        {
+                            isAIIfied &&
+                            <button onClick={() => resetPost()} type='button' className="bg-gray-900 me-2 px-2 py-2 rounded text-white font-semibold cursor-pointer disabled:bg-orange-200">
+                                Reset
+                            </button>
+                        }
+
+                        <button onClick={() => aiIfy()} type='button' className="bg-white border border-gray-500 me-2 px-2 py-2 rounded text-gray-500 uppercase font-semibold cursor-pointer disabled:bg-orange-200" disabled={(isSaving) ? true : false}>
+                            AI-ify
+                        </button>
     
                         <button type='submit' className="bg-orange px-2 py-2 rounded text-white uppercase font-semibold cursor-pointer disabled:bg-orange-200" disabled={(isSaving) ? true : false}>
                             Post

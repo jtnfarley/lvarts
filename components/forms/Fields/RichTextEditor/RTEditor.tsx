@@ -28,6 +28,7 @@ import { EmojiNode } from "./nodes/EmojiNode";
 import { EmojiPlugin } from "./plugins/EmojiPlugin";
 import { UserMentionNodes } from "./nodes/UserMentionNode";
 import MentionsPlugin from "./plugins/MentionsPlugin";
+import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
 // import TreeViewPlugin from "./plugins/TreeViewPlugin";
 
 const EditorCapturePlugin = React.forwardRef((props: any, ref: any) => {
@@ -74,6 +75,7 @@ export default function RTEditor(props:{
 			<div className="editor-container">
 				<ToolbarPlugin />
 				<div className="editor-inner">
+					<EditorRefPlugin editorRef={props.ref} />
 					<RichTextPlugin
 						contentEditable={
 							<ContentEditable

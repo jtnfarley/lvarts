@@ -37,7 +37,7 @@ export default async function RecUsers() {
 
 	return (
 		<section>
-			<div className="flex justify-between xl:w-full xl:flex-col rounded-tl-lg rounded-bl-lg xl:bg-gray-700/30 xl:p-6">
+			<div className="flex justify-between xl:w-full xl:flex-col rounded-tl-lg rounded-bl-lg xl:bg-gray-900/40 xl:p-6">
 				<div className='hidden text-gray-300 font-bold text-md uppercase xl:flex justify-center'>Your Next Best Friend</div>
 				<RecUsersShuffler randUsers={randUsers} user={user}/>
 			</div>			

@@ -17,7 +17,7 @@ export default function PostHeader(props:{postData:FeedRow, user:User, currentUs
 
     return (
 		<div className='flex flex-row xl:px-3 pt-3'>
-			<Link href={`/user/${post.userdetails?.id}`} title={`${profileLabel}'s profile`} className='flex flex-row gap-3'>
+			<Link href={`/user/${post.userdetails?.handle}`} title={`${profileLabel}'s profile`} className='flex flex-row gap-3'>
 				<div><img src={avatar} className='rounded-md border-2 border-orange-300 w-[60px] h-[60px]'/></div>
 				<div>
 					<div className='text-lg font-bold'>{profileLabel}</div>

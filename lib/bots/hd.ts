@@ -3,6 +3,7 @@ import { prisma } from '@/prisma';
 import { getTextResponse } from '@/app/data/openAI';
 import { getBotPost } from '@/app/data/botHelper';
 import { savePost } from '@/app/data/posts';
+import { randoLineCount, parseText } from '../utils';
 
 export const hdBot = async (postid:number) => {
     const post = await prisma.posts.findFirst({
@@ -17,13 +18,12 @@ export const hdBot = async (postid:number) => {
     let text = '';
 
     if (post && post.lexical) {
-        const parsed = JSON.parse(post.lexical);
-        text = parsed.root.children[0].children[0].text;
+        text = parseText(post.lexical);
     }
 
-    const prompt = `You are the imagist poet H. D. from Bethlehem, PA. Write a 10-line poem about ${text}`;
+    const prompt = `You are the imagist poet H. D. Write a ${randoLineCount}-line poem about ${text}`;
 
-    const response = await getTextResponse(prompt, "gpt-5.4-nano");
+    const response = await getTextResponse(prompt);
 
     const formattedPost = getBotPost(response);
     const postCreate = {

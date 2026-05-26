@@ -1,4 +1,7 @@
+'use server'
+
 import OpenAI from 'openai';
+import sharp from 'sharp';
 
 interface AIRequest {
     model: string,
@@ -11,11 +14,11 @@ interface AIImageRequest {
     prompt: string
 }
 
-export const getTextResponse = async (prompt:string, model:string, tools?:string[]) => {
+export const getTextResponse = async (prompt:string, tools?:string[]) => {
     const client = new OpenAI();
 
     const request = {
-        model,
+        model: "gpt-5.4-nano",
         input: prompt
     } as AIRequest
 
@@ -47,9 +50,20 @@ export const getImageResponse = async (prompt:string) => {
     const response = await client.images.generate(request);
 
     if (response && response.data && response.data.length && response.data[0].b64_json) {
-        const image_base64 = await fetch(`data:image/jpeg;base64,${response.data[0].b64_json}`);
-        const image_bytes = image_base64.blob();
+        const imageBuffer = Buffer.from(response.data[0].b64_json, 'base64');
+        const optimizedImageBuffer = await sharp(imageBuffer)
+            .resize({
+                width: 800,
+                height: 800,
+                fit: 'inside',
+                withoutEnlargement: true
+            })
+            .webp({
+                quality: 70,
+                effort: 6
+            })
+            .toBuffer();
 
-        return image_bytes;
+        return new Blob([optimizedImageBuffer], { type: 'image/webp' });
     }
 }

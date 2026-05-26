@@ -36,7 +36,7 @@ export default function RecUsersShuffler(props:{randUsers:UserDetails[], user:Us
 	}, [])
 
 	return (
-		<div>
+		<div className="w-full flex justify-between xl:block ">
 			{shuffledUsers && shuffledUsers.length && 
 				shuffledUsers.length > 0 ? (
 					<>

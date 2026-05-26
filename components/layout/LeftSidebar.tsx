@@ -101,7 +101,7 @@ export default function LeftSidebar(props:{currentUser:User}) {
 			<div className="flex min-h-0 w-full flex-1 flex-col">
 				<div className="mt-4 flex min-h-0 flex-1 flex-col overflow-hidden">
 					{isAnonymous &&
-						<div className="flex min-h-0 flex-1 flex-col justify-center rounded-tr-md bg-gray-700/30 px-5 py-8 text-center text-gray-300">
+						<div className="flex min-h-0 flex-1 flex-col justify-center rounded-tr-md bg-gray-900/40 px-5 py-8 text-center text-gray-300">
 							<div className="text-xl font-bold uppercase">{profileLabel}</div>
 							<div className="mt-3 text-sm text-gray-400">
 								Come play with us, Danny.
@@ -115,7 +115,7 @@ export default function LeftSidebar(props:{currentUser:User}) {
 						</div>
 					}
 					{!hasUserDetails && !isAnonymous &&
-						<div className="flex min-h-0 flex-1 flex-col justify-center rounded-tr-md bg-gray-700/30 px-5 py-8 text-center text-gray-300">
+						<div className="flex min-h-0 flex-1 flex-col justify-center rounded-tr-md bg-gray-900/40 px-5 py-8 text-center text-gray-300">
 							<div className="text-xl font-bold uppercase">{profileLabel}</div>
 							<div className="mt-3 text-sm text-gray-400">
 								Complete your profile to unlock the feed and the rest of the app.

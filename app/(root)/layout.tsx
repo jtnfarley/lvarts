@@ -27,7 +27,7 @@ export default async function RootLayout({
 		: [];
 
 	return (
-		<div className="bg-gray-800/80 backdrop-blur-sm ">
+		<div className="bg-amber-800/50 backdrop-blur-sm ">
 			<Initializer followers={userFollows.followers} following={userFollows.following} likes={userLikes}/>
 			<TopBar/>
 			<main className="flex flex-row justify-between">

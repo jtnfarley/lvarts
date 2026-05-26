@@ -4,8 +4,13 @@ import { getImageResponse } from '@/app/data/openAI';
 import uploadFile from '@/app/actions/fileUploader';
 import { getBotPost } from '@/app/data/botHelper';
 import { savePost } from '@/app/data/posts';
+import { parseText } from '../utils';
 
-export const baumBot = async (postid:number) => {
+export const imageBot = async (postObj:{postid:number, prompt:string, userdetailsid:number, userdir:string}) => {
+    const {postid, prompt, userdetailsid, userdir} = postObj;
+
+    if (!postid || !prompt || !userdetailsid || !userdir) return;
+    
     const post = await prisma.posts.findFirst({
         where: {
             id: postid
@@ -18,28 +23,27 @@ export const baumBot = async (postid:number) => {
     let text = '';
 
     if (post && post.lexical) {
-        const parsed = JSON.parse(post.lexical);
-        text = parsed.root.children[0].children[0].text;
+        text = parseText(post.lexical);
     }
+    
+    const fullPrompt = `${prompt} ${text}`;
 
-    const prompt = `You are the painter Walter Emerson Baum who founded the Baum School of Art and the Allentown Art Museum. Create a  painting about ${text}`;
-
-    const response = await getImageResponse(prompt);
+    const response = await getImageResponse(fullPrompt);
 
     if (response) {
 
-        const name = `${Math.random().toString(36).substring(2, 10)}.png`;
+        const name = `${Math.random().toString(36).substring(2, 10)}.webp`;
 
-        const file = new File([response], name, {type: 'image/png'})
+        const file = new File([response], name, {type: 'image/webp'})
 
-        await uploadFile({file, userdir: 'baum'})
+        await uploadFile({file, userdir})
 
         const formattedPost = getBotPost('');
         
         const postCreate = {
             content: formattedPost.content, 
             lexical: JSON.stringify(formattedPost.lexical), 
-            userdetailsid: 13, 
+            userdetailsid, 
             posttype: 'comment', 
             parentPostId: postid, 
             edited: false,

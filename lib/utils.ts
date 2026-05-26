@@ -44,7 +44,7 @@ export const formatDate = (date:Date | null | undefined):string => {
 export const compressImage = (file:File, maxWidth = 800, maxHeight = 600):Promise<string | undefined> => {
 	return new Promise((resolve, reject) => {
 		
-		const quality = 1;
+		const quality = 0.7;
 		const img = new Image();
 		const reader = new FileReader();
 
@@ -72,7 +72,7 @@ export const compressImage = (file:File, maxWidth = 800, maxHeight = 600):Promis
 
 			if (ctx) {
 				ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-				const compressedDataUrl = canvas.toDataURL('image/png', quality);
+				const compressedDataUrl = canvas.toDataURL('image/webp', quality);
 				resolve(compressedDataUrl);
 			} else {
 				reject();
@@ -109,3 +109,35 @@ export const toSidebarProfile = (userdetails?:UserDetails | null): SidebarProfil
 		urls: []
 	}
 }
+
+
+export const subjects = [
+	'clown', 'doctor', 'dancer', 'poet', 'painter', 'rock musician', 'punk musician', 'classical musician', 'hippie', 'yuppie', 'stoner','priest', 'priestess', 'fiction writer', 'film writer', 'politician', 'accident lawyer', 'AI chatbot'
+];
+
+export const objects = [
+	'clown', 'monkey', 'llama', 'poet', 'cheeseburger', 'l.s.d tab', 'volcano', 'nose', 'hippie', 'yuppie', 'drug','hat', 'underwear', 'book', 'television', 'broken computer', 'spaceship', 'cow', 'guitar', 'piano', 'rainbow', 'personality', 'cell phone', 'hip waders'
+];
+
+export const adjectives = [
+	'drunk', 'stoned', 'horny', 'angry', 'elegant', 'obnoxious', 'breezy', 'nebulous', 'moronic', 'sleepy', 'claustrophobic', 'arachnophobic', 'gothic', 'greasy', 'clammy', 'feverish', 'tripping', 'psychedelic', 'smokey', 'sublime', 'ecstatic', 'blind', 'deaf', 'clumsy', 'cordial', 'grotesque', 'dying', 'sad', 'melancholic', 'fat', 'smooth', 'colorful', 'blue', 'purple', 'rainbow'
+];
+
+export const parseText = (text:string):string => {
+	const parsed = JSON.parse(text);
+
+	let returnText = '';
+
+	if (!parsed || !parsed.root || !parsed.root.children || !parsed.root.children.length) return '';
+
+	for (const child of parsed.root.children) {
+		for (const line of child.children) {
+			if (line.trigger && line.trigger === '@') continue;
+			returnText += line.text + ' ';
+		}
+	}
+
+	return returnText;
+}
+
+export const randoLineCount = Math.floor(Math.random() * 10) + 5;
