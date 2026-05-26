@@ -63,7 +63,8 @@ export const getImageResponse = async (prompt:string) => {
                 effort: 6
             })
             .toBuffer();
+        const optimizedImageBytes = new Uint8Array(optimizedImageBuffer);
 
-        return new Blob([optimizedImageBuffer], { type: 'image/webp' });
+        return new Blob([optimizedImageBytes], { type: 'image/webp' });
     }
 }
