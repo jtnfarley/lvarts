@@ -66,7 +66,7 @@ export default function EventsByMonth(props:{events:FeedRow[]}) {
 								return (	
 									<div className='month w-full flex flex-col flex-shrink-0 items-center' key={i}>
 										<EventsByMonthHeader month={name} year={getYear(events)} forward={forward} back={back}/>
-										<div  className="lg:grid lg:grid-cols-3 md:flex md:flex-col gap-4">
+										<div  className="flex flex-col gap-10 w-full">
 										{
 											events.map((post:FeedRow) => {
 												return (

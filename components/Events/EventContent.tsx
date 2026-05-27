@@ -4,12 +4,11 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import parse from 'html-react-parser';
 import createDOMPurify from 'dompurify';
-import PostMedia from './PostMedia';
-import PostTemplateTags from './PostTemplateTags';
-import { formatDate } from '@/lib/utils';
+import PostTemplateTags from '../PostUi/PostTemplateTags';
 import { FeedRow } from '@/lib/models/initFeedRow';
+import imageUrl from '@/constants/imageUrl';
 
-export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string | undefined}) {
+export default function EventContent(props:{post:FeedRow, googleMapsApiKey:string | undefined}) {
     const post = props.post;
 	const [cleanContent, setCleanContent] = useState<string>(post.content || '');
 	const [templateTagArr, setTemplateTagArr] = useState<Array<{
@@ -21,6 +20,7 @@ export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string
     // const postTags = splitPostTags(post.tags)
     const venuename = post.venuename
     const address = post.address
+	const imageFile = (post.postfile) ? imageUrl+"/"+post.userdetails!.userdir+"/"+post.postfile : undefined;
 
 	const parseTemplateTags = (post:string) => {
 		let placeholder = post;
@@ -123,35 +123,42 @@ export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string
 
     return (
 		<div>
-			<div className='postContent'>
+			<div className='flex'>
+				<div className='h-50 w-full max-w-50' style={{ 
+					background: (imageFile) ? `url(${imageFile})` : '#111', 
+					backgroundPosition: 'center',
+					backgroundSize: '300px 300px',
+					backgroundRepeat: 'no-repeat'
+				}}>
+					{
+						post.eventdate &&
+							<div className='mb-5 px-3 text-white h-full w-full backdrop-blur-xs flex flex-col justify-center items-center text-5xl font-black'>
+								{post.eventdate.getDate()}
+								<div className='text-lg mt-3 font-normal'>{(post.eventdate.getHours() > 12) ? post.eventdate.getHours() - 12 : post.eventdate.getHours()}:{(post.eventdate.getMinutes().toString().length < 2) ? `0${post.eventdate.getMinutes()}` : post.eventdate.getMinutes()}</div>
+							</div>
+					}
+				</div>
 				{
 					displayTitle &&
-						<div className='text-2xl font-bold px-3 pt-3'><Link href={`/post/${post.id}`} title={displayTitle}>{displayTitle}</Link></div>
+						<div className='text-xl font-bold p-5 flex-1'>
+							<div className='mb-5'><Link href={`/post/${post.id}`} title={displayTitle}>{displayTitle}</Link></div>
+							{ cleanContent && 
+								<div className='font-normal text-sm'>
+									<div>{parse(cleanContent)}</div>
+								</div>
+							}
+						</div>
 				}
-				{
-					post.eventdate &&
-						<div className='mb-5 text-lg px-3'>{formatDate(post.eventdate)}</div>
-				}
-
 				{
 					(venuename || address) &&
-						<div className='mb-4 rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-700'>
-							<div className='flex flex-col gap-x-4 gap-y-1'>
-								{venuename && <div className='text-lg'>At <strong>{venuename}</strong></div>}
-								{address && <div><strong><a href={getMapLink(address)} target='_blank' className='text-blue-600'>Map</a></strong></div>}
+						<div className='mb-4 rounded-2xl bg-gray-50 px-4 py-3 text-gray-700 flex justify-center items-center max-w-50'>
+							<div className='flex flex-col gap-x-4 gap-y-1 items-center'>
+								{venuename && <div className='text-center'><strong>@ {venuename}</strong></div>}
+								{address && <div><strong><a href={getMapLink(address)} target='_blank' className='text-blue-600 text-sm'>Map</a></strong></div>}
 							</div>
 						</div>
 				}
-				{ cleanContent && 
-					<div>
-						<div className='flex justify-end text-xs mb-2 me-2 italic'>{post.createdat.toDateString()}</div>
-						<div>{parse(cleanContent)}</div>
-						<div className='text-sm pt-2 italic text-gray-1 px-[13px]'>{(post.edited) ? 'edited' : ''}</div>
-					</div>
-				}
 			</div>
-
-			<PostMedia post={post}/>
 
 			{templateTagArr && templateTagArr.length &&
 				<PostTemplateTags templateTags={templateTagArr} googleMapsApiKey={props.googleMapsApiKey}/>
