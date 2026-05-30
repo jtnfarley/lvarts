@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import {prisma} from '@/prisma'
 import UserDetails from '@/lib/models/userDetails'
 import { generateUniqueHandle, resolveHandle } from './handles'
@@ -138,7 +139,36 @@ interface FollowUserParams {
     followinguserdetailsid: number
 }
 
-export const followUserDAL = async ({userdetailsid, followinguserdetailsid}:FollowUserParams) => {
+const hasValidFollowUsers = async ({userdetailsid, followinguserdetailsid}: FollowUserParams) => {
+    if (
+        !Number.isInteger(userdetailsid) ||
+        !Number.isInteger(followinguserdetailsid) ||
+        userdetailsid <= 0 ||
+        followinguserdetailsid <= 0 ||
+        userdetailsid === followinguserdetailsid
+    ) {
+        return false
+    }
+
+    const users = await prisma.userdetails.findMany({
+        where: {
+            id: {
+                in: [userdetailsid, followinguserdetailsid]
+            }
+        },
+        select: {
+            id: true
+        }
+    })
+
+    return users.length === 2
+}
+
+export const followUserDAL = async ({userdetailsid, followinguserdetailsid}:FollowUserParams): Promise<boolean> => {
+    if (!await hasValidFollowUsers({ userdetailsid, followinguserdetailsid })) {
+        return false
+    }
+
     const alreadyFollowing = await prisma.followers.findFirst({
         where: {
             userdetailsid, 
@@ -146,41 +176,60 @@ export const followUserDAL = async ({userdetailsid, followinguserdetailsid}:Foll
         }
     })
 
-    if (alreadyFollowing) return;
+    if (alreadyFollowing) return true;
 
-    await prisma.followers.create({
-        data: {
-            userdetailsid, 
-            followinguserdetailsid
-        }
-    })
+    try {
+        await prisma.$transaction(async (tx) => {
+            await tx.followers.create({
+                data: {
+                    userdetailsid,
+                    followinguserdetailsid
+                }
+            })
 
-    const noti = await prisma.notifications.create({
-        data: {
-           notificationtypeid: 3,
-           read: false,
-           createdat: new Date()
-        }
-    })
+            const noti = await tx.notifications.create({
+                data: {
+                   notificationtypeid: 3,
+                   read: false,
+                   createdat: new Date()
+                }
+            })
 
-    if (noti) {
-        await prisma.userstonotifications.create({
-            data: {
-                notificationid: noti.id,
-                senderuserdetailsid: userdetailsid,
-                receiveruserdetailsid: followinguserdetailsid
-            }
+            await tx.userstonotifications.create({
+                data: {
+                    notificationid: noti.id,
+                    senderuserdetailsid: userdetailsid,
+                    receiveruserdetailsid: followinguserdetailsid
+                }
+            })
         })
+    } catch (error) {
+        if (
+            error instanceof Prisma.PrismaClientKnownRequestError &&
+            (error.code === 'P2002' || error.code === 'P2003')
+        ) {
+            return false
+        }
+
+        throw error
     }
+
+    return true
 }
 
-export const unfollowUserDAL = async ({userdetailsid, followinguserdetailsid}:FollowUserParams) => {
+export const unfollowUserDAL = async ({userdetailsid, followinguserdetailsid}:FollowUserParams): Promise<boolean> => {
+    if (!await hasValidFollowUsers({ userdetailsid, followinguserdetailsid })) {
+        return false
+    }
+
     await prisma.followers.deleteMany({
         where: {
             userdetailsid, 
             followinguserdetailsid
         }
     })
+
+    return true
 }
 
 

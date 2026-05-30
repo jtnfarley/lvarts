@@ -13,23 +13,44 @@ export default function Follow(props:{followinguserdetailsid:number, user:User})
 	const user = props.user;
 	const [isHovered, setIsHovered] = useState(false);
 	const [isFollowing, setIsFollowing] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const following = useFollowsStore((state) => state.following);
     const addFollowing = useFollowsStore((state) => state.addFollowing);
     const removeFollowing = useFollowsStore((state) => state.removeFollowing);
 
 	const toggleFollow = async () => {
-		if (!user || !user.userdetails || !followinguserdetailsid) return;
+		if (
+			!user ||
+			!user.userdetails ||
+			!followinguserdetailsid ||
+			isSubmitting ||
+			user.userdetails.id === followinguserdetailsid
+		) return;
 
-		if (isFollowing) {
-			await unfollowUser({userdetailsid:user.userdetails.id, followinguserdetailsid});
-			removeFollowing(followinguserdetailsid);
-			setIsFollowing(false);
-			return;
-		}   
+		setIsSubmitting(true);
 
-		await followUser({userdetailsid:user.userdetails.id, followinguserdetailsid});
-		addFollowing(followinguserdetailsid);
-		setIsFollowing(true);
+		try {
+			if (isFollowing) {
+				const success = await unfollowUser({userdetailsid:user.userdetails.id, followinguserdetailsid});
+
+				if (!success) return;
+
+				removeFollowing(followinguserdetailsid);
+				setIsFollowing(false);
+				return;
+			}
+
+			const success = await followUser({userdetailsid:user.userdetails.id, followinguserdetailsid});
+
+			if (!success) return;
+
+			addFollowing(followinguserdetailsid);
+			setIsFollowing(true);
+		} catch (error) {
+			console.error('Failed to toggle follow state', error);
+		} finally {
+			setIsSubmitting(false);
+		}
 	}
 
 	useEffect(() => {
@@ -42,6 +63,7 @@ export default function Follow(props:{followinguserdetailsid:number, user:User})
 		<div className='flex flex-grow justify-end me-2 align-middle'>
 			{isFollowing ? (
 				<button className='text-2xl bg-amber-50 text-gray-300 p-1 rounded-sm max-h-[34px] cursor-pointer border-1' title={isHovered ? 'unfollow' : 'following'}
+					disabled={isSubmitting}
 					onMouseEnter={() => setIsHovered(true)}
 					onMouseLeave={() => setIsHovered(false)}
 					onClick={toggleFollow}
@@ -50,6 +72,7 @@ export default function Follow(props:{followinguserdetailsid:number, user:User})
 				</button>
 			) : (
 				<button className='text-2xl bg-purple-700 text-gray-300 p-1 rounded-sm max-h-[36px] cursor-pointer' title='follow'
+					disabled={isSubmitting}
 					onMouseEnter={() => setIsHovered(true)}
 					onMouseLeave={() => setIsHovered(false)}
 					onClick={toggleFollow}

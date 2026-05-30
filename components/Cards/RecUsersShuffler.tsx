@@ -45,7 +45,7 @@ export default function RecUsersShuffler(props:{randUsers:UserDetails[], user:Us
 								<UserCard
 									key={ userdetails.id }
 									currentUser={ user }
-									recUserId={ userdetails.userid }
+									recUserId={ userdetails.id }
 									displayname={ userdetails.displayname }
 									handle={ userdetails.handle }
 									avatar={ (userdetails && userdetails.userdir && userdetails.avatar) ?

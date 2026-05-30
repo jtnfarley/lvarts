@@ -8,11 +8,11 @@ interface FollowUserParams {
 }
 
 export const followUser = async ({userdetailsid, followinguserdetailsid}:FollowUserParams) => {
-    await followUserDAL({userdetailsid, followinguserdetailsid});
+    return followUserDAL({userdetailsid, followinguserdetailsid});
 }
 
 export const unfollowUser = async ({userdetailsid, followinguserdetailsid}:FollowUserParams) => {
-    await unfollowUserDAL({userdetailsid, followinguserdetailsid});
+    return unfollowUserDAL({userdetailsid, followinguserdetailsid});
 }
 
 export const getUser = async (handle:string) => {
