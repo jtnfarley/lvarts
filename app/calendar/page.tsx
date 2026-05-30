@@ -4,8 +4,6 @@ import EventsByMonth from "@/components/Events/EventsByMonth";
 import { BiCalendarPlus } from "react-icons/bi";
 
 import type { Metadata } from 'next';
-import { prisma } from '@/prisma';
-import Post from '@/lib/models/post';
 import { getEvents } from '../data/posts';
 
 export const metadata: Metadata = {
@@ -21,21 +19,21 @@ export default async function Calendar() {
 	const events = await getEvents();
 
 	return (
-		<div className='bg-gray-50/50 backdrop-blur-sm p-5 rounded-lg mt-5'>
+		<div className='bg-gray-900/50 backdrop-blur-sm p-5 rounded-lg mt-5'>
 			{user ?
 				<div className='flex justify-end'>
 					<a href='/calendar/add-event' title='Add Event'>
-						<BiCalendarPlus className='text-4xl'/>
+						<BiCalendarPlus className='text-4xl' color='white'/>
 					</a>
 				</div>
 				:
 				<div>
-					<Link href={'/'}>Log in to add events</Link>
+					<Link href={'/'} className='text-white'>Log in to add events</Link>
 				</div>
 			}
 			<div>
 				<div className="flex flex-col gap-5 pb-5">
-					<div className='text-xl'>Lehigh Valley Events, Open Mics & Jam Sessions</div>
+					<div className='text-xl text-white'>Lehigh Valley Events, Open Mics & Jam Sessions</div>
 					<div>
 						<EventsByMonth events={events}/>
 					</div>

@@ -39,6 +39,7 @@ const PostValidation = z.object({
     lexical: z.string().optional(),
     id: z.number().optional(),
     postfile: z.string().optional(),
+    isgalleryfile: z.boolean().optional(),
     postfiletype: z.string().optional(),
     postfileObj: z.any().optional(),
     eventid: z.number().optional(),
@@ -66,6 +67,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
     const id = post?.id ?? undefined;
     const content = post?.lexical ?? "";
     const postfile = post?.postfile ?? undefined;
+    const isgalleryfile = post?.isgalleryfile ?? false;
     const resolvedPostType = post?.posttype ?? post?.posttypes?.posttype ?? 'post';
     const eventid = post?.events?.id ?? post?.eventid ?? undefined;
     const eventname = post?.events?.eventname ?? post?.eventname ?? '';

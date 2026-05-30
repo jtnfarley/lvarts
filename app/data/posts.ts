@@ -209,6 +209,22 @@ export const getEvents = async ():Promise<FeedRow[]> => {
     )
 }
 
+export const getGallery = async ():Promise<FeedRow[]> => {
+    return await prisma.$queryRaw<FeedRow[]>(
+        Prisma.sql`
+            ${
+                feedRowInnerQuery(
+                    Prisma.sql`
+                        FROM posts p
+                    `,
+                    Prisma.sql`
+                    where p.isgalleryfile = true`
+                )
+            }
+        `
+    )
+}
+
 export const searchPosts = async (queryString:string):Promise<FeedRow[]> => {
     const trimmedQuery = queryString.trim()
 
@@ -283,6 +299,7 @@ export const savePost = async (postData:any) => {
         posttype, 
         postfile, 
         postfiletype, 
+        isgalleryfile,
         privatePost, 
         parentPostId, 
         edited,
@@ -353,7 +370,8 @@ export const savePost = async (postData:any) => {
         privatepost,
         eventid: (eventid) ? eventid : null,
         postfiletypeid: (postfiletypeid && postfiletypeid.id) ? postfiletypeid.id : null,
-        postfile
+        postfile,
+        isgalleryfile
     }
 
     let post;

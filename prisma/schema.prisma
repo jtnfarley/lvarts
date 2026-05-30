@@ -125,6 +125,7 @@ model posts {
   privatepost                                        Boolean?         @default(false)
   eventid                                            Int?
   postfiletypeid                                     Int?
+  isgalleryfile                                      Boolean?         @default(false)
   commentstopost_commentstopost_commentpostidToposts commentstopost[] @relation("commentstopost_commentpostidToposts")
   commentstopost_commentstopost_postidToposts        commentstopost[] @relation("commentstopost_postidToposts")
   postlikes                                          postlikes[]
