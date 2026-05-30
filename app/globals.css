@@ -54,7 +54,7 @@
     }
 
     .bottombar {
-        @apply fixed flex bottom-0 z-10 w-full rounded-t-3xl bg-transparent p-4 backdrop-blur-sm sm:px-7 md:hidden justify-center;
+        @apply sticky flex bottom-0 z-10 w-full rounded-t-3xl bg-transparent p-4 backdrop-blur-sm sm:px-7 md:hidden justify-center;
     }
 
     .bottombar_container {
