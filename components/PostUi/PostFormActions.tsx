@@ -6,7 +6,7 @@ const PostFormActions = (props:{register:Function, setValue:Function, setTempIma
     return (
         <div className="mt-2 flex flex-row">
             <div className="w-[50%]">
-                <ImageUpload register={props.register} setValue={props.setValue} setTempImage={props.setTempImage}/>
+                <ImageUpload register={props.register} setValue={props.setValue} setTempImage={props.setTempImage} saved={false}/>
             </div>
             <div className="w-[50%] flex justify-end">
                 <button type='submit' className="bg-orange px-2 py-2 rounded text-white uppercase font-semibold">
