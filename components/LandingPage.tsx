@@ -89,8 +89,9 @@ export default function LandingPage() {
                         <div className='text-red-800 bg-white py-1 px-2 rounded-sm'>Please enter a valid email address</div>
                     }
                 </div>
-                <div className='flex justify-center mt-30'>
+                <div className='flex flex-col items-center justify-center mt-25 gap-3'>
                     <Link href='/calendar' className="flex justify-center text-white bg-orange py-2 px-2 rounded-sm w-1/2">Lehigh Valley Events Calendar</Link>
+                    <Link href='/gallery' className="flex justify-center text-white bg-orange py-2 px-2 rounded-sm w-1/2">Lehigh Valley Community Art Gallery</Link>
                 </div>
                 <div className='flex justify-center mt-5 gap-5'>
                     <button onClick={() => setUpAboutModal()} className="text-white cursor-pointer">What is this?</button>

@@ -7,6 +7,7 @@ export default interface Post {
     edited: boolean | null
 	posttype?: string | null
 	postfile?: string | null
+	isgalleryfile?: boolean | null
 	filetype?: string | null
 	postfiletypeid?: number | null
 	posttypeid?: number | null
