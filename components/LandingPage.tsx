@@ -4,12 +4,13 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react"
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useModal } from '@/app/contextProviders/modalProvider'
  
 export default function LandingPage() {
     const [error, setError] = useState<string | undefined>();
     const [showAlert, setShowAlert] = useState<boolean>(false);
+    const [bg, setBg] = useState<string | undefined>();
     const {
             setIsOpen, 
             setTitle, 
@@ -54,8 +55,29 @@ export default function LandingPage() {
         setMessage(`This site just uses functional cookies to keep you signed in. We don't use any tracking cookies or other such nonsense. You are not the product here.`);
 	}
 
+    const bgs = [
+		'IMG_1705.png',
+		'IMG_2873.png',
+		'IMG_2873-2.png',
+		'IMG_0650.png',
+		'IMG_1419-2.png',
+		'IMG_0492.png',
+		'IMG_2396.png',
+		'IMG_2124.png',
+		'IMG_2150-2.png',
+		'IMG_3727.png',
+	]
+
+    useEffect(() => {
+        setBg(bgs[Math.floor(Math.random() * bgs.length)]);
+    },[])
+
     return (
-        <div className="flex items-center justify-center h-screen ">
+        <div className="flex items-center justify-center h-screen " style={{
+            backgroundImage: `url(/images/bgs/${bg})`,
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover'
+        }}>
             <div className="p-5 gap-2 bg-gray-900/25 backdrop-blur-sm rounded-2xl xl:w-[600px]">
                 <div className="flex justify-center">
                     <Image
