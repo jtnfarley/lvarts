@@ -24,7 +24,7 @@ const GalleryItem = (props:{file:FeedRow}) => {
 		img.onload = () => {
 			const aspectRatio = img.naturalWidth / img.naturalHeight;
 			const width = img.naturalWidth / 2;
-			const finalWidth = (width <= 300) ? width: 300;
+			const finalWidth = (width <= 400) ? width : 400;
 			const height = finalWidth / aspectRatio;
 			setDivWidth(finalWidth);
 			setDivHeight(height);

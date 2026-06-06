@@ -385,7 +385,7 @@ input:checked + .slider:before {
 /*** gallery ***/
 
 .galleryGrid {
-    columns:auto 300px;
+    columns:auto 400px;
     column-gap: 5rem;
 }
 
