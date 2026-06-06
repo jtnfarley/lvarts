@@ -190,7 +190,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
             if (file.type.match(/image/)) {
                 fileUrl = await compressImage(file);
                 fileObj.type = 'image/webp';
-                fileObj.name = file.name.split('.')[0] +'.webp';
+                fileObj.name = file.name.split('.')[0].replaceAll('(', '').replaceAll(')','') +'.webp';
             } else if (file.type.match(/audio/)){
                 fileUrl = URL.createObjectURL(file);
                 fileObj.type = file.type;
@@ -483,7 +483,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
 
                 <div className="mt-2 flex flex-row p-4">
                     <div className="w-[50%]">
-                        <MediaUpload register={register} setValue={setValue} setTempImage={setTempFile}/>
+                        <MediaUpload register={register} setValue={setValue} setTempImage={setTempFile} saved={saved}/>
                     </div>
                     <div className="w-[50%] flex justify-end">
                         {

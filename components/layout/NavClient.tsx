@@ -1,6 +1,6 @@
 'use client'
 
-import { BiSolidHomeAlt2, BiSolidSearch, BiSolidUser, BiSolidBell, BiSolidCalendar,  BiArrowFromLeft, BiSolidCircle } from "react-icons/bi";
+import { BiSolidHomeAlt2, BiSolidSearch, BiImage, BiSolidBell, BiSolidCalendar,  BiArrowFromLeft, BiSolidCircle } from "react-icons/bi";
 import Link from "next/link"
 import User from "@/lib/models/user";
 import { useEffect, useState } from "react";
@@ -50,9 +50,9 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 							<BiSolidSearch className="leftIcon"/>
 						</div>
 					</Link> */}
-					<Link href="/profile" className={`leftsidebar_link flex flex-row items-center`} title="Edit Profile">
+					<Link href="/gallery" className={`leftsidebar_link flex flex-row items-center`} title="Art Gallery">
 						<div className="relative">
-							<BiSolidUser className="leftIcon"/>
+							<BiImage className="leftIcon"/>
 						</div>
 					</Link>
 					{user &&

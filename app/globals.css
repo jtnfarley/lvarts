@@ -385,11 +385,8 @@ input:checked + .slider:before {
 /*** gallery ***/
 
 .galleryGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-template-rows: repeat(auto-fit, 300px);
-  grid-auto-flow: dense;
-  grid-gap: 0.1rem;
+    columns:auto 300px;
+    column-gap: 5rem;
 }
 
 

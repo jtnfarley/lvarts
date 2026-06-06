@@ -5,20 +5,16 @@ import UserDetails from "@/lib/models/userDetails";
 import imageUrl from '@/constants/imageUrl';
 import User from "@/lib/models/user";
 import { useEffect, useState } from "react";
+import { shuffleArray } from "@/lib/utils";
 
 export default function RecUsersShuffler(props:{randUsers:UserDetails[], user:User}) {
 	const {user, randUsers} = props;
 	const [shuffledUsers, setShuffledUsers] = useState<any[]>();
 
 	const shuffleUsers = (array:Array<any>) => {
-		for (let i = array.length - 1; i > 0; i--) {
-			// Pick a random index from 0 to i
-			const j = Math.floor(Math.random() * (i + 1));
-			// Swap elements array[i] and array[j]
-			[array[i], array[j]] = [array[j], array[i]];
-		}
+		const shuffledUsers = shuffleArray(array);
 
-		setShuffledUsers(array.slice(0, 5));
+		setShuffledUsers(shuffledUsers.slice(0, 5));
 	}
 
 	useEffect(() => {

@@ -6,8 +6,8 @@ import { BiSolidFilePlus } from "react-icons/bi";
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'audio/mpeg'];
 
-const MediaUpload = (props:{register:Function, setValue:Function, setTempImage:Function}) => {
-    const [fileIsSet, setFileIsSet] = useState<boolean>(false)
+const MediaUpload = (props:{register:Function, setValue:Function, setTempImage:Function, saved:boolean}) => {
+    const [fileIsSet, setFileIsSet] = useState<boolean>(false);
     const postfileRegister = props.register('postfileObj');
     const galleryfileRegister = props.register('isgalleryfile');
 
@@ -33,7 +33,7 @@ const MediaUpload = (props:{register:Function, setValue:Function, setTempImage:F
                 </label>
             </div>
             
-            {fileIsSet && 
+            {fileIsSet && !props.saved &&
                 <div className="flex ms-2 mt-1">
                     <div>
                         <label className="switch">
