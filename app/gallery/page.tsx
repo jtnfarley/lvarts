@@ -1,9 +1,10 @@
 import {isLoggedIn} from "@/app/data/currentUser";
-import { Fascinate } from 'next/font/google'
+import { Major_Mono_Display  } from 'next/font/google'
 
 import type { Metadata } from 'next';
 import { getGallery } from '../data/posts';
 import GalleryItem from "@/components/Gallery/GalleryItem";
+import GalleryTitle from "@/components/Gallery/GalleryTitle";
 import { shuffleArray } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description: "What the what?",
 };
 
-const fascinate = Fascinate({
+const fascinate = Major_Mono_Display({
   	weight: "400",
 	subsets: []
 })
@@ -28,10 +29,10 @@ export default async function Gallery() {
 	}
 
 	return (
-		<div className='bg-[url(/images/frames/marble.png)] bg-cover rounded-lg mt-5'>
-			<div className="flex flex-col gap-5 p-10">
-				<div className={`text-7xl text-gray-900 text-center ${fascinate.className}`}>Lehigh Valley Community Art Gallery</div>
-				<div className='galleryGrid mt-20'>
+		<div className='rounded-lg mt-5'>
+			<div className="flex flex-col gap-5 px-10 items-center w-full">
+				<GalleryTitle/>
+				<div className='galleryGrid mt-20 w-full'>
 					{
 						shuffledFiles && shuffledFiles.length &&
 						shuffledFiles.map((file, index)  => {

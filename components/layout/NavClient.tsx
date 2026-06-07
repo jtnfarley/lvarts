@@ -6,9 +6,10 @@ import User from "@/lib/models/user";
 import { useEffect, useState } from "react";
 import SignOut from '@/components/auth/buttons/SignOut';
 
-export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNotifications:Function}) {
+export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNotifications:Function, shade?:string}) {
 	const {user, hasNewNotifications} = props;
 	const [hasNotis, setHasNotis] = useState<boolean>(props.hasNotis);
+	const [shadeClass, setShadeClass] = useState<string>((props.shade && props.shade === 'dark') ? "leftIcon_dark" : "leftIcon");
 
 	const checkNotis = async () => {
 		const newNotis = await hasNewNotifications(user?.id);
@@ -29,12 +30,12 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 				<>
 					<a href="/home" className={`leftsidebar_link flex flex-row items-center`} title="Home">
 						<div className="relative">
-							<BiSolidHomeAlt2 className="leftIcon"/>
+							<BiSolidHomeAlt2 className={shadeClass}/>
 						</div>
 					</a>
 					<Link href="/notifications" className={`leftsidebar_link flex flex-row items-center`} title="Notifications" onClick={() => setHasNotis(false)}>
 						<div className="relative">
-							<BiSolidBell className="leftIcon"/>
+							<BiSolidBell className={shadeClass}/>
 							{hasNotis &&
 								<div className="absolute top-[20%] right-0"><BiSolidCircle color='red'/></div>
 							}
@@ -42,23 +43,23 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 					</Link>
 					<Link href="/calendar" className={`leftsidebar_link flex flex-row items-center`} title="Calendar">
 						<div className="relative">
-							<BiSolidCalendar className="leftIcon"/>
+							<BiSolidCalendar className={shadeClass}/>
 						</div>
 					</Link>
 					{/* <Link href="/scene" className={`leftsidebar_link flex flex-row items-center`}>
 						<div className="relative">
-							<BiSolidSearch className="leftIcon"/>
+							<BiSolidSearch className={shadeClass}/>
 						</div>
 					</Link> */}
 					<Link href="/gallery" className={`leftsidebar_link flex flex-row items-center`} title="Art Gallery">
 						<div className="relative">
-							<BiImage className="leftIcon"/>
+							<BiImage className={shadeClass}/>
 						</div>
 					</Link>
 					{user &&
 						<>
 							<div>
-								<SignOut/>
+								<SignOut shade={props.shade}/>
 							</div>
 						</>
 					}

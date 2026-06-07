@@ -28,14 +28,14 @@ export default async function RootLayout({
 		}
 	}
 	return (
-		<div>
+		<div className="bg-[url(/images/frames/marble.png)] bg-cover">
 			<TopBar/>
 			<main className="flex flex-row">
 				<section className="calendar-container">
 					{
 						user && 
 						<section className="hidden pt-3 pe-3 xl:flex w-full justify-end">
-							<Nav user={user}/>
+							<Nav user={user} shade='dark'/>
 						</section>
 					}
 					<div className="flex flex-col w-full min-h-screen">

@@ -53,6 +53,10 @@
         @apply text-3xl fill-[#f3e5c9];
     }
 
+    .leftIcon_dark {
+        @apply text-3xl fill-[#252525];
+    }
+
     .bottombar {
         @apply sticky flex bottom-0 z-10 w-full rounded-t-3xl bg-transparent p-4 backdrop-blur-sm sm:px-7 md:hidden justify-center;
     }

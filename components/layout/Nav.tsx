@@ -15,7 +15,7 @@ const hasNewNotifications = async (userdetailsid:number):Promise<boolean> => {
 	return (notifications && notifications.length && Number.parseInt(notifications[0].count) > 0) ? true : false
 }
 
-export default async function Nav(props: {user?:User}) {
+export default async function Nav(props: {user?:User, shade?:string}) {
 	const {user} = props;
 	let hasNotis = false;
 
@@ -26,7 +26,7 @@ export default async function Nav(props: {user?:User}) {
 	return (		
 		<div className=''>
 			{user ?
-				<NavClient user={user} hasNotis={hasNotis} hasNewNotifications={hasNewNotifications}/>
+				<NavClient user={user} hasNotis={hasNotis} hasNewNotifications={hasNewNotifications} shade={props.shade}/>
 				:
 				<Link href='/' className='leftsidebar_link flex flex-row items-center'>
 					<p className="hidden text-gray-500 text-lg md:block me-4">Sign In</p>
