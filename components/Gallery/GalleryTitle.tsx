@@ -38,7 +38,9 @@ const adjectives = [
 	'85% leAn',
 	'choose your own Adventure',
 	'plAstic fAntAstic',
-	'provocAtive'
+	'provocAtive',
+	'MAsticAted',
+	'undigested'
 ]
 
 export default function GalleryTitle() {
