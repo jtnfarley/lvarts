@@ -10,7 +10,7 @@ interface Props {
 
 const AddEventForm = ({user, savePost}: Props) => {
     return (
-        <div className="bg-white rounded-lg p-5">
+        <div className="bg-[#fcf9ef] rounded-lg p-5">
             <div className="mb-4 text-xl font-semibold">Add Event</div>
             <div className="mb-4 text-sm text-gray-600">
                 Add the title, time, location, and description so the event can appear in the calendar and scene feeds.

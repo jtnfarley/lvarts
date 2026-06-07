@@ -207,7 +207,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
         if (postfile && post?.userdetails?.userdir) {
             setTempImage({
                 name: postfile,
-                type: post?.filetypes?.filetype ?? post?.filetype,
+                type: post?.filetypes?.filetype ?? post?.filetype ?? 'image/webp',
                 url: `${imageUrl}/${post.userdetails.userdir}/${postfile}`
             } as OptimizedFile);
         }
@@ -374,7 +374,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
                                 <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Title</div>
                                 <input
                                     {...register('eventname')}
-                                    className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                    className="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white"
                                     placeholder={`What's cookin'`}
                                 />
                             </div>
@@ -390,7 +390,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
                                             showTimeSelect
                                             showIcon
                                             dateFormat="MMMM d, yyyy h:mm aa"
-                                            className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                            className="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white"
                                             icon={<BiCalendar />}
                                         />
                                     )}
@@ -404,7 +404,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
                                 <div className="relative">
                                     <input
                                         {...venuenameRegistration}
-                                        className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                        className="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white"
                                         placeholder="ArtsQuest, The Funhouse, Godfrey Daniels, etc."
                                         autoComplete="off"
                                         onChange={(event) => {
@@ -448,7 +448,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
                                 <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Map Address</div>
                                 <input
                                     {...register('address')}
-                                    className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                                    className="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white"
                                     placeholder="123 Main St., Bethlehem, PA"
                                 />
                             </div>

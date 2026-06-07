@@ -87,19 +87,19 @@ export default function LeftSidebar(props:{currentUser:User}) {
     }, [])
 
 	return (
-		<section className="leftsidebar pt-3">
+		<section className="leftsidebar">
 			<Link href='/home' className="flex justify-center items-center">
 				<Image
-					src='/logos/art-abbr-paths.svg'
+					src='/logos/lvarts-artsy-paths.svg'
 					alt="Lehigh Valley Arts & Music"
-					width={125}
-					height={125}
+					width={384}
+					height={384}
 					priority 
-					className="rotate-345"
+					style={{opacity:'85%'}}
 				/>
 			</Link>
 			<div className="flex min-h-0 w-full flex-1 flex-col">
-				<div className="mt-4 flex min-h-0 flex-1 flex-col overflow-hidden">
+				<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
 					{isAnonymous &&
 						<div className="flex min-h-0 flex-1 flex-col justify-center rounded-tr-md bg-gray-900/40 px-5 py-8 text-center text-gray-300">
 							<div className="text-xl font-bold uppercase">{profileLabel}</div>

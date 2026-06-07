@@ -24,7 +24,7 @@ export default async function RootLayout({
 					<GoogleAnalytics gaId="G-J6PQBNCBKC" />
 				</head>
 				<body>
-					<RandoBgs/>
+					{/* <RandoBgs/> */}
 					
 					<main className='lg:flex lg:justify-center'>
 						<div className="lg:w-full">

@@ -18,7 +18,7 @@ const AddPostForm = ({user, posttype, edited, parentPostId, savePost}: Props) =>
     }
 
     return (
-        <div className="bg-white p-0 rounded-box mb-10">
+        <div className="bg-[#fcf9ef] p-3 rounded-box mb-10">
             <PostForm user={user} posttype={posttype} post={postData} edited={edited} savePost={savePost}/>
         </div>
     )

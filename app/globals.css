@@ -50,7 +50,7 @@
     }
 
     .leftIcon {
-        @apply text-3xl fill-[#f3e5c9];
+        @apply text-3xl fill-[#fdf5d8];
     }
 
     .leftIcon_dark {

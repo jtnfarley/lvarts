@@ -12,7 +12,7 @@ interface Props {
 
 const EditEventPostForm = ({post, user, savePost}: Props) => {
     return (
-        <div className="bg-white rounded-lg p-5">
+        <div className="bg-[#fcf9ef] rounded-lg p-5">
             <div className="mb-4 text-xl font-semibold">Edit Event</div>
             <PostForm post={post} user={user} edited={true} savePost={savePost}/>
         </div>

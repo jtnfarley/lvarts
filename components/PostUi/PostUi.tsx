@@ -27,7 +27,7 @@ export default function PostUi(props:{postData:FeedRow, user:User, googleMapsApi
 				}
 			</div>
 
-			<div key={post.id} className="rounded-box bg-white">
+			<div key={post.id} className="rounded-box bg-[#fcf9ef]">
 				<PostHeader postData={post} user={user} currentUserPost={currentUserPost}/>
 				<PostContent post={post} googleMapsApiKey={props.googleMapsApiKey}/>
 				<div className='grid grid-flow-col grid-rows-1 px-4 py-4'>

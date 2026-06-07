@@ -7,8 +7,8 @@ import UserDetails from "@/lib/models/userDetails";
 import Nav from "@/components/layout/Nav";
 
 export const metadata: Metadata = {
-  title: "Lehigh Valley Arts & Music",
-  description: "Lehigh Valley Arts Community Social Media",
+  title: "Lehigh Valley Arts & Music Events Calendar",
+  description: "Art & Music Events in the Lehigh Valley",
 };
 
 export default async function RootLayout({
@@ -28,7 +28,7 @@ export default async function RootLayout({
 		}
 	}
 	return (
-		<div>
+		<div className="bg-gray-800">
 			<TopBar/>
 			<main className="flex flex-row">
 				<LeftSidebar currentUser={user}/>
