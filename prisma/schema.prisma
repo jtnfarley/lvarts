@@ -36,7 +36,7 @@ model Session {
   createdAt    DateTime @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime @default(now()) @db.Timestamptz(6)
 
-  user              User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usersFK")
+  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usersFK")
 }
 
 model User {
@@ -47,9 +47,20 @@ model User {
   createdAt     DateTime     @default(now()) @db.Timestamptz(6)
   updatedAt     DateTime     @default(now()) @db.Timestamptz(6)
   emailVerified DateTime?    @db.Timestamptz(6)
-  accounts       Account[]
-  sessions       Session[]
+  accounts      Account[]
+  sessions      Session[]
   userdetails   userdetails?
+}
+
+model audiotracks {
+  id           BigInt  @id @default(autoincrement())
+  postid       Int
+  trackname    String? @db.VarChar
+  artist       String? @db.VarChar
+  album        String? @db.VarChar
+  releaseyear  Int?
+  coverartfile String? @db.VarChar
+  post         posts?  @relation(fields: [postid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postidFK")
 }
 
 model cities {
@@ -133,6 +144,7 @@ model posts {
   posttypes                                          posttypes        @relation(fields: [posttypeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postTypeFK")
   filetypes                                          filetypes?       @relation(fields: [postfiletypeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postfiletypeFK")
   usertoposts                                        usertoposts[]
+  audiotracks                                        audiotracks[]
 }
 
 model posttypes {
