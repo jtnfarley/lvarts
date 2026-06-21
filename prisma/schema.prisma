@@ -8,35 +8,31 @@ datasource db {
 }
 
 model Account {
-  id                Int      @default(autoincrement())
-  userId            Int
-  type              String?  @db.VarChar
-  provider          String?  @db.VarChar
-  providerAccountId String?  @unique(map: "provider_unique") @db.VarChar
-  access_token      String?  @db.VarChar
+  id                Int     @id(map: "accounts_pkey") @default(autoincrement())
+  userId            Int     @map("userid")
+  type              String  @db.VarChar
+  provider          String  @db.VarChar
+  providerAccountId String
+  access_token      String? @db.VarChar
   expires_at        Int?
-  token_type        String?  @db.VarChar
-  scope             String?  @db.VarChar
-  id_token          String   @db.VarChar
-  session_state     String?  @db.VarChar
-  refresh_token     String?  @db.VarChar
-  createdAt         DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime @default(now()) @db.Timestamptz(6)
-  user              User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usersFK")
+  token_type        String? @db.VarChar
+  scope             String? @db.VarChar
+  id_token          String? @db.VarChar
+  session_state     String? @db.VarChar
+  refresh_token     String? @db.VarChar
+  user              User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usersFK")
 
-  @@id([id, id_token], map: "accounts_pkey")
   @@unique([provider, providerAccountId])
 }
 
 model Session {
   id           BigInt   @id @default(autoincrement())
   sessionToken String   @unique(map: "sessionTokenUnique") @db.VarChar
-  userId       Int
+  userId       Int      @map("userid")
   expires      DateTime @db.Timestamptz(6)
   createdAt    DateTime @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime @default(now()) @db.Timestamptz(6)
-
-  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usersFK")
+  user         User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Session_userid_fkey")
 }
 
 model User {
@@ -52,15 +48,23 @@ model User {
   userdetails   userdetails?
 }
 
+model VerificationToken {
+  identifier String   @db.VarChar
+  token      String   @unique(map: "VerificationToken_token_key") @db.VarChar
+  expires    DateTime @db.Timestamptz(6)
+
+  @@unique([identifier, token], map: "identifier_token")
+}
+
 model audiotracks {
-  id           BigInt  @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   postid       Int
   trackname    String? @db.VarChar
   artist       String? @db.VarChar
   album        String? @db.VarChar
   releaseyear  Int?
   coverartfile String? @db.VarChar
-  post         posts?  @relation(fields: [postid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postidFK")
+  posts        posts   @relation(fields: [postid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postid_fk")
 }
 
 model cities {
@@ -137,6 +141,7 @@ model posts {
   eventid                                            Int?
   postfiletypeid                                     Int?
   isgalleryfile                                      Boolean?         @default(false)
+  audiotracks                                        audiotracks[]
   commentstopost_commentstopost_commentpostidToposts commentstopost[] @relation("commentstopost_commentpostidToposts")
   commentstopost_commentstopost_postidToposts        commentstopost[] @relation("commentstopost_postidToposts")
   postlikes                                          postlikes[]
@@ -144,7 +149,8 @@ model posts {
   posttypes                                          posttypes        @relation(fields: [posttypeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postTypeFK")
   filetypes                                          filetypes?       @relation(fields: [postfiletypeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postfiletypeFK")
   usertoposts                                        usertoposts[]
-  audiotracks                                        audiotracks[]
+
+  @@index([postfile], map: "postfile_IX")
 }
 
 model posttypes {

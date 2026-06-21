@@ -24,7 +24,7 @@ export const getTextResponse = async (prompt:string, tools?:string[]) => {
 
     let aiTools = [];
 
-    if (tools && tools.length) {
+    if (tools?.length) {
         for (const tool in tools) {
             aiTools.push({type: tool});
         }
@@ -49,7 +49,7 @@ export const getImageResponse = async (prompt:string) => {
 
     const response = await client.images.generate(request);
 
-    if (response && response.data && response.data.length && response.data[0].b64_json) {
+    if (response?.data?.length && response.data[0].b64_json) {
         const imageBuffer = Buffer.from(response.data[0].b64_json, 'base64');
         const optimizedImageBuffer = await sharp(imageBuffer)
             .resize({

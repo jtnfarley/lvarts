@@ -278,12 +278,9 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
         contentBackup.current.push(text);
         const subject = subjects[Math.floor(Math.random() * subjects.length)];
         const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-        const object = objects[Math.floor(Math.random() * objects.length)];
-        const adjective2 = adjectives[Math.floor(Math.random() * adjectives.length)];
         const adjective3 = adjectives[Math.floor(Math.random() * adjectives.length)];
         const article = /^[aeiou]/i.test(adjective) ? 'an' : 'a';
-        const article2 = /^[aeiou]/i.test(adjective2) ? 'an' : 'a';
-        const prompt = `You are a ${adjective} ${subject} with a ${adjective2} ${object}. Write a ${adjective3} tweet about ${text}. Do not use emojis.`
+        const prompt = `You are a ${adjective} ${subject}. Write a ${adjective3} post about "${text}". Do not use emojis. keep the response under 700 characters. get weird with it.`
 
         try {
             const res = await getAITextResponse(prompt);
@@ -304,7 +301,7 @@ const PostForm = ({user, edited, savePost, post}: Props) => {
                     root.append(paragraph);
                 });
                 const paragraph = $createParagraphNode();
-                const note = $createTextNode(`Post formatted by AI pretending to be ${article} ${adjective} ${subject} with ${article2} ${adjective2} ${object}.`);
+                const note = $createTextNode(`Post formatted by AI pretending to be ${article} ${adjective} ${subject}.`);
                 note.setFormat('italic');
                 paragraph.append(note);
 

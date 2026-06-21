@@ -4,6 +4,7 @@ import Feed from "@/components/Feed";
 import RecUsers from '@/components/RecUsers';
 import type { Metadata } from 'next';
 import { getFeedRow, savePost } from "@/app/data/posts";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: 'Home - Lehigh Vally Arts & Music',
@@ -12,6 +13,8 @@ export const metadata: Metadata = {
 
 export default async function Home() {
 	const user = await currentUser();
+
+	if (!user) redirect('/');
 
 	const feed = await getFeedRow(user.userdetails!);
 

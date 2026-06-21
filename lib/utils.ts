@@ -120,7 +120,7 @@ export const objects = [
 ];
 
 export const adjectives = [
-	'drunk', 'stoned', 'horny', 'angry', 'elegant', 'obnoxious', 'breezy', 'nebulous', 'moronic', 'sleepy', 'claustrophobic', 'arachnophobic', 'gothic', 'greasy', 'clammy', 'feverish', 'tripping', 'psychedelic', 'smokey', 'sublime', 'ecstatic', 'blind', 'deaf', 'clumsy', 'cordial', 'grotesque', 'dying', 'sad', 'melancholic', 'fat', 'smooth', 'colorful', 'blue', 'purple', 'rainbow'
+	'drunk', 'stoned', 'horny', 'angry', 'elegant', 'obnoxious', 'breezy', 'nebulous', 'moronic', 'sleepy', 'claustrophobic', 'arachnophobic', 'gothic', 'greasy', 'feverish', 'tripping', 'psychedelic', 'smokey', 'sublime', 'ecstatic', 'blind', 'deaf', 'clumsy', 'cordial', 'grotesque', 'dying', 'sad', 'melancholic', 'fat', 'colorful', 'rainbow', 'lying', 'bored', 'cynical', 'stubborn', 'satanic'
 ];
 
 export const parseText = (text:string):string => {

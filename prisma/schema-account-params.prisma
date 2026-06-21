@@ -8,21 +8,20 @@ datasource db {
 }
 
 model Account {
-  id                Int     @default(autoincrement())
-  userid            Int
-  type              String? @db.VarChar
-  provider          String? @db.VarChar
-  providerAccountId String? 
+  id                Int     @id(map: "accounts_pkey") @default(autoincrement())
+  userId            Int     @map("userid")
+  type              String  @db.VarChar
+  provider          String  @db.VarChar
+  providerAccountId String 
   access_token      String? @db.VarChar
   expires_at        Int?
   token_type        String? @db.VarChar
   scope             String? @db.VarChar
-  id_token          String  @db.VarChar
+  id_token          String? @db.VarChar
   session_state     String? @db.VarChar
   refresh_token     String? @db.VarChar
-  user              User    @relation(fields: [userid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usersFK")
+  user              User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usersFK")
 
-  @@id([id, id_token], map: "accounts_pkey")
   @@unique([provider, providerAccountId])
 }
 
