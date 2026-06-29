@@ -145,7 +145,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
         if (values.posttype === 'audio') {
             values.posttype = 'post';
         }
-
+console.log(values)
         await savePost(values);
 
         if (post?.id) {
@@ -183,7 +183,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit, (errors) => console.log('Zod validation errors:', errors))}>
             <div>
                 {isScheduledPost &&
                     <EventFields

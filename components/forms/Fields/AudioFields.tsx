@@ -86,7 +86,7 @@ const AudioFields = (props: {
                 <div>
                     <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Release Year</div>
                     <input
-                        {...register('releaseyear')}
+                        {...register('releaseyear', { setValueAs: (v: string) => v === '' ? undefined : Number.parseInt(v, 10) })}
                         className="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white"
                         placeholder={`1979`}
                     />
