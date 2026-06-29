@@ -24,34 +24,12 @@ export interface FeedRow {
     eventid: number | null
     eventname: string | null
     eventdate: Date | null
-    events: {
-        id: number | null
-        eventname: string | null
-        eventdate: Date | null
-        venueid: number | null
-        venues: {
-            id: number | null
-            venuename: string | null
-            address: string | null
-            city: string | null
-            state: string | null
-            zipcode: string | null
-        }
-    }
     venueid: number | null
     venuename: string | null
     address: string | null
     city: string | null
     state: string | null
     zipcode: string | null
-    venues: {
-        id: number | null
-        venuename: string | null
-        address: string | null
-        city: string | null
-        state: string | null
-        zipcode: string | null
-    }
     filetype: string | null
     filetypes: {
         filetype: string | null
