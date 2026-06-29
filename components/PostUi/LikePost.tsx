@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react';
 
 import { likePost, unlikePost } from "@/app/actions/posts";
-import Post from '@/lib/models/post';
 import User from '@/lib/models/user';
 import { useLikesStore } from '@/stores/user-likes-store';
 
 import { BiHeart, BiSolidHeart } from "react-icons/bi";
+import { FeedRow } from '@/lib/models/initFeedRow';
 
-export default function LikePost(props:{postData:Post, user:User, currentUserPost:boolean}) {
-	const post:Post = props.postData
+export default function LikePost(props:{postData:FeedRow, user:User, currentUserPost:boolean}) {
+	const post:FeedRow = props.postData
 	const user = props.user
 	const userdetails = user.userdetails;
 	const currentUserPost = props.currentUserPost;

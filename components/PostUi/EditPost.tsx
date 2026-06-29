@@ -1,11 +1,11 @@
 'use client'
 
-import Post from '@/lib/models/post';
 import { BiEdit } from "react-icons/bi";
 import Link from 'next/link';
+import { FeedRow } from '@/lib/models/initFeedRow';
 
-export default function EditPost(props:{postData:Post}) {
-	const post:Post = props.postData
+export default function EditPost(props:{postData:FeedRow}) {
+	const post:FeedRow = props.postData
 
     return (
 		<div className='text-2xl'>

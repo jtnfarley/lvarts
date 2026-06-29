@@ -1,12 +1,11 @@
 'use client'
 
-import Post from '@/lib/models/post';
-
 import { BiTrash } from "react-icons/bi";
 import { useModal } from '@/app/contextProviders/modalProvider'
+import { FeedRow } from '@/lib/models/initFeedRow';
 
-export default function DeletePost(props:{postData:Post}) {
-	const post:Post = props.postData
+export default function DeletePost(props:{postData:FeedRow}) {
+	const post:FeedRow = props.postData
 	const {
         setIsOpen, 
         setTitle, 
