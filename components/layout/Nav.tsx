@@ -24,7 +24,7 @@ export default async function Nav(props: {user?:User, shade?:string}) {
 	}
 
 	return (		
-		<div className=''>
+		<div>
 			{user ?
 				<NavClient user={user} hasNotis={hasNotis} hasNewNotifications={hasNewNotifications} shade={props.shade}/>
 				:

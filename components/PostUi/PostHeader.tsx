@@ -17,11 +17,11 @@ export default function PostHeader(props:{postData:FeedRow, user:User, currentUs
 
     return (
 		<div className='flex flex-row xl:px-3 pt-3'>
-			<Link href={`/user/${post.userdetails?.handle}`} title={`${profileLabel}'s profile`} className='flex flex-row gap-3'>
-				<div><img src={avatar} className='rounded-md border-2 border-orange-300 w-[60px] h-[60px]'/></div>
+			<Link href={`/user/${post.userdetails?.handle}`} title={`${profileLabel}'s profile`} className='flex flex-row gap-3 items-center'>
+				<div><img src={avatar} className='border-[3px] border-gray-600 rounded-md shadow-md shadow-gray-600 rotate-[-4deg] w-[60px] h-[60px] object-cover'/></div>
 				<div>
-					<div className='text-lg font-bold'>{profileLabel}</div>
-					<div className='text-sm sm:text-md'>
+					<div className='font-poster text-2xl uppercase tracking-wide leading-tight'>{profileLabel}</div>
+					<div className='font-typewriter text-sm text-neutral-600'>
 						{post.userdetails?.handle && post.userdetails?.displayname && <span>@{post.userdetails.handle}</span>}
 					</div>
 					{/* <div className='text-xs'>{post.createdat.toDateString()}</div> */}

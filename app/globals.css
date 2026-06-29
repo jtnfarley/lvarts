@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Permanent+Marker&family=Special+Elite&display=swap');
 /*   ---break---    */
 @custom-variant dark (&:is(.dark *));
 
@@ -22,7 +23,7 @@
 
 @layer components {
     .main-container {
-        @apply flex w-lg min-h-screen flex-1 flex-col items-center px-6 pt-3 max-md:pb-32 md:px-25 overflow-auto xl:mt-10;
+        @apply flex w-lg min-h-screen flex-1 flex-col items-center px-6 pt-3 pb-[100px] overflow-auto xl:mt-10;
     }
 
     .calendar-container {
@@ -58,11 +59,11 @@
     }
 
     .bottombar {
-        @apply sticky flex bottom-0 z-10 w-full rounded-t-3xl bg-transparent p-4 backdrop-blur-sm sm:px-7 md:hidden justify-center;
+        @apply sticky flex bottom-0 z-10 w-full rounded-t-3xl bg-transparent justify-center;
     }
 
     .bottombar_container {
-        @apply flex items-center justify-between gap-3 sm:gap-5;
+        @apply p-4 bg-gray-950/80 w-full;
     }
 
     .bottombar_link {
@@ -319,6 +320,11 @@
 
     --color-gray-1: #697c89;
     --color-glassmorphism: rgba(16,16,18,0.6);
+
+    /* collage type voices: poster headline / hand-marker / typewriter meta */
+    --font-poster: 'Anton', 'Arial Narrow', sans-serif;
+    --font-marker: 'Permanent Marker', cursive;
+    --font-typewriter: 'Special Elite', 'Courier New', monospace;
 }
 
 /**** switch ***/
@@ -420,4 +426,68 @@ input:checked + .slider:before {
   100% {
     opacity: 0;
   }
+}
+
+
+/*** collage design language (proof of concept) ***/
+/* Controlled chaos: wild surface, strict skeleton.
+   Tilts are quantized (fixed angles, picked deterministically per id),
+   palette is locked to the riso inks, texture is maximal but hue is limited. */
+
+@layer utilities {
+    /* hard offset shadows = screen-print / sticker feel (no blur) */
+    .shadow-hard      { box-shadow: 6px 6px 0 0 #0a0a0a; }
+    .shadow-hard-sm   { box-shadow: 3px 3px 0 0 #0a0a0a; }
+    .shadow-hard-orange { box-shadow: 5px 5px 0 0 var(--color-orange); }
+    .shadow-hard-purple { box-shadow: 5px 5px 0 0 var(--color-purple); }
+
+    /* halftone dot overlay (opt-in utility) */
+    .halftone {
+        background-image: radial-gradient(rgba(0,0,0,0.10) 1px, transparent 1.3px);
+        background-size: 5px 5px;
+    }
+}
+
+@layer components {
+    /* cream paper card, cut-paper border, hard shadow.
+       tilt is driven by a CSS var so :hover can override it (rotate is its own
+       property in Tailwind v4; translate composes independently for the lift) */
+    .collage-card {
+        @apply relative bg-[#fcf9ef] rounded-lg;
+        --tilt: 0deg;
+        rotate: var(--tilt);
+        box-shadow: 6px 6px 0 0 #0a0a0a;
+        transition: rotate 0.2s ease-out, translate 0.2s ease-out, box-shadow 0.2s ease-out;
+    }
+    .collage-card.tilt-1 { --tilt: -2deg; }
+    .collage-card.tilt-2 { --tilt: 1.5deg; }
+    .collage-card.tilt-3 { --tilt: -1deg; }
+    .collage-card.tilt-4 { --tilt: 2.25deg; }
+
+    /* strip of washi tape stuck on a corner */
+    .washi-tape::before {
+        content: "";
+        position: absolute;
+        top: -11px;
+        left: 26px;
+        width: 80px;
+        height: 26px;
+        transform: rotate(-5deg);
+        background:
+            repeating-linear-gradient(45deg, rgba(255,255,255,0.28) 0 4px, transparent 4px 8px),
+            rgba(255,127,37,0.62);
+        border-left: 1px dashed rgba(0,0,0,0.18);
+        border-right: 1px dashed rgba(0,0,0,0.18);
+        z-index: 20;
+        pointer-events: none;
+    }
+
+    /* rubber-stamp button: presses into the page on click */
+    .stamp-btn {
+        @apply border-2 border-black rounded-none cursor-pointer;
+        box-shadow: 3px 3px 0 0 #0a0a0a;
+        transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+    .stamp-btn:hover  { transform: translate(-1px,-1px) rotate(-3deg); box-shadow: 4px 4px 0 0 #0a0a0a; }
+    .stamp-btn:active { transform: translate(3px,3px)  rotate(-3deg); box-shadow: 0 0 0 0 #0a0a0a; }
 }

@@ -1,16 +1,11 @@
 
 import { prisma } from '@/prisma';
-import { getImageResponse } from '@/app/data/openAI';
-import { uploadFile } from '@/app/actions/fileUploader';
+import { getTextResponse } from '@/app/data/openAI';
 import { getBotPost } from '@/app/data/botHelper';
 import { savePost } from '@/app/data/posts';
-import { parseText } from '../utils';
+import { randoLineCount, parseText } from '../utils';
 
-export const imageBot = async (postObj:{postid:number, prompt:string, userdetailsid:number, userdir:string}) => {
-    const {postid, prompt, userdetailsid, userdir} = postObj;
-
-    if (!postid || !prompt || !userdetailsid || !userdir) return;
-    
+export const musikfestBot = async (postid:number) => {
     const post = await prisma.posts.findFirst({
         where: {
             id: postid
@@ -25,34 +20,25 @@ export const imageBot = async (postObj:{postid:number, prompt:string, userdetail
     if (post && post.lexical) {
         text = parseText(post.lexical);
     }
-    
-    const fullPrompt = `${prompt} ${text}`;
 
-    const response = await getImageResponse(fullPrompt);
+    const prompt = `Create a musikfest schedule using ${text} as genre preference or theme. return a json array of performances related to or mentioning ${text}.`;
 
-    if (response) {
+    const response = await getTextResponse(prompt, [{
+                type: "file_search",
+                vector_store_ids: [process.env.VECTOR_STORE],
+            }]);
+console.log(response)
+    // const formattedPost = getBotPost(response);
+    // const postCreate = {
+    //     content: formattedPost.content, 
+    //     lexical: JSON.stringify(formattedPost.lexical), 
+    //     userdetailsid: 12, 
+    //     posttype: 'comment', 
+    //     parentPostId: postid, 
+    //     edited: false
+    // }
 
-        const name = `${Math.random().toString(36).substring(2, 10)}.webp`;
-
-        const file = new File([response], name, {type: 'image/webp'})
-
-        await uploadFile({file, userdir})
-
-        const formattedPost = getBotPost('');
-        
-        const postCreate = {
-            content: formattedPost.content, 
-            lexical: JSON.stringify(formattedPost.lexical), 
-            userdetailsid, 
-            posttype: 'comment', 
-            parentPostId: postid, 
-            edited: false,
-            postfile: file.name,
-            postfiletype: file.type
-        }
-
-        await savePost(postCreate);
-    }
+    // await savePost(postCreate);
 }
 
 

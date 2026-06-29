@@ -1,23 +1,15 @@
-import Post from '@/lib/models/post';
 import PostMediaImage from "./PostMediaImage";
 import PostMediaAudio from "./PostMediaAudio";
 import PostMediaEmbed from "./PostMediaEmbed";
 import { FeedRow } from '@/lib/models/initFeedRow';
 
 function PostMedia(props:{post:FeedRow}) {
-    let postfileType;
-
-    if (props.post.postfile) {
-        postfileType = 'image';
-    }
-    // postfileType =;
-
     return (
         <>
-            {(postfileType === 'image') ?
+            {(props.post.filetype === 'image/webp') ?
                 <PostMediaImage post={props.post} />
                 :
-                (postfileType === 'audio') ?
+                (props.post.filetype === 'audio/mpeg') ?
                 <PostMediaAudio post={props.post} />
                 :
                 <PostMediaEmbed post={props.post} />

@@ -5,6 +5,7 @@ import './globals.css'
 import RandoBgs from "@/components/layout/RandoBgs";
 import { ModalProvider } from '@/app/contextProviders/modalProvider'
 import { ModalRoot } from '@/components/Modal/ModalRoot'
+import Radio from '@/components/Radio/RadioServer';
 
 export const metadata: Metadata = {
   title: "Lehigh Valley Art & Music",
@@ -24,13 +25,14 @@ export default async function RootLayout({
 					<GoogleAnalytics gaId="G-J6PQBNCBKC" />
 				</head>
 				<body>
-					{/* <RandoBgs/> */}
-					
+					<RandoBgs/>
+
 					<main className='lg:flex lg:justify-center'>
 						<div className="lg:w-full">
 							{children}
 						</div>
 					</main>
+					<Radio/>
 					<ModalRoot/>
 				</body>
 			</html>

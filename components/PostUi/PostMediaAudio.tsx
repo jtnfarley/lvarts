@@ -1,17 +1,10 @@
-import Post from '@/lib/models/post';
-import {useState} from 'react'
 import imageUrl from '@/constants/imageUrl';
+import { FeedRow } from '@/lib/models/initFeedRow';
 
-function PostMediaAudio(props:{post:Post}) {
+function PostMediaAudio(props:{post:FeedRow}) {
     const post = props.post;
 
-    // const [imageLoaded, setImageLoaded] = useState(false);
-
-    const audioFile = imageUrl+"/"+post.userdetails!.userdir+"/"+post.postfile;
-
-    // const imageLoad = () => {
-    //     setImageLoaded(true)
-    // }
+    const audioFile = `${imageUrl}/${post.userdetails!.userdir}/${post.postfile}`;
 
     return (
         <div className='flex justify-center'> 

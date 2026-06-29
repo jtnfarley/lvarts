@@ -64,6 +64,7 @@ model audiotracks {
   album        String? @db.VarChar
   releaseyear  Int?
   coverartfile String? @db.VarChar
+  azuracastid  Int?
   posts        posts   @relation(fields: [postid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postid_fk")
 }
 

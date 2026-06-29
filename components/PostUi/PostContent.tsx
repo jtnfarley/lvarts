@@ -8,6 +8,8 @@ import PostMedia from './PostMedia';
 import PostTemplateTags from './PostTemplateTags';
 import { formatDate } from '@/lib/utils';
 import { FeedRow } from '@/lib/models/initFeedRow';
+import imageUrl from '@/constants/imageUrl';
+import Image from 'next/image';
 
 export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string | undefined}) {
     const post = props.post;
@@ -17,10 +19,14 @@ export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string
 				index: number,
 				tagText: string
 			}>>();
-    const displayTitle = post.eventname
-    // const postTags = splitPostTags(post.tags)
-    const venuename = post.venuename
-    const address = post.address
+    const displayTitle = post.eventname;
+    const venuename = post.venuename;
+    const address = post.address;
+	const trackname = post.audio.trackname;
+	const artist = post.audio.artist;
+	const album = post.audio.album;
+	const releaseyear = post.audio.releaseyear;
+	const coverartfile = (post.audio.coverartfile) ? `${imageUrl}/${post.userdetails!.userdir}/${post.audio.coverartfile}` : null;
 
 	const parseTemplateTags = (post:string) => {
 		let placeholder = post;
@@ -142,6 +148,26 @@ export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string
 							</div>
 						</div>
 				}
+
+				{
+					(trackname && post.postfile) &&
+						<div className='mb-4 rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-700'>
+							<div className='flex gap-x-4 gap-y-1'>
+								{coverartfile && 
+									<div>
+										<Image src={coverartfile} alt={`${trackname} by ${artist}`} width={150} height={150} />
+									</div>
+								}
+								<div>
+									<div className='text-lg'><strong>{trackname}</strong></div>
+									{artist && <div>{artist}</div>}
+									{album && <div>{album}</div>}
+									{releaseyear && <div>{releaseyear}</div>}
+								</div>
+							</div>
+						</div>
+				}
+
 				{ cleanContent && 
 					<div>
 						<div className='flex justify-end text-xs mb-2 me-2 italic'>{post.createdat.toDateString()}</div>

@@ -6,11 +6,14 @@ export default async function RightSidebar() {
 	const user = await currentUser();
 
 	return (
-		<section className="rightsidebar">
-			<div className='my-4'>
-				<Nav user={user}/>
-			</div>
-			<RecUsers/>			
-		</section>
+		<div>
+			<section className="rightsidebar bg-[#0c0a18]/50 backdrop-blur-sm">
+				<div className='my-4'>
+					<Nav user={user}/>
+				</div>
+				<RecUsers/>			
+			</section>
+			
+		</div>
 	)
 }

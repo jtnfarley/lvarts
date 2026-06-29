@@ -33,4 +33,12 @@ export interface FeedRow {
         displayName: string | null
     } | null
     comments: number | null
+    audio: {
+        id: number | null
+        trackname: string | null
+        artist: string | null
+        album: string | null
+        coverartfile: string | null
+        releaseyear: number | null
+    }
 }

@@ -19,21 +19,28 @@ export default function PostUi(props:{postData:FeedRow, user:User, googleMapsApi
 			? `${post.parentPost.displayName}'s`
 			: "someone's";
 
+	// quantized tilt, picked deterministically per post so it's stable across renders
+	const tilts = ['tilt-1', 'tilt-2', 'tilt-3', 'tilt-4'];
+	const tilt = tilts[post.id % tilts.length];
+
     return (
-		<div>
-			<div className='text-sm pb-2 italic text-white'>
+		<div className='my-5 mr-2'>
+			<div className='text-sm pb-2 font-typewriter text-white'>
 				{post.posttype === 'comment' && post.parentPost &&
 					<Link href={`/post/${post.parentPost.postid}`}>commenting on {parentPostLabel} post</Link>
 				}
 			</div>
 
-			<div key={post.id} className="rounded-box bg-[#fcf9ef]">
+			<div
+				key={post.id}
+				className={`collage-card washi-tape flex flex-col gap-2 p-3 ${tilt}`}
+			>
 				<PostHeader postData={post} user={user} currentUserPost={currentUserPost}/>
 				<PostContent post={post} googleMapsApiKey={props.googleMapsApiKey}/>
 				<div className='grid grid-flow-col grid-rows-1 px-4 py-4'>
 					<PostActions postData={post} user={user} currentUserPost={currentUserPost}/>
 				</div>
-			</div>		
+			</div>
 		</div>
     )
 }

@@ -69,4 +69,11 @@ export default interface Post {
 		venuename?: string | null
 		address?: string | null
 	} | null
+	audio?: {
+		trackname?: string | null
+        artist?: string | null
+        album?: string | null
+        releaseyear?: string | null
+        coverartfile?: string | null
+	} | null
 }

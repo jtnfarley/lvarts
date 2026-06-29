@@ -2,12 +2,7 @@
 
 import OpenAI from 'openai';
 import sharp from 'sharp';
-
-interface AIRequest {
-    model: string,
-    input: string,
-    tools?: any[]
-}
+import Anthropic from "@anthropic-ai/sdk";
 
 interface AIImageRequest {
     model: string,
@@ -15,26 +10,19 @@ interface AIImageRequest {
 }
 
 export const getTextResponse = async (prompt:string, tools?:string[]) => {
-    const client = new OpenAI();
+    const client = new Anthropic();
 
-    const request = {
-        model: "gpt-5.4-nano",
-        input: prompt
-    } as AIRequest
-
-    let aiTools = [];
-
-    if (tools?.length) {
-        for (const tool in tools) {
-            aiTools.push({type: tool});
-        }
-
-        request.tools = aiTools;
-    }
-
-    const response = await client.responses.create(request);
-
-    return response.output_text;
+    const message = await client.messages.create({
+        model: "claude-haiku-4-5",
+        max_tokens: 500,
+        messages: [
+            {
+            role: "user",
+            content: prompt
+            }
+        ]
+    });
+    return message.content[0].text;
 }
 
 export const getImageResponse = async (prompt:string) => {

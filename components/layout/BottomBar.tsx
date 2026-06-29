@@ -1,4 +1,4 @@
-import SignOut from '@/components/auth/buttons/SignOut';
+
 import Nav from "./Nav";
 import {isLoggedIn} from "@/app/data/currentUser";
 
@@ -7,7 +7,7 @@ export default async function BottomBar() {
 
 	return (
 		<section className="bottombar">
-			<div className="bottombar_container">
+			<div className="bottombar_container  md:hidden">
 				{user && 
 					<Nav user={user}/>
 				}

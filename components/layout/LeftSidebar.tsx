@@ -87,7 +87,7 @@ export default function LeftSidebar(props:{currentUser:User}) {
     }, [])
 
 	return (
-		<section className="leftsidebar">
+		<section className="leftsidebar bg-[#0c0a18]/50 backdrop-blur-sm">
 			<Link href='/home' className="flex justify-center items-center">
 				<Image
 					src='/logos/lvarts-artsy-paths.svg'

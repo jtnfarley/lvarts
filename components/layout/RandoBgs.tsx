@@ -2,139 +2,61 @@
 
 import { useEffect, useState } from "react";
 
+// the photos to ghost behind the app — one is picked per visit
+const BG_IMAGES = [
+	'IMG_0492.png', 'IMG_0650.png', 'IMG_1419-2.png', 'IMG_1419.png', 'IMG_1705.png',
+	'IMG_2124.png', 'IMG_2150-2.png', 'IMG_2396.png', 'IMG_2873-2.png', 'IMG_2873.png', 'IMG_3727.png',
+];
 
+// locked riso inks — one tints the photo per visit (orange / purple / electric blue / acid green)
+const INKS = ['#ff7f25', '#9422B4', '#3126FF', '#2CFF00'];
+
+// deep ink-black backdrop; shadows lean into this, highlights lean into the ink → fake duotone
+const INK_BLACK = '#0c0a18';
 
 export default function RandoBgs() {
-	// const [randoGradient, setRandoGradient] = useState<{backgroundImage:string, clipPath?:string, opacity?:number, animation?:string}>({
-	// 	backgroundImage:`linear-gradient(to top right, #434453, #4354fd)`,
-	// 	clipPath: `polygon(0)`,
-	// 	opacity: 1,
-	// 	animation: ''
-	// });
-
-	const [randoBg, setRandoBg] = useState<{
-		backgroundColor?:string, 
-		backgroundImage?:string, 
-		backgroundRepeat?:string, 
-		backgroundPosition?:string, 
-		backgroundSize?:string, 
-		animation?:string}>
-		({
-			backgroundColor: '#efefef',
-			backgroundImage: `url()`,
-			backgroundRepeat: 'no-repeat',
-			backgroundPosition: 'center center',
-			backgroundSize: 'cover', // This will now persist correctly
-			animation:''
-	});
-
-	const tb = ['top','bottom', ''];
-	const lr = ['left','right', ''];
-	const gradientTypes = ['linear', 'conic']
-	// const alphaNum = [
-	// 	'a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9'
-	// ]
-
-	const randHex = ():string => {
-		let hex = '';
-		return `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.random() + 0.5})`
-	}
-
-	const randDeg = () => Math.floor(Math.random() * 360);
-
-	const getLinearGradient = (iterator:number = 3):string => {
-		let randHexes = '';
-		for (let i = Math.floor(Math.random() * iterator) + 2; i >= 0 ; i--) {
-			randHexes += `${randHex()}${(i > 0) ? ',':''}`
-		}
-		return `linear-gradient(${randDeg()}deg, ${randHexes})`;
-	}
-
-	const getRadialGradient = ():string => {
-		const shapes = ['ellipse', 'circle'];
-		const randShape = shapes[Math.floor(Math.random() * shapes.length)];
-		let randHexes = '';
-		for (let i = Math.floor(Math.random() * 3) + 2; i >= 0 ; i--) {
-			randHexes += `${randHex()} ${Math.floor(Math.random() * 100)}%${(i > 0) ? ',':''}`
-		}
-		return `radial-gradient(${randShape}, ${randHexes})`;
-	}
-
-	const getConicGradient = ():string => {
-		let randHexes = '';
-		const iterator =  Math.floor(Math.random() * 360) + 150;
-		// const numOfDegrees = 360 / iterator;
-		let lastDegree = 360;
-		for (let i = Math.floor(Math.random() * 10) + 2; i >= 0 ; i--) {
-			const degrees = Math.floor(Math.random() * lastDegree);
-			randHexes += `${randHex()}${(i > 0) ? ',':''}`
-			lastDegree = lastDegree - degrees;
-		}
-		return `conic-gradient(${randHexes})`;
-	}
-
-	// const getClipPath = ():string => {
-	// 	let polygon = '';
-	// 	for (let i = Math.floor(Math.random() * 30) + 10; i >= 0; i--) {
-	// 		polygon += `${Math.floor(Math.random() * 100)}% ${Math.floor(Math.random() * 100)}%${(i > 0) ? ',':''}`
-	// 	}
-	// 	return `polygon(${polygon})`;
-	// }
-
-	const getRandoGradient = () => {
-		const randoGradType = gradientTypes[Math.floor(Math.random() * gradientTypes.length)];
-
-		let bg = {
-			backgroundColor: '#efefef',
-			backgroundImage: `url()`,
-			backgroundRepeat: 'no-repeat',
-			backgroundPosition: 'center center',
-			backgroundSize: 'cover', // This will now persist correctly
-			animation:'',
-			clipPath: 'polygon(0)',
-		};
-		
-		switch (randoGradType) {
-			case 'linear':
-				bg.backgroundImage = getLinearGradient();
-				// bg.clipPath = getClipPath();
-				break;
-			case 'radial':
-				bg.backgroundImage = getRadialGradient();
-				// bg.clipPath = getClipPath();
-				break;
-			case 'conic':
-				bg.backgroundImage = getConicGradient();
-				// bg.clipPath = getClipPath();
-				break;
-		}
-
-		// const opacity = Math.random() + 0.5;
-		// bg.opacity = opacity;
-		// bg.backgroundImage = `url(/images/bgs/${bgs[Math.floor(Math.random() * bgs.length)]})`;
-
-		// bg.backgroundImage = 'linear-gradient(blue, pink)';
-
-		const secs = Math.floor(Math.random() * 10) + 5;
-		bg.animation = `hue-rotation ${secs}s infinite ease-in-out`
-
-		// setRandoGradient(gradient);
-		setRandoBg(bg);
-	}
+	const [pick, setPick] = useState<{ image: string; ink: string } | null>(null);
 
 	useEffect(() => {
-		getRandoGradient();
-	}, [])
+		// random per visit, but constrained to the brand palette (calm, not the old rainbow)
+		const image = BG_IMAGES[Math.floor(Math.random() * BG_IMAGES.length)];
+		const ink = INKS[Math.floor(Math.random() * INKS.length)];
+		setPick({ image, ink });
+	}, []);
 
 	return (
-		<div className="relative -z-1">
-			<div className="fixed h-screen w-full" style={randoBg}>
-				{/* <div className={`overflow-hidden h-screen w-full fixed`}>
-					{randoBg !== '' && 
-						<Image src={randoBg} alt='random background image' width={2000} height={1500} key={getRandoInt()} style={{height:'100vh', width:'100%', minWidth:'1000px'}} className="hidden md:block"/>
-					} 
-				</div> */}
-			</div>
+		<div className="fixed inset-0 -z-10 overflow-hidden" style={{ backgroundColor: INK_BLACK }}>
+			{pick && (
+				<>
+					{/* ghosted, desaturated photo */}
+					<div
+						className="absolute inset-0 bg-cover bg-center"
+						style={{
+							backgroundImage: `url(/images/bgs/${pick.image})`,
+							filter: 'grayscale(1) contrast(1.15) brightness(0.55)',
+							opacity: 0.8,
+						}}
+					/>
+					{/* single-ink duotone tint — lifts the highlights into the riso color */}
+					<div
+						className="absolute inset-0"
+						style={{ backgroundColor: pick.ink, mixBlendMode: 'screen', opacity: 0.3 }}
+					/>
+					{/* push the shadows back toward ink-black for depth */}
+					<div
+						className="absolute inset-0"
+						style={{ backgroundColor: INK_BLACK, mixBlendMode: 'multiply', opacity: 0.35 }}
+					/>
+					{/* vignette: open in the center (where the feed sits), dark at the edges (under the sidebars) */}
+					<div
+						className="absolute inset-0"
+						style={{
+							background:
+								`radial-gradient(ellipse 70% 60% at 50% 42%, transparent 0%, ${INK_BLACK}cc 100%)`,
+						}}
+					/>
+				</>
+			)}
 		</div>
 	);
 }

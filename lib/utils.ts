@@ -120,7 +120,11 @@ export const objects = [
 ];
 
 export const adjectives = [
-	'drunk', 'stoned', 'horny', 'angry', 'elegant', 'obnoxious', 'breezy', 'nebulous', 'moronic', 'sleepy', 'claustrophobic', 'arachnophobic', 'gothic', 'greasy', 'feverish', 'tripping', 'psychedelic', 'smokey', 'sublime', 'ecstatic', 'blind', 'deaf', 'clumsy', 'cordial', 'grotesque', 'dying', 'sad', 'melancholic', 'fat', 'colorful', 'rainbow', 'lying', 'bored', 'cynical', 'stubborn', 'satanic'
+	'drunk', 'stoned', 'horny', 'angry', 'elegant', 'obnoxious', 'breezy', 'nebulous', 'moronic', 'sleepy', 'claustrophobic', 'arachnophobic', 'gothic', 'greasy', 'feverish', 'tripping', 'psychedelic', 'smokey', 'sublime', 'ecstatic', 'blind', 'deaf', 'clumsy', 'cordial', 'grotesque', 'dying', 'sad', 'melancholic', 'fat', 'colorful', 'rainbow', 'lying', 'bored', 'cynical', 'stubborn', 'satanic', 'weird', 'chaotic', 'passive-aggressive'
+];
+
+export const boringAdjectives = [
+	'funny', 'serious', 'sad', 'weird', 'chaotic', 'passive-aggressive'
 ];
 
 export const parseText = (text:string):string => {
@@ -128,7 +132,7 @@ export const parseText = (text:string):string => {
 
 	let returnText = '';
 
-	if (!parsed || !parsed.root || !parsed.root.children || !parsed.root.children.length) return '';
+	if (!parsed?.root?.children?.length) return '';
 
 	for (const child of parsed.root.children) {
 		for (const line of child.children) {

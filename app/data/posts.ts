@@ -82,6 +82,14 @@ const feedRowSelect = Prisma.sql`
         ft.filetype,
         (select count(pl.postid)::int from postlikes pl where pl.postid = p.id) as likes,
         (select count(cp.postid)::int from commentstopost cp where cp.postid = p.id) as comments,
+        json_build_object(
+            'id', at.id,
+            'trackname', at.trackname, 
+            'artist', at.artist, 
+            'album', at.album, 
+            'releaseyear', at.releaseyear, 
+            'coverartfile', at.coverartfile
+        ) as audio,
         ${parentPostSelect}
 `
 
@@ -94,6 +102,8 @@ const feedRowSharedJoins = Prisma.sql`
         ON e.id = p.eventid
     LEFT JOIN venues v
         ON v.id = e.venueid
+    LEFT JOIN audiotracks at
+        ON at.postid = p.id
     --LEFT JOIN cities c
         --ON c.id = v.cityid
     --LEFT JOIN states s
@@ -300,14 +310,19 @@ export const savePost = async (postData:any) => {
         postfile, 
         postfiletype, 
         isgalleryfile,
-        privatePost, 
         parentPostId, 
         edited,
         eventname,
         eventdate,  
         privatepost, 
         venuename,
-        address
+        address,
+        trackname,
+        artist,
+        album,
+        releaseyear,
+        coverartfile,
+        addToRadio
     } = postData
 
     let {venueid, eventid} = postData
@@ -358,7 +373,7 @@ export const savePost = async (postData:any) => {
         })
     }
 
-    if (postTypeQuery && postTypeQuery.id) posttypeid = postTypeQuery.id;
+    if (postTypeQuery?.id) posttypeid = postTypeQuery.id;
 
     const postDataCreate = {
         content,
@@ -369,7 +384,7 @@ export const savePost = async (postData:any) => {
         updatedat,
         privatepost,
         eventid: (eventid) ? eventid : null,
-        postfiletypeid: (postfiletypeid && postfiletypeid.id) ? postfiletypeid.id : null,
+        postfiletypeid: (postfiletypeid?.id) ? postfiletypeid.id : null,
         postfile,
         isgalleryfile
     }
@@ -395,24 +410,50 @@ export const savePost = async (postData:any) => {
                 userdetailsid
             },
         })
-    }
 
-    if (posttype === 'comment' && parentPostId) {
-        await prisma.commentstopost.create({
-            data: {
-                postid: Number.parseInt(parentPostId),
-                commentpostid: post.id
+        if (trackname && postfile) { //assume this is an audiotrack
+            const audiotrack = await prisma.audiotracks.create({
+                data: {
+                    postid: post.id,
+                    trackname,
+                    album,
+                    artist,
+                    releaseyear: Number.parseInt(releaseyear),
+                    coverartfile: coverartfile.name || undefined
+                }
+            })
+
+            if (audiotrack?.id && addToRadio) {
+                const azuracastid = await addToPlaylist(postfile);
+
+                await prisma.audiotracks.update({
+                data: {
+                    azuracastid
+                },
+                where: {
+                    id: audiotrack.id
+                }
+            })
             }
+        }
+
+        if (posttype === 'comment' && parentPostId) {
+            await prisma.commentstopost.create({
+                data: {
+                    postid: Number.parseInt(parentPostId),
+                    commentpostid: post.id
+                }
+            })
+
+            await notifyParentPostAuthor(Number.parseInt(parentPostId), userdetailsid);
+        }
+
+        await notifyMentionedUsers({
+            postid: post.id,
+            authorUserDetailsId: userdetailsid,
+            lexical
         })
-
-        await notifyParentPostAuthor(Number.parseInt(parentPostId), userdetailsid);
     }
-
-    await notifyMentionedUsers({
-        postid: post.id,
-        authorUserDetailsId: userdetailsid,
-        lexical
-    })
     
     return post
 }
@@ -567,6 +608,22 @@ export const deletePost = async (postid:number) => {
         }
     })
 
+    const audiotrack = await prisma.audiotracks.findFirst({
+        where: {
+            postid
+        }
+    })
+
+    if (audiotrack?.azuracastid) {
+        await deleteFromPlaylist(audiotrack.azuracastid);
+    }
+
+    await prisma.audiotracks.deleteMany({
+        where: {
+            postid
+        }
+    })
+
     await prisma.posts.deleteMany({
         where: {
             id: postid
@@ -616,4 +673,54 @@ const saveEvent = async (eventData:{eventname:string, eventdate:Date, venueid:nu
     }
 
     return eventid;
+}
+
+
+const addToPlaylist = async (filename:string):Promise<number | undefined> => {
+    //here we're adding the audio track to the playlist
+    const files = await fetch('https://a6.asurahosting.com/api/station/614/files',{
+        headers: {
+            'Authorization': `Bearer ${process.env.AZURACAST_API_KEY}`
+        }
+    })
+    .then(res => res.json())
+    .then(res2 => res2)
+    .catch(err => console.log(err));
+
+    if (files.length) {
+        
+        const file = files.find((item:any) => item.path === filename.toLowerCase())
+
+        if (!file?.playlists?.length) {
+            file.playlists = [{id: 6820}];
+            // PHP requires "length" as float; JSON.stringify drops the decimal for whole numbers
+            const body = JSON.stringify(file).replace(/"length":(\d+)(?=[,}])/g, '"length":$1.0');
+            
+            await fetch(`https://a6.asurahosting.com/api/station/614/file/${file.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${process.env.AZURACAST_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body
+            })
+            .then(res => res.json())
+            .then(res2 => res2)
+            .catch(err => console.log(err));
+
+            return file.id;
+        }
+    }
+
+    return;
+}
+
+const deleteFromPlaylist = async (azuracastid:number) => {
+    await fetch(`https://a6.asurahosting.com/api/station/614/file/${azuracastid}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${process.env.AZURACAST_API_KEY}`,
+            'Content-Type': 'application/json'
+        }
+    })
 }

@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import Post from '@/lib/models/post';
+import { FeedRow } from '@/lib/models/initFeedRow';
 
-function PostMediaEmbed(props:{post:Post}) {
+function PostMediaEmbed(props:{post:FeedRow}) {
 
     let iframeContainer:HTMLDivElement | undefined | null
 
-    const extractMedia = (post:Post) => {
+    const extractMedia = (post:FeedRow) => {
         if (!post.content) {
             return false
         }

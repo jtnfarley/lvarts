@@ -62,7 +62,7 @@ export default function Follow(props:{followinguserdetailsid:number, user:User})
     return (
 		<div className='flex flex-grow justify-end me-2 align-middle'>
 			{isFollowing ? (
-				<button className='text-2xl bg-amber-50 text-gray-300 p-1 rounded-sm max-h-[34px] cursor-pointer border-1' title={isHovered ? 'unfollow' : 'following'}
+				<button className='stamp-btn text-2xl bg-amber-50 p-1 max-h-[34px] rotate-[-3deg]' title={isHovered ? 'unfollow' : 'following'}
 					disabled={isSubmitting}
 					onMouseEnter={() => setIsHovered(true)}
 					onMouseLeave={() => setIsHovered(false)}
@@ -71,7 +71,7 @@ export default function Follow(props:{followinguserdetailsid:number, user:User})
 					{isHovered ? <BiSolidUserX color='#f03030' /> : <BiSolidUserCheck color='#12bc01' />}
 				</button>
 			) : (
-				<button className='text-2xl bg-purple-700 text-gray-300 p-1 rounded-sm max-h-[36px] cursor-pointer' title='follow'
+				<button className='stamp-btn text-2xl bg-orange text-white p-1 max-h-[36px] rotate-[-3deg]' title='follow'
 					disabled={isSubmitting}
 					onMouseEnter={() => setIsHovered(true)}
 					onMouseLeave={() => setIsHovered(false)}
