@@ -124,7 +124,7 @@ export const adjectives = [
 ];
 
 export const boringAdjectives = [
-	'funny', 'serious', 'sad', 'weird', 'chaotic', 'passive-aggressive'
+	'funny', 'weird', 'chaotic', 'passive-aggressive', 'poetic', 'dramatic', 'nostalgic', 'enthusiastic', 'deadpan', 'mysterious', 'caffeinated', 'cryptic', 'loud', 'riotous'
 ];
 
 export const parseText = (text:string):string => {

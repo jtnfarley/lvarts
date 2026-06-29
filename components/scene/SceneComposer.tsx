@@ -3,7 +3,6 @@
 import { useState } from 'react'
 
 import PostForm from '@/components/forms/PostForm'
-import type Post from '@/lib/models/post'
 import type User from '@/lib/models/user'
 
 const composerOptions = [
@@ -70,7 +69,7 @@ export default function SceneComposer(props: Props) {
             <PostForm
                 key={posttype}
                 user={user}
-                post={{ posttype } as Post}
+                post={{ posttype }}
                 edited={false}
                 savePost={savePost}
             />

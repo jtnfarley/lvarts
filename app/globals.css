@@ -27,7 +27,7 @@
     }
 
     .calendar-container {
-        @apply flex min-h-screen flex-1 flex-col items-center px-6 pt-3 max-md:pb-32 sm:px-10 overflow-auto;
+        @apply flex min-h-screen flex-1 flex-col items-center px-6 pt-3 max-md:pb-32 sm:px-10 overflow-auto pb-[120px];
     }
 
     /* .center-box {

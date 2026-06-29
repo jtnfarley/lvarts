@@ -23,10 +23,7 @@ export const musikfestBot = async (postid:number) => {
 
     const prompt = `Create a musikfest schedule using ${text} as genre preference or theme. return a json array of performances related to or mentioning ${text}.`;
 
-    const response = await getTextResponse(prompt, [{
-                type: "file_search",
-                vector_store_ids: [process.env.VECTOR_STORE],
-            }]);
+    const response = await getTextResponse(prompt);
 console.log(response)
     // const formattedPost = getBotPost(response);
     // const postCreate = {

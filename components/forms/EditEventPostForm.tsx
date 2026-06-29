@@ -2,10 +2,10 @@
 
 import PostForm from "./PostForm";
 import User from "@/lib/models/user";
-import Post from "@/lib/models/post";
+import { FeedRow } from "@/lib/models/initFeedRow";
 
 interface Props {
-    post: Post
+    post: Partial<FeedRow>
     user: User
     savePost: Function
 }
