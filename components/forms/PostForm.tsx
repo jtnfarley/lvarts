@@ -8,9 +8,8 @@ import { useEffect, useRef, useState } from "react";
 import RTEditor from "./Fields/RichTextEditor/RTEditor";
 import {uploadFile, ftpFile} from "@/app/actions/fileUploader";
 import User from "@/lib/models/user";
-import Post from "@/lib/models/post";
 import MediaUpload from "@/components/PostUi/MediaUpload"
-import { compressImage, subjects, objects, adjectives, boringAdjectives } from "@/lib/utils";
+import { compressImage, subjects, adjectives, boringAdjectives } from "@/lib/utils";
 import OptimizedFile from "@/lib/models/optimizedFile";
 import { Spinner } from "../layout/Spinner";
 import imageUrl from "@/constants/imageUrl";
@@ -22,14 +21,14 @@ import AudioUploadLink from "../PostUi/AudioUploadLink";
 import AddEventLink from "../PostUi/AddEventLink";
 import EventFields from "./Fields/EventFields";
 import AudioFields from "./Fields/AudioFields";
-import { useRouter } from "next/navigation";
+import { FeedRow } from "@/lib/models/initFeedRow";
 
 interface Props {
     savePost:Function,
     user: User,
     posttype?: string,
     edited?: boolean,
-    post?:Partial<Post>,
+    post?:FeedRow,
     onAudioFileSelected?: (selected: boolean) => void,
     addToRadio?: boolean,
 }
@@ -55,7 +54,7 @@ const PostValidation = z.object({
     trackname: z.string().optional(),
     artist: z.string().optional(),
     album: z.string().optional(),
-    releaseyear: z.string().optional(),
+    releaseyear: z.number().optional(),
     coverartfile: z.any().optional(),
     addToRadio: z.boolean().optional()
     // privatepost: z.boolean().optional(),
@@ -108,11 +107,10 @@ const PostForm = ({user, edited, savePost, post, onAudioFileSelected, addToRadio
     const [showTones, setShowTones] = useState(false);
     const contentBackup = useRef<string[]>([]);
     const editorRef:any = useRef(null);
-    const parentPostId = post?.parentPostId !== undefined ? post.parentPostId.toString() : undefined;
+    const parentPostId = post?.parentPostId !== undefined ? post.parentPostId?.toString() : undefined;
     const id = post?.id ?? undefined;
     const content = post?.lexical ?? "";
     const postfile = post?.postfile ?? undefined;
-    // const isgalleryfile = post?.isgalleryfile ?? false;
     const resolvedPostType = post?.posttype ?? post?.posttypes?.posttype ?? 'post';
     const eventid = post?.events?.id ?? post?.eventid ?? undefined;
     const eventname = post?.events?.eventname ?? post?.eventname ?? '';

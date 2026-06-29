@@ -6,7 +6,11 @@ export interface FeedRow {
     updatedat: Date
     edited: boolean | null
     posttype: string
+    posttypes: {
+        posttype: string
+    }
     privatepost: boolean | null
+    parentPostId: number | null
     userdetails: {
         id: number
         userid: number
@@ -17,14 +21,41 @@ export interface FeedRow {
         biohtml: string | null
         biolexical: string | null
     }
+    eventid: number | null
     eventname: string | null
     eventdate: Date | null
+    events: {
+        id: number | null
+        eventname: string | null
+        eventdate: Date | null
+        venueid: number | null
+        venues: {
+            id: number | null
+            venuename: string | null
+            address: string | null
+            city: string | null
+            state: string | null
+            zipcode: string | null
+        }
+    }
+    venueid: number | null
     venuename: string | null
     address: string | null
     city: string | null
     state: string | null
     zipcode: string | null
+    venues: {
+        id: number | null
+        venuename: string | null
+        address: string | null
+        city: string | null
+        state: string | null
+        zipcode: string | null
+    }
     filetype: string | null
+    filetypes: {
+        filetype: string | null
+    }
     postfile: string | null
     likes: number | null
     parentPost?: {
