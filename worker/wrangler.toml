@@ -1,0 +1,12 @@
+name = "lvartsmusic-upload"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+[vars]
+# Set ALLOWED_ORIGIN to your production domain, e.g. "https://lvartsmusic.com"
+# For local dev with `wrangler dev`, you can override this with a .dev.vars file
+ALLOWED_ORIGIN = "https://lvartsmusic.com"
+
+# Secrets (never put in this file — use `wrangler secret put` for each):
+#   wrangler secret put BUNNY_KEY
+#   wrangler secret put UPLOAD_SECRET      (same value as UPLOAD_SECRET in .env.local)
