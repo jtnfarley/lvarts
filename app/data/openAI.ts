@@ -22,7 +22,8 @@ export const getTextResponse = async (prompt:string, tools?:string[]) => {
             }
         ]
     });
-    return message.content[0].text;
+    const block = message.content[0];
+    return block.type === 'text' ? block.text : '';
 }
 
 export const getImageResponse = async (prompt:string) => {
