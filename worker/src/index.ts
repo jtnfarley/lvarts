@@ -3,7 +3,7 @@ export interface Env {
     UPLOAD_SECRET: string;
     ALLOWED_ORIGIN: string;
 }
- 
+
 const STORAGE_HOSTNAME = 'ny.storage.bunnycdn.com';
 const STORAGE_ZONE = 'lvartsmusic-ny';
 
