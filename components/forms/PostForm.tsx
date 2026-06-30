@@ -18,6 +18,7 @@ import { FeedRow } from "@/lib/models/initFeedRow";
 import { useFileUpload } from "./hooks/useFileUpload";
 import { useVenueSearch } from "./hooks/useVenueSearch";
 import { useAIIfy } from "./hooks/useAIIfy";
+import PostTypeSelector from "./PostTypeSelector";
 
 interface Props {
     savePost: Function,
@@ -27,6 +28,7 @@ interface Props {
     post?: Partial<FeedRow>,
     onAudioFileSelected?: (selected: boolean) => void,
     addToRadio?: boolean,
+    allowTypeSwitch?: boolean,
 }
 
 const PostValidation = z.object({
@@ -46,7 +48,7 @@ const PostValidation = z.object({
     eventdate: z.date().nullable().optional(),
     venuename: z.string().optional(),
     address: z.string().optional(),
-    venueid: z.number().optional(),
+    venueid: z.preprocess(val => (val === '' || val === null) ? undefined : val, z.number().optional()),
     trackname: z.string().optional(),
     artist: z.string().optional(),
     album: z.string().optional(),
@@ -64,7 +66,7 @@ const PostValidation = z.object({
     }
 });
 
-const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadio }: Props) => {
+const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadio, allowTypeSwitch }: Props) => {
     const [clearEditor, setClearEditor] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -73,7 +75,8 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
     const editorRef = useRef<any>(null);
 
     const resolvedPostType = post?.posttype ?? post?.posttypes?.posttype ?? 'post';
-    const isScheduledPost = isSceneScheduledPostType(resolvedPostType);
+    const [activeType, setActiveType] = useState(resolvedPostType);
+    const isScheduledPost = isSceneScheduledPostType(activeType);
 
     const parentPostId = post?.parentPostId !== undefined ? post.parentPostId?.toString() : undefined;
 
@@ -109,6 +112,18 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
         useVenueSearch(isScheduledPost, post?.venuename ?? '', setValue);
 
     const { isAIIfied, showTones, setShowTones, boringAdjectives, aiIfy, resetPost } = useAIIfy(setIsSaving);
+
+    const handleTypeChange = (type: string) => {
+        setActiveType(type);
+        setValue('posttype', type);
+        if (type !== 'audio') {
+            setInternalAddToRadio(false);
+            setValue('addToRadio', false);
+        }
+        if (!isSceneScheduledPostType(type)) {
+            setValue('venueid', undefined);
+        }
+    };
 
     const venuenameRegistration = register('venuename');
 
@@ -213,7 +228,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                     />
                 }
 
-                {resolvedPostType === 'audio'
+                {activeType === 'audio'
                     ? <AudioFields register={register} control={control} setValue={setValue} setupTempFile={handleSetupTempFile} clearEditor={clearEditor} errors={errors} />
                     : <Controller
                         control={control}
@@ -245,7 +260,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                     </div>
                 )}
 
-                {resolvedPostType === 'audio' && fileSelectedForRadio && (
+                {activeType === 'audio' && fileSelectedForRadio && (
                     <>
                         <div className="flex items-center gap-2 mb-3">
                             <label className="switch" aria-label="Add to streaming radio">
@@ -267,17 +282,26 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                     </>
                 )}
 
-                <div className="mt-2 flex flex-row p-4">
-                    <div className="w-[50%]">
-                        {resolvedPostType !== 'audio' &&
-                            <div className="w-full flex gap-3">
-                                <MediaUpload register={register} setValue={setValue} setTempImage={handleSetupTempFile} saved={saved} />
-                                <AudioUploadLink />
-                                <AddEventLink />
+                <div className="mt-2 flex flex-col sm:flex-row p-4 gap-2">
+                    <div className="w-full sm:w-[50%]">
+                        {allowTypeSwitch ? (
+                            <div className="w-full flex items-center gap-3">
+                                <PostTypeSelector activeType={activeType} onChange={handleTypeChange} />
+                                {activeType !== 'audio' && (
+                                    <MediaUpload register={register} setValue={setValue} setTempImage={handleSetupTempFile} saved={saved} />
+                                )}
                             </div>
-                        }
+                        ) : (
+                            activeType !== 'audio' && (
+                                <div className="w-full flex gap-3">
+                                    <MediaUpload register={register} setValue={setValue} setTempImage={handleSetupTempFile} saved={saved} />
+                                    <AudioUploadLink />
+                                    <AddEventLink />
+                                </div>
+                            )
+                        )}
                     </div>
-                    <div className="w-[50%] flex justify-end">
+                    <div className="w-full flex justify-end sm:w-[50%]">
                         {isSaving && <div className="me-2"><Spinner /></div>}
 
                         {saved && (
@@ -297,7 +321,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                             {showTones && (
                                 <>
                                     <div className="fixed inset-0 z-10" aria-hidden="true" onClick={() => setShowTones(false)} onKeyDown={(e) => e.key === 'Escape' && setShowTones(false)} />
-                                    <div className="absolute bottom-full mb-2 right-0 z-20 bg-white border border-gray-200 rounded-xl shadow-lg p-3 w-82">
+                                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-20 bg-white border border-gray-200 rounded-xl shadow-lg p-3 w-82">
                                         <div className="text-xs font-semibold text-gray-400 uppercase mb-2">Pick a tone</div>
                                         <div className="flex flex-wrap gap-2">
                                             {boringAdjectives?.map((adjective) => (

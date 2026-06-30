@@ -572,14 +572,6 @@ export const deletePost = async (postid:number) => {
         }
     })
 
-    if (post.posttypeid === 3 && post.eventid) {
-        await prisma.events.deleteMany({
-            where: {
-                id: post.eventid
-            }
-        })
-    }
-
     const postNotifications = await prisma.notifications.findMany({
         where: {
             postid
@@ -629,6 +621,14 @@ export const deletePost = async (postid:number) => {
             id: postid
         }
     })
+
+    if (post.posttypeid === 3 && post.eventid) {
+        await prisma.events.deleteMany({
+            where: {
+                id: post.eventid
+            }
+        })
+    }
 
     return true;
 }
