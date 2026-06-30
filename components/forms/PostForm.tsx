@@ -68,6 +68,8 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
     const [clearEditor, setClearEditor] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [fileSelectedForRadio, setFileSelectedForRadio] = useState(false);
+    const [internalAddToRadio, setInternalAddToRadio] = useState(addToRadio ?? false);
     const editorRef = useRef<any>(null);
 
     const resolvedPostType = post?.posttype ?? post?.posttypes?.posttype ?? 'post';
@@ -101,7 +103,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
         defaultValues,
     });
 
-    const { tempFile, setTempFile, uploadError, setUploadError, setupTempFile, handleUpload } = useFileUpload(post, user, addToRadio);
+    const { tempFile, setTempFile, uploadError, setUploadError, setupTempFile, handleUpload } = useFileUpload(post, user, internalAddToRadio);
 
     const { setVenueQuery, venueSuggestions, isVenueSearchOpen, setIsVenueSearchOpen, isVenueSearching, selectVenue, resetVenueSearch } =
         useVenueSearch(isScheduledPost, post?.venuename ?? '', setValue);
@@ -186,7 +188,10 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
 
     const handleSetupTempFile = async (file: File) => {
         await setupTempFile(file);
-        if (file?.type.match(/audio/)) onAudioFileSelected?.(true);
+        if (file?.type.match(/audio/)) {
+            setFileSelectedForRadio(true);
+            onAudioFileSelected?.(true);
+        }
     };
 
     return (
@@ -238,6 +243,28 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                     <div className="mx-4 mb-2 rounded bg-red-100 border border-red-400 px-3 py-2 text-sm text-red-700">
                         {uploadError}
                     </div>
+                )}
+
+                {resolvedPostType === 'audio' && fileSelectedForRadio && (
+                    <>
+                        <div className="flex items-center gap-2 mb-3">
+                            <label className="switch" aria-label="Add to streaming radio">
+                                <input
+                                    type="checkbox"
+                                    checked={internalAddToRadio}
+                                    onChange={(e) => {
+                                        setInternalAddToRadio(e.target.checked);
+                                        setValue('addToRadio', e.target.checked);
+                                    }}
+                                />
+                                <span className="slider round"></span>
+                            </label>
+                            <div className="text-xs">Add to streaming radio</div>
+                        </div>
+                        <div className="text-sm italic" id="toc">
+                            By uploading, you attest that you are the copyright owner of the selected track, and you grant LVArtandMusic.com non-exclusive rights to stream your track for promotional purposes without royalties or compensation.
+                        </div>
+                    </>
                 )}
 
                 <div className="mt-2 flex flex-row p-4">
