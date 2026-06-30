@@ -48,7 +48,7 @@ const PostValidation = z.object({
     eventdate: z.date().nullable().optional(),
     venuename: z.string().optional(),
     address: z.string().optional(),
-    venueid: z.preprocess(val => (val === '' || val === null) ? undefined : val, z.number().optional()),
+    venueid: z.number().optional(),
     trackname: z.string().optional(),
     artist: z.string().optional(),
     album: z.string().optional(),
