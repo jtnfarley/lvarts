@@ -8,7 +8,7 @@ import User from "@/lib/models/user";
 import { BiImageAdd } from "react-icons/bi";
 import { useEffect, useRef, useState } from "react";
 import { BiPlus, BiRefresh, BiX } from "react-icons/bi";
-import { uploadFile } from "@/app/actions/fileUploader";
+import { uploadViaWorker } from "@/lib/clientUpload";
 import { getRandomString } from "@/lib/utils";
 import { getHandleSuggestion } from "@/app/actions/handles";
 import imageUrl from '@/constants/imageUrl';
@@ -97,7 +97,7 @@ const AccountInfo = (props:{userdetails: SidebarProfile, saveUser:(user: UpdateU
 
     const sendFile = async (filedata:{file:File, userdir:string}) => {
         const {file, userdir} = filedata;
-        await uploadFile({file, userdir});
+        await uploadViaWorker(file, userdir);
         setAvatarUrl(`${avatarUrlBase}/${userdir}/${file.name}`);
     }
 
