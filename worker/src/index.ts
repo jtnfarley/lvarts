@@ -76,9 +76,15 @@ export default {
             body: request.body,
         });
 
-        return new Response(bunnyRes.ok ? null : 'CDN upload failed', {
-            status: bunnyRes.ok ? 200 : 502,
-            headers: corsHeaders(origin),
-        });
+        if (!bunnyRes.ok) {
+            const bunnyBody = await bunnyRes.text();
+            console.error(`BunnyCDN ${bunnyRes.status}: ${bunnyBody}`);
+            return new Response(`CDN upload failed: ${bunnyRes.status} ${bunnyBody}`, {
+                status: 502,
+                headers: corsHeaders(origin),
+            });
+        }
+
+        return new Response(null, { status: 200, headers: corsHeaders(origin) });
     },
 };
