@@ -1,5 +1,18 @@
 'use server'
 
+export const uploadFile = async (params: { file: File; userdir: string }) => {
+    const { file, userdir } = params;
+    const url = `https://ny.storage.bunnycdn.com/lvartsmusic-ny/${userdir}/${file.name}`;
+    const ACCESS_KEY = process.env.BUNNY_KEY;
+    if (!ACCESS_KEY) throw new Error('Missing BUNNY_KEY environment variable');
+
+    await fetch(url, {
+        method: 'PUT',
+        headers: { 'AccessKey': ACCESS_KEY, 'Content-Type': 'application/octet-stream' },
+        body: Buffer.from(await file.arrayBuffer()),
+    });
+};
+
 // Fetches an audio file already on BunnyCDN and forwards it to AzuraCast.
 // Called after the client has completed a direct CDN upload, so no file data
 // passes through Vercel — only the filename + a server-to-server relay.
