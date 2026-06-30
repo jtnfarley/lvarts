@@ -14,7 +14,10 @@ const getAudioTrack = async (trackname:string) => {
 			}
 		},
 		where: {
-			postfile: `${trackname}.mp3`
+			postfile: {
+				equals: `${trackname}.mp3`,
+				mode: 'insensitive'
+			}
 		},
 		orderBy: {
 			id: 'desc'
