@@ -55,8 +55,9 @@ export default function GalleryTitle() {
 	return (
 		<div id='title1'>
 		{adjective !== '' &&
-			<div className={`text-xl text-white bg-gray-900 p-5 shadow-xl rounded-lg ${fascinate.className} w-full lg:text-5xl`}>
-				<div className="text-lg lg:text-3xl">lehiGh VAlley</div><div><em>{adjective}</em> Art GAllery</div>
+			<div className={`text-xl text-white bg-gray-900 p-5 shadow-xl rounded-lg w-full lg:text-5xl`}>
+				<div className="mb-3 text-lg lg:text-3xl">Lehigh Valley</div>
+				<div className={fascinate.className}><em>{adjective}</em> Art GAllery</div>
 			</div>
 		}
 		</div>
