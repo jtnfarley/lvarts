@@ -144,7 +144,7 @@ export const parseText = (text:string):string => {
 	return returnText;
 }
 
-export const randoLineCount = Math.floor(Math.random() * 10) + 5;
+export const randoLineCount = () => Math.floor(Math.random() * 10) + 5;
 
 export const shuffleArray = (array:Array<any>) => {
 	for (let i = array.length - 1; i > 0; i--) {

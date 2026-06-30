@@ -10,7 +10,7 @@ interface AIImageRequest {
 }
 
 export const getTextResponse = async (prompt:string, tools?:string[]) => {
-    const client = new Anthropic();
+    const client = new Anthropic({ timeout: 30_000, maxRetries: 1 });
 
     const message = await client.messages.create({
         model: "claude-haiku-4-5",

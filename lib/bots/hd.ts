@@ -21,7 +21,7 @@ export const hdBot = async (postid:number) => {
         text = parseText(post.lexical);
     }
 
-    const prompt = `You are the imagist poet H. D. Write a ${randoLineCount}-line poem about ${text}`;
+    const prompt = `You are the imagist poet H. D. Write a ${randoLineCount()}-line poem about ${text}`;
 
     const response = await getTextResponse(prompt);
 

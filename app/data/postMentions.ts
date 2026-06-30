@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { extractMentionedUserIdsFromLexical } from "@/lib/mentions";
 import { hdBot } from "@/lib/bots/hd";
 import { imageBot } from "@/lib/bots/imageBot";
@@ -34,15 +35,15 @@ export const notifyMentionedUsers = async ({
 	for (const mentionedUserId of nextMentionedUserIds) {
 		switch (mentionedUserId) {
 			case 12:
-				hdBot(postid).then();
+				after(() => hdBot(postid));
 				return;
 			case 13:
 				const prompt = `You are the painter Walter Emerson Baum who founded the Baum School of Art and the Allentown Art Museum. Create a painting about`;
-				imageBot({postid, prompt, userdetailsid: 13, userdir: 'baum'}).then();
+				after(() => imageBot({postid, prompt, userdetailsid: 13, userdir: 'baum'}));
 				return;
 			case 14:
 				const prompt2 = `You are the painter Ella Sophonisba Hergesheimer. Create a painting about`;
-				imageBot({postid, prompt: prompt2, userdetailsid: 14, userdir: 'hergesheimer'}).then();
+				after(() => imageBot({postid, prompt: prompt2, userdetailsid: 14, userdir: 'hergesheimer'}));
 				return;
 		}
 
