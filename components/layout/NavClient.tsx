@@ -28,11 +28,11 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 		<div className='flex gap-8 justify-center items-center md:mb-6'>
 			{user ?
 				<>
-					<a href="/home" className={`leftsidebar_link flex flex-row items-center`} title="Home">
+					<Link href="/home" className={`leftsidebar_link flex flex-row items-center`} title="Home">
 						<div className="relative">
 							<BiSolidHomeAlt2 className={shadeClass}/>
 						</div>
-					</a>
+					</Link>
 					<Link href="/notifications" className={`leftsidebar_link flex flex-row items-center`} title="Notifications" onClick={() => setHasNotis(false)}>
 						<div className="relative">
 							<BiSolidBell className={shadeClass}/>

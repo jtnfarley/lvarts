@@ -18,32 +18,35 @@ export default async function RootLayout({
 }>) {
 	let user = await isLoggedIn();
 
-	if (!user) {
-		user = {
-			userdetails:{} as UserDetails,
-			anonymous: true,
-			id: 0,
-			createdat: new Date(),
-			updatedat: new Date()
-		}
-	}
+	user ??= {
+		userdetails:{} as UserDetails,
+		anonymous: true,
+		id: 0,
+		createdat: new Date(),
+		updatedat: new Date()
+	};
 	return (
-		<div className="bg-[url(/images/frames/marble.png)] bg-cover">
-			<TopBar/>
-			<main className="flex flex-row">
-				<section className="calendar-container">
-					{
-						user && 
-						<section className="hidden pt-3 pe-3 xl:flex w-full justify-end">
-							<Nav user={user} shade='dark'/>
-						</section>
-					}
-					<div className="flex flex-col w-full min-h-screen">
-						{children}
-					</div>
-				</section>
-			</main>
-			<BottomBar/>
-		</div>	
+		<div className="bg-white">
+			<div className="fixed w-full h-screen z-0" id='bg1'>
+				<div className="relative bg-cover bg-center w-full h-screen z-0" style={{backgroundImage: 'url(/images/frames/marble.png)', opacity: 0.3}}></div>
+			</div>
+			<div className="relative z-10">
+				<TopBar/>
+				<main className="flex flex-row">
+					<section className="calendar-container">
+						{
+							user && 
+							<section className="hidden pt-3 pe-3 xl:flex w-full justify-end">
+								<Nav user={user} shade='dark'/>
+							</section>
+						}
+						<div className="flex flex-col w-full min-h-screen">
+							{children}
+						</div>
+					</section>
+				</main>
+				<BottomBar/>
+			</div>	
+		</div>
 	);
 }

@@ -12,7 +12,8 @@ export default function RandoPlaceholder() {
         'Go ahead, squeeze the Charmin',
         'Post no bills',
         'Your ad here',
-        "Got somethin' pithy?"
+        "Got somethin' pithy?",
+        "For a good time, call..."
     ]
 
     useEffect(() => {
