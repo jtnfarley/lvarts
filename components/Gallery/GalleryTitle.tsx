@@ -55,7 +55,7 @@ export default function GalleryTitle() {
 	return (
 		<div>
 		{adjective !== '' &&
-			<div className={`text-xl text-gray-900 bg-white/60 p-5 shadow-xl rounded-lg ${fascinate.className} w-full lg:text-5xl`}>
+			<div className={`text-xl text-white bg-gray-900 p-5 shadow-xl rounded-lg ${fascinate.className} w-full lg:text-5xl`}>
 				<div className="text-lg lg:text-3xl">lehiGh VAlley</div><div><em>{adjective}</em> Art GAllery</div>
 			</div>
 		}

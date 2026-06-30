@@ -7,7 +7,7 @@ export default async function BottomBar() {
 
 	return (
 		<section className="bottombar">
-			<div className="bottombar_container  md:hidden">
+			<div className="bottombar_container md:hidden">
 				{user && 
 					<Nav user={user}/>
 				}

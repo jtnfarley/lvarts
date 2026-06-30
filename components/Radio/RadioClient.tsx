@@ -109,8 +109,8 @@ export default function RadioClient(props:{nowPlaying:any}) {
 		<div className="flex justify-center w-full bg-gray-900/80">
 			{audiotrack && 
 				<div className="p-3 flex gap-2 items-center">
-					<div className="text-white"><Image src={coverartfile} width={75} height={75} alt={`${audiotrack.trackname} by ${audiotrack.artist}`}/></div>
-					<div className="text-white text-sm w-[150px]">
+					<div className="text-white"><Image src={coverartfile} width={75} height={75} alt={`${audiotrack.trackname} by ${audiotrack.artist}`} className="min-w-[25px]"/></div>
+					<div className="text-white text-sm max-w-[150px]">
 						<div className="text-xs"><em>Now Playing</em></div>
 						<div className="flex items-center">
 							<div><Link href={`/post/${nowPlaying.id}`}><strong>{audiotrack.trackname}</strong></Link></div>
@@ -140,6 +140,7 @@ export default function RadioClient(props:{nowPlaying:any}) {
 						step="0.01"
 						value={volume}
 						onChange={(event) => setVolume(Number(event.target.value))}
+						className="max-w-[100px]"
 					/>
 				</label>
 			</div>		

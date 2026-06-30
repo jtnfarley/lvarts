@@ -29,7 +29,7 @@ const getAudioTrack = async (trackname:string) => {
 
 export default async function Radio() {
 	return (
-		<section className="fixed bottom-[86px] md:bottom-0 w-full">
+		<section className="fixed bottom-[62px] md:bottom-0 w-full">
 			<Tracks getAudioTrack={getAudioTrack}/>	
 		</section>
 	)

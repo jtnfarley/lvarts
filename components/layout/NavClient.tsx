@@ -25,7 +25,7 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 	}, [])
 
 	return (		
-		<div className='flex gap-8 justify-center items-center mb-6'>
+		<div className='flex gap-8 justify-center items-center md:mb-6'>
 			{user ?
 				<>
 					<a href="/home" className={`leftsidebar_link flex flex-row items-center`} title="Home">

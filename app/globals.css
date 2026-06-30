@@ -23,7 +23,7 @@
 
 @layer components {
     .main-container {
-        @apply flex w-lg min-h-screen flex-1 flex-col items-center px-6 pt-3 pb-[100px] overflow-auto xl:mt-10;
+        @apply flex w-lg min-h-screen flex-1 flex-col items-center px-4 pt-3 pb-[100px] overflow-auto xl:mt-10 lg:px-20;
     }
 
     .calendar-container {
