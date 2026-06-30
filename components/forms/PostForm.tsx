@@ -142,10 +142,17 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
             return;
         }
 
+        // Strip file objects after upload — only the filename is needed server-side.
+        // Passing raw File / base64 data URLs to a server action blows Vercel's 4.5MB limit.
+        delete (values as any).postfileObj;
+        if (values.coverartfile?.name) {
+            values.coverartfile = { name: values.coverartfile.name };
+        }
+
         if (values.posttype === 'audio') {
             values.posttype = 'post';
         }
-console.log(values)
+
         await savePost(values);
 
         if (post?.id) {
