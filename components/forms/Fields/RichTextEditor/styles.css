@@ -116,11 +116,6 @@ h1 {
   font-size: 94%;
 }
 
-.editor-link {
-  color: rgb(33, 111, 219) !important;
-  text-decoration: none;
-}
-
 .editor-mention {
   display: inline-flex;
   align-items: center;

@@ -12,6 +12,12 @@ export const metadata: Metadata = {
   description: "Lehigh Valley Arts Community Social Media",
 };
 
+// Applies the persisted theme to the document root before paint, so it
+// survives client-side navigation between route groups (nested layouts
+// remount on navigation and their inline scripts don't re-run, but the
+// <html> element here never unmounts).
+const themeInitScript = `(function(){try{var t=localStorage.getItem('lvartsmusic-theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
+
 export default async function RootLayout({
   	children,
 }: Readonly<{
@@ -20,9 +26,10 @@ export default async function RootLayout({
 
 	return (
 		<ModalProvider>
-			<html lang="en">
+			<html lang="en" data-theme="lvartsmusic" suppressHydrationWarning>
 				<head>
 					<GoogleAnalytics gaId="G-J6PQBNCBKC" />
+					<script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
 				</head>
 				<body>
 					<RandoBgs/>

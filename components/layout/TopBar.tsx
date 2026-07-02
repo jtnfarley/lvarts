@@ -3,6 +3,7 @@ import Nav from "./Nav"
 import ThemeToggle from "./ThemeToggle"
 import Avatar from "@/components/shared/Avatar"
 import imageUrl from '@/constants/imageUrl'
+import Link from "next/link"
 
 const TopBar = (props: {theme?:'lvartsmusic', user?:User}) => {
     if (props.theme === 'lvartsmusic') {
@@ -13,28 +14,27 @@ const TopBar = (props: {theme?:'lvartsmusic', user?:User}) => {
 
         return (
             <header className="sticky top-0 z-20 border-b border-lvartsmusic-border bg-lvartsmusic-background/90 backdrop-blur">
-                <div className="mx-auto flex h-16 w-full max-w-[1265px] items-center justify-between px-4">
-                    <a href='/home' className="flex shrink-0 items-center gap-2.5">
+                <div className="mx-auto flex h-16 w-full max-w-[1265px] items-center justify-between">
+                    <Link href='/home' className="flex shrink-0 items-center gap-2.5">
                         <img
-                            src='/logos/lvarts-artsy-paths.svg'
+                            src='/logos/map.png'
                             alt="Lehigh Valley Arts & Music"
-                            className="h-10 w-10"
+                            className="h-[64px]"
                         />
-                        <span className="hidden text-lg font-extrabold tracking-tight text-lvartsmusic-foreground sm:block">
-                            Lehigh Valley Arts &amp; Music
-                        </span>
-                    </a>
+                    </Link>
 
-                    <nav className="hidden md:block">
-                        <Nav user={props.user} theme="lvartsmusic" />
-                    </nav>
+                    {!props.user?.anonymous &&
+                        <nav className="hidden md:block">
+                            <Nav user={props.user} theme="lvartsmusic" />
+                        </nav>
+                    }
 
                     <div className="flex shrink-0 items-center gap-1">
                         <ThemeToggle />
                         {userdetails &&
-                            <a href="/profile" className="rounded-full p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/10" title="Your profile">
+                            <Link href="/profile" className="rounded-full p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/10" title="Your profile">
                                 <Avatar imageUrl={avatar} displayName={userdetails.displayname} handle={userdetails.handle} size="sm" />
-                            </a>
+                            </Link>
                         }
                     </div>
                 </div>

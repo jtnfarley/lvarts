@@ -8,15 +8,13 @@ const STORAGE_KEY = 'lvartsmusic-theme'
 export default function ThemeToggle() {
 	const [isDark, setIsDark] = useState(false)
 
-	const getShell = () => document.querySelector('[data-theme="lvartsmusic"]')
-
 	useEffect(() => {
-		setIsDark(getShell()?.classList.contains('dark') ?? false)
+		setIsDark(document.documentElement.classList.contains('dark'))
 	}, [])
 
 	const toggleTheme = () => {
 		const next = !isDark
-		getShell()?.classList.toggle('dark', next)
+		document.documentElement.classList.toggle('dark', next)
 		localStorage.setItem(STORAGE_KEY, next ? 'dark' : 'light')
 		setIsDark(next)
 	}

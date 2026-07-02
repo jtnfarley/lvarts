@@ -9,7 +9,6 @@ import User from "@/lib/models/user";
 import createDOMPurify from "dompurify";
 import { useFollowsStore } from '@/stores/follows-store';
 import Avatar from '@/components/shared/Avatar';
-import CommunityPlaceholder from '@/components/shared/CommunityPlaceholder';
 
 export default function Profile(props:{profile:SidebarProfile, user:User, getUpdatedProfile?:Function, theme?:'lvartsmusic'}) {
 	const { profile, user, theme } = props;
@@ -79,39 +78,25 @@ export default function Profile(props:{profile:SidebarProfile, user:User, getUpd
 					<strong className="text-lvartsmusic-foreground">{profile.postcount || 0}</strong> posts
 				</div>
 
-				{isOwnProfile &&
-					<button onClick={() => redirect(`/profile`)} className="lvartsmusic-pill-outline mt-4 w-full">
-						<BiEdit className="inline" /> My Profile
-					</button>
-				}
-
-				<div className="mt-6">
-					<h2 className="text-xs font-bold uppercase tracking-wide text-lvartsmusic-muted">Skills</h2>
-					<div className="mt-2 flex flex-wrap gap-2 opacity-50">
-						<span className="rounded-full border border-dashed border-lvartsmusic-muted px-3 py-1 text-xs font-medium text-lvartsmusic-muted">
-							Coming soon
-						</span>
-					</div>
-				</div>
-
-				<div className="mt-6">
-					<h2 className="text-xs font-bold uppercase tracking-wide text-lvartsmusic-muted">Communities</h2>
-					<CommunityPlaceholder />
-				</div>
-
 				{profile.urls && profile.urls.length > 0 &&
 					<div className="mt-6">
 						<h2 className="text-xs font-bold uppercase tracking-wide text-lvartsmusic-muted">Links</h2>
 						<div className="mt-2 space-y-1 text-center">
 							{profile.urls.map((url, index) => (
 								<div key={index}>
-									<a href={(url.url.match(/^https?:\/\//)) ? url.url : `https://${url.url}`} target='blank' className='text-lvartsmusic-accent'>
+									<a href={(url.url.match(/^https?:\/\//)) ? url.url : `https://${url.url}`} target='_blank' rel='noopener noreferrer' className='link'>
 										{url.urlname || url.url}
 									</a>
 								</div>
 							))}
 						</div>
 					</div>
+				}
+
+				{isOwnProfile &&
+					<button onClick={() => redirect(`/profile`)} className="lvartsmusic-pill-outline mt-4 w-full">
+						<BiEdit className="inline" /> My Profile
+					</button>
 				}
 			</div>
 		)
@@ -166,7 +151,7 @@ export default function Profile(props:{profile:SidebarProfile, user:User, getUpd
                             {profile.urls.map((url, index) => {
                                 return (
                                     <div key={index} className='mb-2'>
-                                        <a href={(url.url.match(/^https?:\/\//)) ? url.url : `https://${url.url}`} target='blank' className='text-blue-500'>{url.urlname || url.url}</a>
+                                        <a href={(url.url.match(/^https?:\/\//)) ? url.url : `https://${url.url}`} target='_blank' rel='noopener noreferrer' className='text-blue-500'>{url.urlname || url.url}</a>
                                     </div>
                                 )
                             })}

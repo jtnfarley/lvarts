@@ -18,8 +18,8 @@ export default function Search(props:{query:string, user:User, posts:FeedRow[], 
                     {user && 
                         posts &&
                         <div className="flex flex-col gap-5 py-3">
-                            <div className='bg-white rounded-md text-2xl font-bold px-3 py-3 flex justify-center'>
-                                {query.toString()}
+                            <div className='lvartsmusic-card text-2xl font-bold px-3 py-3 flex justify-center'>
+                                #{query.toString()}
                             </div>
                             {
                                 (user && posts && posts.length) &&

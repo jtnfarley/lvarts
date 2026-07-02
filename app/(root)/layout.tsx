@@ -18,11 +18,6 @@ export const metadata: Metadata = {
   description: "Lehigh Valley Arts Community Social Media",
 };
 
-// Applies the persisted theme before paint to avoid a light/dark flash.
-// Runs synchronously as the first child of the theme wrapper, so
-// `document.currentScript.parentElement` always resolves to that wrapper.
-const themeInitScript = `(function(){try{var t=localStorage.getItem('lvartsmusic-theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.currentScript.parentElement.classList.add('dark');}catch(e){}})();`;
-
 export default async function RootLayout({
   	children,
 }: Readonly<{
@@ -37,9 +32,13 @@ export default async function RootLayout({
 		? await getUserLikesDAL(user.userdetails.id)
 		: [];
 
+	const gradientAngle = Math.floor(Math.random() * 360);
+
 	return (
-		<div data-theme="lvartsmusic" suppressHydrationWarning className={`${geistSans.variable} font-lvartsmusic-sans bg-lvartsmusic-background text-lvartsmusic-foreground`}>
-			<script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+		<div
+			className={`${geistSans.variable} font-lvartsmusic-sans lvartsmusic-bg-gradient text-lvartsmusic-foreground`}
+			style={{ '--gradient-angle': `${gradientAngle}deg` } as React.CSSProperties}
+		>
 			<Initializer followers={userFollows.followers} following={userFollows.following} likes={userLikes}/>
 			<TopBar theme="lvartsmusic" user={user}/>
 			<main className="mx-auto flex w-full max-w-[1265px] justify-center">

@@ -3,12 +3,6 @@
 /*   ---break---    */
 @custom-variant dark (&:is(.dark *));
 
-
-
-.noti-link a {
-    color:var(--color-orange-300);
-}
-
 .post-img img {
     position:relative!important;
 }
@@ -98,6 +92,7 @@
    already-present `@custom-variant dark (&:is(.dark *));` at the top of this file. */
 [data-theme="lvartsmusic"] {
     --lvartsmusic-background: #fbf9f5;
+    --lvartsmusic-background-light: #fff4dd;
     --lvartsmusic-foreground: #1c1a17;
     --lvartsmusic-card: #ffffff;
     --lvartsmusic-border: rgba(0,0,0,0.08);
@@ -109,6 +104,7 @@
 
 [data-theme="lvartsmusic"].dark {
     --lvartsmusic-background: #050403;
+    --lvartsmusic-background-light: #2a2016;
     --lvartsmusic-foreground: #f4f4f5;
     --lvartsmusic-card: #18181b;
     --lvartsmusic-border: rgba(255,255,255,0.1);
@@ -131,6 +127,12 @@
 }
 
 @layer components {
+    /* subtle diagonal wash: same background color, lifted slightly at one edge.
+       --gradient-angle is set inline per layout so the tilt varies per visit. */
+    .lvartsmusic-bg-gradient {
+        background: linear-gradient(var(--gradient-angle, 135deg), var(--lvartsmusic-background), var(--lvartsmusic-background-light));
+    }
+
     .lvartsmusic-card {
         @apply rounded-2xl border border-lvartsmusic-border bg-lvartsmusic-card;
     }
@@ -325,6 +327,10 @@
     --font-poster: 'Anton', 'Arial Narrow', sans-serif;
     --font-marker: 'Permanent Marker', cursive;
     --font-typewriter: 'Special Elite', 'Courier New', monospace;
+}
+
+a.editor-link, a.link {
+    color:rgb(30, 120, 255);
 }
 
 /**** switch ***/

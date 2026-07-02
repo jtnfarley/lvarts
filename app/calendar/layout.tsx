@@ -1,17 +1,15 @@
 import { Metadata } from "next";
 import {isLoggedIn} from "@/app/data/currentUser";
 import TopBar from "@/components/layout/TopBar";
-import LeftSidebar from "@/components/layout/LeftSidebar";
 import BottomBar from "@/components/layout/BottomBar";
 import UserDetails from "@/lib/models/userDetails";
-import Nav from "@/components/layout/Nav";
 
 export const metadata: Metadata = {
   title: "Lehigh Valley Arts & Music Events Calendar",
   description: "Art & Music Events in the Lehigh Valley",
 };
 
-export default async function RootLayout({
+export default async function CalendarLayout({
   	children,
 }: Readonly<{
   	children: React.ReactNode;
@@ -27,24 +25,22 @@ export default async function RootLayout({
 			updatedat: new Date()
 		}
 	}
+	const gradientAngle = Math.floor(Math.random() * 360);
+
 	return (
-		<div className="bg-gray-800">
-			<TopBar/>
-			<main className="flex flex-row">
-				<LeftSidebar currentUser={user}/>
+		<div
+			className="min-h-screen lvartsmusic-bg-gradient text-lvartsmusic-foreground"
+			style={{ '--gradient-angle': `${gradientAngle}deg` } as React.CSSProperties}
+		>
+			<TopBar theme="lvartsmusic" user={user}/>
+			<main>
 				<section className="calendar-container">
-					{
-						user && 
-						<section className="hidden pt-3 pe-3 xl:flex w-full justify-end">
-							<Nav user={user}/>
-						</section>
-					}
-					<div className="flex flex-col w-full min-h-screen">
+					<div className="flex flex-col w-full max-w-[1000px] mx-auto min-h-screen">
 						{children}
 					</div>
 				</section>
 			</main>
-			<BottomBar/>
-		</div>	
+			<BottomBar theme="lvartsmusic"/>
+		</div>
 	);
 }

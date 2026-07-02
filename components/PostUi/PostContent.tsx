@@ -76,11 +76,11 @@ export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string
 					}
 
 					linkEnd = placeholder.indexOf('</span>',linkIndex);
+					console.log(placeholder.substring(linkIndex, linkEnd))
 					linkLength = placeholder.substring(linkIndex, linkEnd).length;
-					linkText = placeholder.slice(linkIndex);
-					linkText = linkText.slice(0, linkEnd)
-					linkText = linkText.substring((fullLink.match(/http:/)) ? 7 : 8,50)+'...'
-
+					linkText = placeholder.substring(linkIndex, linkEnd)
+					linkText = linkText.replace(/^https?:\/\//, '');
+					linkText = linkText.length > 50 ? linkText.substring(0, 50)+'...' : linkText;
 					placeholder = `${placeholder.slice(0, linkIndex)}${linkText}${placeholder.slice(linkIndex + linkLength)}`
 					placeholder = placeholder.slice(0, placeholder.indexOf('>',editorLinks[i].index)) + " target='_blank'" + placeholder.slice(placeholder.indexOf('>',editorLinks[i].index)) 
 				}
@@ -88,7 +88,6 @@ export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string
 
 			post = placeholder;
 		}
-
 		if (post.match(/\[(.*?)\]/g)) {
 			post = parseTemplateTags(post);
 		}

@@ -6,15 +6,16 @@ import { signIn } from "next-auth/react"
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useModal } from '@/app/contextProviders/modalProvider'
- 
+import { BG_IMAGES } from '@/components/layout/RandoBgs'
+
 export default function LandingPage() {
     const [error, setError] = useState<string | undefined>();
     const [showAlert, setShowAlert] = useState<boolean>(false);
     const [bg, setBg] = useState<string | undefined>();
     const {
-            setIsOpen, 
-            setTitle, 
-            setType,   
+            setIsOpen,
+            setTitle,
+            setType,
             setMessage,
         } = useModal()
 
@@ -22,7 +23,7 @@ export default function LandingPage() {
         const options = {redirectTo: '/home', email:''}
         if (provider === 'nodemailer') {
             const email = document.getElementById('email') as HTMLInputElement;
-            
+
             if (email.value !== '')
                 options.email = email.value;
             else {
@@ -37,90 +38,93 @@ export default function LandingPage() {
     const setUpAboutModal = () => {
 		setIsOpen(true);
         setTitle('What this is:');
-        setType('GenericModal');  
+        setType('GenericModal');
         setMessage(`Lehigh Valley Art & Music is a gathering place to promote and discover the thriving Lehigh Valley art scene. It's like Twitter/X without sociopathic billionaires and Russian troll farms mucking it up. If you're not a troll bot, or a sociopathic billionaire, please join us. Promote your show. Display your work. Find your new favorite band. Post your Musikfest schedule. Engage and collaborate.`);
 	}
 
     const setUpPrivacyModal = () => {
 		setIsOpen(true);
         setTitle('Privacy Policy');
-        setType('GenericModal');  
+        setType('GenericModal');
         setMessage(`This site is run by a guy in Whitehall who has no interest in selling your data. With that said, this is a public website, and the Internet is overrun with bad actors. There's always a chance your data will leak out. Fortunately we don't store a lot of personal data. Just your name, email and your Google avatar, if you have one, but that's all mostly public anyway.`);
 	}
 
      const setUpCookieModal = () => {
 		setIsOpen(true);
         setTitle('Cookies! Mmmmmm');
-        setType('GenericModal');  
+        setType('GenericModal');
         setMessage(`This site just uses functional cookies to keep you signed in. We don't use any tracking cookies or other such nonsense. You are not the product here.`);
 	}
 
-    const bgs = [
-		'IMG_1705.png',
-		'IMG_2873.png',
-		'IMG_2873-2.png',
-		'IMG_0650.png',
-		'IMG_1419-2.png',
-		'IMG_0492.png',
-		'IMG_2396.png',
-		'IMG_2124.png',
-		'IMG_2150-2.png',
-		'IMG_3727.png',
-	]
-
     useEffect(() => {
-        setBg(bgs[Math.floor(Math.random() * bgs.length)]);
+        setBg(BG_IMAGES[Math.floor(Math.random() * BG_IMAGES.length)]);
     },[])
 
     return (
-        <div className="flex items-center justify-center h-screen " style={{
-            backgroundImage: `url(/images/bgs/${bg})`,
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: 'cover'
-        }}>
-            <div className="p-5 gap-2 bg-gray-900/25 backdrop-blur-sm rounded-2xl xl:w-[600px]">
-                <div className="flex justify-center">
-                    <Image
-                        src='/logos/lvarts-artsy-paths.svg'
-                        alt="Lehigh Valley Arts & Music"
-                        width={500}
-                        height={195}
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        priority
-                        className="w-full rounded-sm"
-                    />
-                </div>
+        <div className="flex min-h-screen items-center justify-center p-4">
+            <div className="flex w-full max-w-4xl overflow-hidden rounded-3xl border border-lvartsmusic-border bg-lvartsmusic-card shadow-2xl">
+                <div className="flex w-full flex-col justify-center p-8 md:w-1/2 md:p-12">
+                    <div className="flex justify-center mb-8">
+                        <Image
+                            src='/logos/lvarts-artsy-paths.svg'
+                            alt="Lehigh Valley Arts & Music"
+                            width={280}
+                            height={110}
+                            sizes="280px"
+                            className="w-full max-w-[280px] rounded-sm"
+                        />
+                    </div>
 
-                <div className="flex flex-col my-5 justify-center items-center">
-                    <button onClick={() => signInUser('google')} className='bg-white w-72 flex justify-center px-3 py-3 rounded-full my-5'>
-                        Sign Up/Sign In with Google 
-                        <div className='ms-3'><img src='/images/goog.png' alt='Google Icon' className='w-[30px] h-[30px]'/></div>
-                    </button>
-                    <div className="flex justify-center my-3 border-b-1 border-gray-600 w-2/3"></div>
-                    <div className="my-2 text-white">Sign Up/Sign In with Email</div>
-                    <div className="flex items-center mb-2">
-                        <input type='text' name='email' id='email' placeholder='Email' className="border-2 px-2 py-2 me-2 rounded-md bg-white" 
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="email" className="text-sm font-medium text-lvartsmusic-foreground">Email</label>
+                        <input type='text' name='email' id='email' placeholder='you@example.com'
                             onFocus={() => setShowAlert(true)}
                         />
-                        <Button onClick={() => signInUser('nodemailer')} className='px-3 py-5.5'>Send Link</Button>
+                        <Button onClick={() => signInUser('nodemailer')} className='lvartsmusic-pill-accent w-full mt-1 text-white'>Send Link</Button>
+                        {showAlert &&
+                            <div className='text-sm text-lvartsmusic-muted'><em>Be sure to check your spam folder for the sign-in link.</em></div>
+                        }
+                        {error &&
+                            <div className='text-sm text-red-600'>Please enter a valid email address</div>
+                        }
                     </div>
-                    {showAlert && 
-                        <div className='text-green-900 bg-white py-1 px-2 rounded-sm'><em>Be sure to check your spam folder for the sign-in link.</em></div>
-                    }
-                    {error && 
-                        <div className='text-red-800 bg-white py-1 px-2 rounded-sm'>Please enter a valid email address</div>
-                    }
+
+                    <div className="flex items-center gap-3 my-6">
+                        <div className="h-px flex-1 bg-lvartsmusic-border"></div>
+                        <span className="text-xs text-lvartsmusic-muted">or</span>
+                        <div className="h-px flex-1 bg-lvartsmusic-border"></div>
+                    </div>
+
+                    <button onClick={() => signInUser('google')} className='w-full flex items-center justify-center gap-3 rounded-full border border-lvartsmusic-border bg-white px-3 py-2.5 text-gray-700 font-medium hover:bg-gray-50 transition-colors'>
+                        <img src='/images/goog.png' alt='Google Icon' className='w-[22px] h-[22px]'/>
+                        Sign Up/Sign In with Google
+                    </button>
+
+                    <div className='flex flex-col sm:flex-row justify-center mt-8 gap-3'>
+                        <Link href='/calendar' className="lvartsmusic-pill-outline text-center">Events Calendar</Link>
+                        <Link href='/gallery' className="lvartsmusic-pill-outline text-center">Community Art Gallery</Link>
+                    </div>
+
+                    <div className='flex justify-center mt-6 gap-5'>
+                        <button onClick={() => setUpAboutModal()} className="text-xs text-lvartsmusic-muted hover:text-lvartsmusic-accent cursor-pointer">What is this?</button>
+                        <button onClick={() => setUpPrivacyModal()} className="text-xs text-lvartsmusic-muted hover:text-lvartsmusic-accent cursor-pointer">Privacy Policy</button>
+                        <button onClick={() => setUpCookieModal()} className="text-xs text-lvartsmusic-muted hover:text-lvartsmusic-accent cursor-pointer">Cookie Policy</button>
+                    </div>
                 </div>
-                <div className='flex flex-col items-center justify-center mt-25 gap-3'>
-                    <Link href='/calendar' className="flex justify-center text-white bg-orange py-2 px-2 rounded-sm w-1/2">Lehigh Valley Events Calendar</Link>
-                    <Link href='/gallery' className="flex justify-center text-white bg-orange py-2 px-2 rounded-sm w-1/2">Lehigh Valley Community Art Gallery</Link>
+
+                <div className="relative hidden md:block md:w-1/2">
+                    {bg && (
+                        <Image
+                            src={`/images/bgs/${bg}`}
+                            alt=""
+                            fill
+                            priority
+                            sizes="(max-width: 768px) 0px, 50vw"
+                            className="object-cover"
+                        />
+                    )}
                 </div>
-                <div className='flex justify-center mt-5 gap-5'>
-                    <button onClick={() => setUpAboutModal()} className="text-white cursor-pointer">What is this?</button>
-                    <button onClick={() => setUpPrivacyModal()} className="text-white cursor-pointer">Privacy Policy</button>
-                    <button onClick={() => setUpCookieModal()} className="text-white cursor-pointer">Cookie Policy</button>
-                </div>
-        </div>
+            </div>
         </div>
     )
 }
