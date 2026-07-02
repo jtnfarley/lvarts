@@ -23,7 +23,7 @@
 
 @layer components {
     .main-container {
-        @apply flex w-lg min-h-screen flex-1 flex-col items-center px-4 pt-3 pb-[100px] overflow-auto xl:mt-10 lg:px-20;
+        @apply flex w-lg min-h-screen flex-1 flex-col items-center px-4 pt-4 pb-[100px] overflow-auto;
     }
 
     .calendar-container {
@@ -93,55 +93,58 @@
     .user-card_btn {
         @apply h-auto min-w-[74px] rounded-lg bg-primary text-[12px];
     }
+}
 
-    /*       .account-form_input {
-            @apply border border-dark-4 bg-dark-3 text-light-1 !important;
-        }
+/*** lvartsmusic theme (restyled app shell: nav/sidebars/feed) ***/
+/* Light values are the default under [data-theme="lvartsmusic"]; a `.dark`
+   ancestor class (toggled by ThemeToggle) swaps in the dark palette via the
+   already-present `@custom-variant dark (&:is(.dark *));` at the top of this file. */
+[data-theme="lvartsmusic"] {
+    --lvartsmusic-background: #fbf9f5;
+    --lvartsmusic-foreground: #1c1a17;
+    --lvartsmusic-card: #ffffff;
+    --lvartsmusic-border: rgba(0,0,0,0.08);
+    --lvartsmusic-accent: #eb7f2e;
+    --lvartsmusic-accent-foreground: #fffaf3;
+    --lvartsmusic-accent-highlight: #f2c230;
+    --lvartsmusic-muted: #6b6b6b;
+}
 
-        .no-focus {
-            @apply focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0 !important;
-        }
+[data-theme="lvartsmusic"].dark {
+    --lvartsmusic-background: #050403;
+    --lvartsmusic-foreground: #f4f4f5;
+    --lvartsmusic-card: #18181b;
+    --lvartsmusic-border: rgba(255,255,255,0.1);
+    --lvartsmusic-accent: #eb7f2e;
+    --lvartsmusic-accent-foreground: #fffaf3;
+    --lvartsmusic-accent-highlight: #f2c230;
+    --lvartsmusic-muted: #a1a1aa;
+}
 
-        .group-card {
-            @apply w-full rounded-lg bg-dark-3 px-4 py-5 sm:w-96;
-        }
+@theme inline {
+    --color-lvartsmusic-background: var(--lvartsmusic-background);
+    --color-lvartsmusic-foreground: var(--lvartsmusic-foreground);
+    --color-lvartsmusic-card: var(--lvartsmusic-card);
+    --color-lvartsmusic-border: var(--lvartsmusic-border);
+    --color-lvartsmusic-accent: var(--lvartsmusic-accent);
+    --color-lvartsmusic-accent-foreground: var(--lvartsmusic-accent-foreground);
+    --color-lvartsmusic-accent-highlight: var(--lvartsmusic-accent-highlight);
+    --color-lvartsmusic-muted: var(--lvartsmusic-muted);
+    --font-lvartsmusic-sans: var(--font-geist-sans);
+}
 
-        .group-card_btn {
-            @apply rounded-lg bg-primary-500 px-5 py-1.5 text-small-regular !text-light-1 !important;
-        }
+@layer components {
+    .lvartsmusic-card {
+        @apply rounded-2xl border border-lvartsmusic-border bg-lvartsmusic-card;
+    }
 
-        .tweet-card_bar {
-            @apply relative mt-2 w-0.5 grow rounded-full bg-neutral-800;
+    .lvartsmusic-pill-accent {
+        @apply rounded-full bg-lvartsmusic-accent px-4 py-2 text-sm font-bold text-lvartsmusic-accent-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40;
+    }
 
-        }
-
-        .pagination {
-            @apply mt-10 flex w-full items-center justify-center gap-5;
-        }
-
-        .tab {
-            @apply flex min-h-[50px] flex-1 items-center gap-3 bg-dark-2 text-light-2 data-[state=active]:bg-[#0e0e12] data-[state=active]:text-light-2 !important;
-        }
-
-        .comment-form {
-            @apply mt-10 flex items-center gap-4 border-y border-y-dark-4 py-5 max-xs:flex-col !important;
-        }
-
-        .comment-form_btn {
-            @apply rounded-3xl bg-primary-500 px-8 py-2 !text-small-regular text-light-1 max-xs:w-full !important;
-        }
-
-        .notification-card {
-            @apply flex items-center gap-2 rounded-md bg-dark-2 px-7 py-4;
-        }
-
-        .searchbar {
-            @apply flex gap-1 rounded-lg bg-dark-3 px-4 py-2;
-        }
-
-        .searchbar_input {
-            @apply border-none bg-dark-3 text-base-regular text-light-4 outline-none !important;
-        }    */
+    .lvartsmusic-pill-outline {
+        @apply rounded-full border border-lvartsmusic-accent/50 px-4 py-2 text-sm font-semibold text-lvartsmusic-accent transition-colors hover:bg-lvartsmusic-accent/10;
+    }
 }
 
 @layer utilities {
@@ -397,6 +400,13 @@ input:checked + .slider:before {
 .galleryGrid {
     columns:auto 400px;
     column-gap: 5rem;
+}
+
+
+/*** forms ***/
+
+input[type='text'] {
+    @apply w-full rounded-lg border border-[var(--lvartsmusic-border)] px-3 py-2 bg-[var(--lvartsmusic-card)]
 }
 
 

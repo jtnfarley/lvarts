@@ -312,7 +312,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                         )}
 
                         {isAIIfied && (
-                            <button onClick={() => resetPost(editorRef)} type='button' className="bg-gray-900 me-2 px-2 py-2 rounded text-white font-semibold cursor-pointer disabled:bg-orange-200">
+                            <button onClick={() => resetPost(editorRef)} type='button' className="bg-gray-900 me-2 px-3.5 py-1.5 rounded-full text-white font-semibold cursor-pointer disabled:bg-orange-200">
                                 Reset
                             </button>
                         )}
@@ -341,14 +341,14 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                             <button
                                 onClick={() => setShowTones(!showTones)}
                                 type='button'
-                                className="bg-white border border-gray-500 px-2 py-2 rounded text-gray-500 uppercase font-semibold cursor-pointer disabled:bg-orange-200"
+                                className="bg-white border border-gray-500 px-3.5 py-1.5 rounded-full text-gray-500 uppercase font-semibold cursor-pointer disabled:bg-orange-200 text-sm"
                                 disabled={isSaving}
                             >
                                 AI-ify
                             </button>
                         </div>
 
-                        <button type='submit' className="bg-orange px-2 py-2 rounded text-white uppercase font-semibold cursor-pointer disabled:bg-orange-200" disabled={isSaving}>
+                        <button type='submit' className="bg-orange px-3.5 py-1.5 rounded-full text-white uppercase font-semibold cursor-pointer disabled:bg-orange-200 text-sm" disabled={isSaving}>
                             Post
                         </button>
                     </div>

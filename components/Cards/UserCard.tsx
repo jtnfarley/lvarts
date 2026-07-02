@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import User from "@/lib/models/user"
 import Follow from '../PostUi/Follow';
+import Avatar from '@/components/shared/Avatar';
 
 interface Props {
     currentUser: User
@@ -16,7 +17,7 @@ interface Props {
 const UserCard = ({currentUser, recUserId, displayname, handle, avatar, biohtml}: Props) => {
 
     const router = useRouter()
-    
+
     const viewProfile = () => {
         router.push(`/user/${handle}`)
     }
@@ -25,30 +26,22 @@ const UserCard = ({currentUser, recUserId, displayname, handle, avatar, biohtml}
 
     const truncateText = (text:string, length:number) => {
         return (text.length > length) ? `${text.substring(0, length)}...` : text;
-    } 
+    }
 
     return (
-        <article className="xl:w-full xl:border-b xl:border-dashed xl:border-b-gray-500 py-4">
-            <div className="flex items-center text-gray-700 text-sm gap-3 justify-between">
-                <button className="xl:flex w-full gap-3 items-center cursor-pointer" onClick={viewProfile} title={displayname || (handle ? `@${handle}` : 'Profile')}>
-                    <div className="w-[45px]">
-                        <img src={avatar} className='rounded-none border-2 border-black shadow-hard-sm rotate-[-3deg] w-[45px] h-[45px] object-cover'/>
-                    </div>
+        <article className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-black/5 dark:hover:bg-white/10">
+            <button className="flex min-w-0 flex-1 items-center gap-3 text-left cursor-pointer" onClick={viewProfile} title={displayname || (handle ? `@${handle}` : 'Profile')}>
+                <Avatar imageUrl={avatar} displayName={displayname} handle={handle} size="sm" />
 
-                    <div className='hidden xl:block text-start'>
-                        <div className='font-poster uppercase tracking-wide xl:text-gray-200 xl:text-[18px] leading-tight'>{truncateText(displayname || '', 17) || (handle ? `@${truncateText(handle, 10)}` : 'Artist')}</div>
-                        {handle && <div className='hidden xl:block font-typewriter text-sm lowercase text-orange'>@{truncateText(handle, 17)}</div>}
-                    </div>
-                </button>
-                <div className='hidden xl:block'>
-                    <Follow followinguserdetailsid={recUserId} user={currentUser}/>
+                <div className="min-w-0 flex-1">
+                    <div className="truncate text-[15px] font-bold text-lvartsmusic-foreground">{truncateText(displayname || '', 17) || (handle ? `@${truncateText(handle, 10)}` : 'Artist')}</div>
+                    {handle && <div className="truncate text-sm text-lvartsmusic-muted">@{truncateText(handle, 17)}</div>}
+                    {bio && bio !== '' &&
+                        <div className="truncate text-sm text-lvartsmusic-muted">{truncateText(bio, 60)}</div>
+                    }
                 </div>
-            </div>
-            {bio && bio !== '' &&
-                <div className="mt-3">
-                    <div className='hidden xl:block text-sm rounded-sm text-gray-400'>{truncateText(bio, 100)}</div>
-                </div>
-            }
+            </button>
+            <Follow followinguserdetailsid={recUserId} user={currentUser}/>
         </article>
     )
 }

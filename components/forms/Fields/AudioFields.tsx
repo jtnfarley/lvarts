@@ -61,8 +61,8 @@ const AudioFields = (props: {
                     <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Track Title <span className="text-red-500">*</span></div>
                     <input
                         {...register('trackname', { required: 'Track title is required' })}
-                        className="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white"
                         placeholder={`Let's Get Shirt-Faced`}
+                        type='text'
                     />
                     {errors?.trackname && <p className="mt-1 text-xs text-red-500">{errors.trackname.message}</p>}
                 </div>
@@ -70,7 +70,7 @@ const AudioFields = (props: {
                     <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Artist Name <span className="text-red-500">*</span></div>
                     <input
                         {...register('artist', { required: 'Artist name is required' })}
-                        className="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white"
+                        type='text'
                         placeholder={`The Happy Accidents`}
                     />
                     {errors?.artist && <p className="mt-1 text-xs text-red-500">{errors.artist.message}</p>}
@@ -79,7 +79,7 @@ const AudioFields = (props: {
                     <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Album Name</div>
                     <input
                         {...register('album')}
-                        className="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white"
+                        type='text'
                         placeholder={`Death Before Disco`}
                     />
                 </div>
@@ -87,7 +87,7 @@ const AudioFields = (props: {
                     <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Release Year</div>
                     <input
                         {...register('releaseyear', { setValueAs: (v: string) => v === '' ? undefined : Number.parseInt(v, 10) })}
-                        className="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white"
+                        type='text'
                         placeholder={`1979`}
                     />
                 </div>

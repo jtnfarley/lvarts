@@ -27,13 +27,8 @@ export default function DeletePost(props:{postData:FeedRow}) {
 	}
 
     return (
-		<>
-			<div className='text-2xl'>
-				<button onClick={setUpModal}>
-					<div className='text-2xl'><BiTrash /></div>
-				</button>
-				
-			</div>
-		</>
+		<button onClick={setUpModal} className='rounded-full p-2 text-lvartsmusic-muted transition-colors hover:bg-rose-500/10 hover:text-rose-500'>
+			<BiTrash className="h-4.5 w-4.5" />
+		</button>
     )
 }

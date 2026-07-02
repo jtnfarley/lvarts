@@ -83,7 +83,7 @@ export default function RTEditor(props:{
 								placeholder={
 									<RandoPlaceholder/>
 								}
-								className="contentEditable w-full py-2 px-3 text-gray-700 focus:outline-none min-h-50 field-sizing-content"
+								className="contentEditable w-full py-2 px-3 text-gray-700 dark:text-zinc-100 focus:outline-none min-h-50 field-sizing-content"
 							/>
 						}
 						ErrorBoundary={LexicalErrorBoundary}

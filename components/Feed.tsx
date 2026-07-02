@@ -112,10 +112,10 @@ export default function Feed(props:{feed:FeedRow[], user:User, getFeedRow:Functi
         <div className="flex flex-col gap-5 pb-5">
 			<APIProvider apiKey={googleMapsApiKey || ''}>
 				{
-					(hasQueuedPosts) && 
+					(hasQueuedPosts) &&
 						<div className='flex justify-center'>
-							<button onClick={loadNewPosts} className='bg-white/25 rounded-full px-3 py-1 text-white flex items-center gap-2'>
-								<div className='text-xl'><BiRefresh color='white' /></div> 
+							<button onClick={loadNewPosts} className='flex items-center gap-2 rounded-full bg-lvartsmusic-card px-4 py-1.5 text-sm text-lvartsmusic-foreground hover:bg-black/5 dark:hover:bg-white/10'>
+								<div className='text-xl'><BiRefresh /></div>
 								Load more posts
 							</button>
 						</div>
@@ -131,7 +131,7 @@ export default function Feed(props:{feed:FeedRow[], user:User, getFeedRow:Functi
 					<LoadOldPosts getOldPosts={getOldPostsFromServer} endOfPosts={endOfPosts}/>
 				</>
 				:
-				<div className='rounded-box flex-row bg-white'>It's quiet. <em>Too quiet.</em> Follow some folks, like <Link href='/user/atown_clown' className='text-blue-500'>this clown</Link>, to get in on the action.</div>
+				<div className='lvartsmusic-card p-4 text-lvartsmusic-muted'>It's quiet. <em>Too quiet.</em> Follow some folks, like <Link href='/user/atown_clown' className='text-lvartsmusic-accent'>this clown</Link>, to get in on the action.</div>
 			}
 			</APIProvider>
         </div>

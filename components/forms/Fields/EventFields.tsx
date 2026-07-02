@@ -39,7 +39,7 @@ const EventFields = (props: {
                     <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Title</div>
                     <input
                         {...register('eventname')}
-                        className="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white"
+                        type='text'
                         placeholder={`What's cookin'`}
                     />
                 </div>
@@ -55,7 +55,7 @@ const EventFields = (props: {
                                 showTimeSelect
                                 showIcon
                                 dateFormat="MMMM d, yyyy h:mm aa"
-                                className="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white"
+                                className="w-full rounded-xl border border-gray-300 px-3 py-2"
                                 icon={<BiCalendar />}
                             />
                         )}
@@ -69,7 +69,7 @@ const EventFields = (props: {
                     <div className="relative">
                         <input
                             {...venuenameRegistration}
-                            className="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white"
+                            type='text'
                             placeholder="ArtsQuest, The Funhouse, Godfrey Daniels, etc."
                             autoComplete="off"
                             onChange={(event) => {
@@ -113,7 +113,7 @@ const EventFields = (props: {
                     <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Map Address</div>
                     <input
                         {...register('address')}
-                        className="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white"
+                        type='text'
                         placeholder="123 Main St., Bethlehem, PA"
                     />
                 </div>

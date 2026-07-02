@@ -46,7 +46,7 @@ export default function RecUsersShuffler(props:{randUsers:UserDetails[], user:Us
 									handle={ userdetails.handle }
 									avatar={ (userdetails && userdetails.userdir && userdetails.avatar) ?
 										`${imageUrl}/${userdetails.userdir}/${userdetails.avatar}` :
-										'/images/melty-man.png'
+										undefined
 									}
 									biohtml={ userdetails.biohtml }
 									// userType = 'User'

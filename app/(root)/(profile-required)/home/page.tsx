@@ -22,8 +22,9 @@ export default async function Home() {
 
 	return (
 		<div>
-			<div className='xl:hidden'>
-				<RecUsers/>	
+			<div className='lvartsmusic-card mb-4 p-4 xl:hidden'>
+				<h2 className="mb-2 text-xl font-extrabold text-lvartsmusic-foreground">Who to follow</h2>
+				<RecUsers/>
 			</div>
 			<div>
 				<AddPostForm user={user} posttype='post' edited={false} savePost={savePost} />

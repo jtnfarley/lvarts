@@ -2,7 +2,7 @@
 
 import User from '@/lib/models/user';
 
-import { BiSolidUserCheck, BiUserPlus, BiSolidUserX } from "react-icons/bi";
+import { BiUserPlus } from "react-icons/bi";
 
 import { useEffect, useState } from 'react';
 import { followUser, unfollowUser } from '@/app/actions/user';
@@ -11,7 +11,6 @@ import { useFollowsStore } from '@/stores/follows-store';
 export default function Follow(props:{followinguserdetailsid:number, user:User}) {
 	const followinguserdetailsid = props.followinguserdetailsid;
 	const user = props.user;
-	const [isHovered, setIsHovered] = useState(false);
 	const [isFollowing, setIsFollowing] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const following = useFollowsStore((state) => state.following);
@@ -60,26 +59,27 @@ export default function Follow(props:{followinguserdetailsid:number, user:User})
 	}, [following])
 
     return (
-		<div className='flex flex-grow justify-end me-2 align-middle'>
+		<div className='flex shrink-0 justify-end'>
 			{isFollowing ? (
-				<button className='stamp-btn text-2xl bg-amber-50 p-1 max-h-[34px] rotate-[-3deg]' title={isHovered ? 'unfollow' : 'following'}
+				<button
+					type="button"
+					className="group rounded-full border border-zinc-500/50 px-3.5 py-1.5 text-sm font-semibold text-lvartsmusic-foreground transition-colors hover:border-rose-800 hover:bg-rose-950/20 hover:text-rose-500"
 					disabled={isSubmitting}
-					onMouseEnter={() => setIsHovered(true)}
-					onMouseLeave={() => setIsHovered(false)}
 					onClick={toggleFollow}
 				>
-					{isHovered ? <BiSolidUserX color='#f03030' /> : <BiSolidUserCheck color='#12bc01' />}
+					<span className="group-hover:hidden">Following</span>
+					<span className="hidden group-hover:inline">Unfollow</span>
 				</button>
 			) : (
-				<button className='stamp-btn text-2xl bg-orange text-white p-1 max-h-[36px] rotate-[-3deg]' title='follow'
+				<button
+					type="button"
+					className="lvartsmusic-pill-accent flex items-center gap-1.5 px-3.5 py-1.5"
 					disabled={isSubmitting}
-					onMouseEnter={() => setIsHovered(true)}
-					onMouseLeave={() => setIsHovered(false)}
 					onClick={toggleFollow}
 				>
-					<BiUserPlus />
+					<BiUserPlus /> Follow
 				</button>
 			)}
-		</div>					
+		</div>
     )
 }

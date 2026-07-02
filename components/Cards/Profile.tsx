@@ -1,6 +1,5 @@
 'use client'
 
-import Image from "next/image"
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import imageUrl from '@/constants/imageUrl';
@@ -9,14 +8,16 @@ import type SidebarProfile from '@/lib/models/sidebarProfile';
 import User from "@/lib/models/user";
 import createDOMPurify from "dompurify";
 import { useFollowsStore } from '@/stores/follows-store';
+import Avatar from '@/components/shared/Avatar';
+import CommunityPlaceholder from '@/components/shared/CommunityPlaceholder';
 
-export default function Profile(props:{profile:SidebarProfile, user:User, getUpdatedProfile?:Function}) {
-	const { profile, user } = props;
+export default function Profile(props:{profile:SidebarProfile, user:User, getUpdatedProfile?:Function, theme?:'lvartsmusic'}) {
+	const { profile, user, theme } = props;
 	const [biohtml, setBioHtml] = useState('');
 	const avatarSrc = (profile && profile.userdir && profile.avatar) ?
 		`${imageUrl}/${profile.userdir}/${profile.avatar}` :
-		'/images/melty-man.png'
-        
+		undefined
+
     const userfollowing = useFollowsStore((state) => state.following);
     const userfollowers = useFollowsStore((state) => state.followers);
     let followers = 0, following = 0;
@@ -37,7 +38,86 @@ export default function Profile(props:{profile:SidebarProfile, user:User, getUpd
 		setBioHtml(createDOMPurify(window).sanitize(profile.biohtml));
 	}, [profile.biohtml]);
 
-	return (	
+	const isOwnProfile = Boolean(profile && user && user.userdetails && profile.id === user.userdetails.id);
+
+	if (theme === 'lvartsmusic') {
+		return (
+			<div className="lvartsmusic-card w-full p-5">
+				<div className="flex items-center justify-center gap-6">
+					<div className="text-center">
+						<p className="text-lg font-extrabold text-lvartsmusic-foreground">{following || 0}</p>
+						<p className="text-xs text-lvartsmusic-muted">Following</p>
+					</div>
+
+					<div className="relative flex h-24 w-24 shrink-0 items-center justify-center">
+						<div className="absolute inset-0 rounded-full border border-lvartsmusic-accent/15" />
+						<div className="absolute inset-2 rounded-full border border-lvartsmusic-accent/30" />
+						<div className="absolute inset-4 rounded-full border-2 border-lvartsmusic-accent-highlight/50" />
+						<Avatar imageUrl={avatarSrc} displayName={profile?.displayname} handle={profile?.handle} size="lg" />
+					</div>
+
+					<div className="text-center">
+						<p className="text-lg font-extrabold text-lvartsmusic-foreground">{followers || 0}</p>
+						<p className="text-xs text-lvartsmusic-muted">Followers</p>
+					</div>
+				</div>
+
+				<div className="mt-4 text-center">
+					<p className="truncate text-base font-bold text-lvartsmusic-foreground">
+						{profile.displayname || (profile.handle ? `@${profile.handle}` : '')}
+					</p>
+					{profile.handle &&
+						<p className="text-sm text-lvartsmusic-muted">@{profile.handle}</p>
+					}
+				</div>
+
+				{biohtml &&
+					<div className="mt-3 text-center text-sm text-lvartsmusic-muted" dangerouslySetInnerHTML={{ __html: biohtml }} />
+				}
+
+				<div className="mt-4 text-center text-sm text-lvartsmusic-muted">
+					<strong className="text-lvartsmusic-foreground">{profile.postcount || 0}</strong> posts
+				</div>
+
+				{isOwnProfile &&
+					<button onClick={() => redirect(`/profile`)} className="lvartsmusic-pill-outline mt-4 w-full">
+						<BiEdit className="inline" /> My Profile
+					</button>
+				}
+
+				<div className="mt-6">
+					<h2 className="text-xs font-bold uppercase tracking-wide text-lvartsmusic-muted">Skills</h2>
+					<div className="mt-2 flex flex-wrap gap-2 opacity-50">
+						<span className="rounded-full border border-dashed border-lvartsmusic-muted px-3 py-1 text-xs font-medium text-lvartsmusic-muted">
+							Coming soon
+						</span>
+					</div>
+				</div>
+
+				<div className="mt-6">
+					<h2 className="text-xs font-bold uppercase tracking-wide text-lvartsmusic-muted">Communities</h2>
+					<CommunityPlaceholder />
+				</div>
+
+				{profile.urls && profile.urls.length > 0 &&
+					<div className="mt-6">
+						<h2 className="text-xs font-bold uppercase tracking-wide text-lvartsmusic-muted">Links</h2>
+						<div className="mt-2 space-y-1 text-center">
+							{profile.urls.map((url, index) => (
+								<div key={index}>
+									<a href={(url.url.match(/^https?:\/\//)) ? url.url : `https://${url.url}`} target='blank' className='text-lvartsmusic-accent'>
+										{url.urlname || url.url}
+									</a>
+								</div>
+							))}
+						</div>
+					</div>
+				}
+			</div>
+		)
+	}
+
+	return (
         <div className="flex min-h-0 flex-1 flex-col px-5 py-8 bg-gray-900/40 rounded-tr-md w-full">
             {profile && user && user.userdetails && profile.id === user.userdetails.id && 
                 <div className="w-full flex justify-center mb-8 text-gray-400">
@@ -45,11 +125,11 @@ export default function Profile(props:{profile:SidebarProfile, user:User, getUpd
                 </div>
             }
             <div className='h-45 flex justify-center'>
-                <Image
-                    src={avatarSrc}
-                    alt={profile?.displayname || 'Lehigh Valley Art & Music'}
-                    width={300}
-                    height={300}
+                <Avatar
+                    imageUrl={avatarSrc}
+                    displayName={profile?.displayname}
+                    handle={profile?.handle}
+                    size="lg"
                     className='avatar-profile'
                 />
             </div>
