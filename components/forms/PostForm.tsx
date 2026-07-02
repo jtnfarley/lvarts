@@ -312,7 +312,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                         )}
 
                         {isAIIfied && (
-                            <button onClick={() => resetPost(editorRef)} type='button' className="bg-gray-900 me-2 px-3.5 py-1.5 rounded-full text-white font-semibold cursor-pointer disabled:bg-orange-200">
+                            <button onClick={() => resetPost(editorRef)} type='button' className="me-2 px-3.5 py-1.5 rounded-full text-white font-semibold cursor-pointer disabled:bg-orange-200">
                                 Reset
                             </button>
                         )}

@@ -34,7 +34,7 @@ export default async function EditPostPage({
             <div className="lvartsmusic-card">
             {
                 (post && id) &&           
-                    <div className='py-5 flex flex-col'>
+                    <div className='flex flex-col'>
                         <div className='mt-2'>
                             <EditPostForm post={post} user={user} savePost={savePost}/>
                         </div>

@@ -33,7 +33,7 @@ export default async function SinglePostPage({
         <>
         {(user) ?
             (post && !Number.isNaN(postId) && googleMapsApiKey) &&           
-                <div className='py-5 flex flex-col'>
+                <div className='flex flex-col'>
                     <div className='mb-4'>
                         <SinglePost post={post} user={user} googleMapsApiKey={googleMapsApiKey} />
                     </div>

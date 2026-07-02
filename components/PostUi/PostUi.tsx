@@ -21,12 +21,11 @@ export default function PostUi(props:{postData:FeedRow, user:User, googleMapsApi
 
     return (
 		<div className='mb-4'>
-			<div className='pb-2 text-sm text-lvartsmusic-muted'>
-				{post.posttype === 'comment' && post.parentPost &&
+			{post.posttype === 'comment' && post.parentPost &&
+				<div className='pb-2 text-sm text-lvartsmusic-muted'>
 					<Link href={`/post/${post.parentPost.postid}`}>commenting on {parentPostLabel} post</Link>
-				}
-			</div>
-
+				</div>
+			}
 			<div
 				key={post.id}
 				className="lvartsmusic-card flex flex-col gap-2 px-4 py-3 transition-colors hover:bg-black/5 dark:hover:bg-white/5"

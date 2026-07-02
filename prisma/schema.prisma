@@ -8,19 +8,21 @@ datasource db {
 }
 
 model Account {
-  id                Int     @id(map: "accounts_pkey") @default(autoincrement())
-  userId            Int     @map("userid")
-  type              String  @db.VarChar
-  provider          String  @db.VarChar
-  providerAccountId String
-  access_token      String? @db.VarChar
+  id                Int      @id(map: "accounts_pkey") @default(autoincrement())
+  userId            Int      @map("userid")
+  type              String   @db.VarChar
+  provider          String   @db.VarChar
+  providerAccountId String   @db.VarChar
+  access_token      String?  @db.VarChar
   expires_at        Int?
-  token_type        String? @db.VarChar
-  scope             String? @db.VarChar
-  id_token          String? @db.VarChar
-  session_state     String? @db.VarChar
-  refresh_token     String? @db.VarChar
-  user              User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usersFK")
+  token_type        String?  @db.VarChar
+  scope             String?  @db.VarChar
+  id_token          String?  @db.VarChar
+  session_state     String?  @db.VarChar
+  refresh_token     String?  @db.VarChar
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime @default(now()) @db.Timestamptz(6)
+  user              User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usersFK")
 
   @@unique([provider, providerAccountId])
 }
@@ -48,23 +50,15 @@ model User {
   userdetails   userdetails?
 }
 
-model VerificationToken {
-  identifier String   @db.VarChar
-  token      String   @unique(map: "VerificationToken_token_key") @db.VarChar
-  expires    DateTime @db.Timestamptz(6)
-
-  @@unique([identifier, token], map: "identifier_token")
-}
-
 model audiotracks {
-  id           Int     @id @default(autoincrement())
+  id           BigInt  @id @default(autoincrement())
   postid       Int
   trackname    String? @db.VarChar
   artist       String? @db.VarChar
   album        String? @db.VarChar
   releaseyear  Int?
   coverartfile String? @db.VarChar
-  azuracastid  Int?
+  azuracastid  BigInt?
   posts        posts   @relation(fields: [postid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postid_fk")
 }
 
@@ -236,4 +230,12 @@ model zipcodes {
   id      Int      @id @default(autoincrement())
   zipcode String   @db.VarChar
   venues  venues[]
+}
+
+model VerificationToken {
+  identifier String   @db.VarChar
+  token      String   @unique @db.VarChar
+  expires    DateTime @db.Timestamptz(6)
+
+  @@unique([identifier, token], map: "identifier_token")
 }

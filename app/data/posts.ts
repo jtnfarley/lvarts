@@ -715,7 +715,7 @@ const addToPlaylist = async (filename:string):Promise<number | undefined> => {
     return;
 }
 
-const deleteFromPlaylist = async (azuracastid:number) => {
+const deleteFromPlaylist = async (azuracastid:bigint) => {
     await fetch(`https://a6.asurahosting.com/api/station/614/file/${azuracastid}`, {
         method: 'DELETE',
         headers: {

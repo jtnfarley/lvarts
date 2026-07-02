@@ -43,3 +43,6 @@ next-env.d.ts
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# db sync dumps (contain production data)
+/scripts/.db-sync/
