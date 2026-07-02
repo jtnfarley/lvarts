@@ -10,9 +10,15 @@ baselined against the real, current schema (`20260702101520_baseline_2026_07_02`
 1. Edit `prisma/schema.prisma`.
 2. `npx prisma migrate dev --name <change-description>` — applies it to your
    local dev database and generates a migration file.
-3. Commit the migration folder along with your code change.
-4. Before/during deploy, run `npx prisma migrate deploy` against production
-   (`postgresql_DATABASE_URL` pointed at prod) to apply the same migration.
+3. Commit the migration folder along with your code change and push to `main`.
+4. `.github/workflows/prisma-migrate.yml` automatically runs
+   `prisma migrate deploy` against production whenever `prisma/migrations/**`
+   changes on `main` — no manual deploy step needed. It uses the
+   `PROD_DATABASE_URL` repo secret (Settings → Secrets and variables →
+   Actions). Note there's no explicit ordering with Vercel's own git-triggered
+   deploy, so for changes where app code strictly requires the new schema to
+   already exist, land the migration a beat ahead of the code (e.g. merge the
+   migration first, deploy the code after) or watch both runs.
 
 Never run `ALTER TABLE`/manual DDL directly against production — it's exactly
 what caused the drift this baseline fixed (see git history around

@@ -6,7 +6,7 @@
 
 
 .noti-link a {
-    color:var(--color-primary);
+    color:var(--color-orange-300);
 }
 
 .post-img img {
@@ -50,10 +50,7 @@
         @apply w-35 h-35 rounded-2xl border-2 outline-6 outline-offset-6 outline-amber-400 border-amber-200 mb-8;
     }
 
-    .leftIcon {
-        @apply text-3xl fill-[#fdf5d8];
-    }
-
+   
     .leftIcon_dark {
         @apply text-3xl fill-[#252525];
     }

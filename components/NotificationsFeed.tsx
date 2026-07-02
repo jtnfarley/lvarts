@@ -17,12 +17,12 @@ export default function NotificationsFeed(props:{user:User, notis:Notification[]
 	})
 
 	return (
-        <div className='flex flex-col gap-5 bg-white rounded-box'>
+        <div className='flex flex-col gap-5'>
             {
 				(user && notis && notis.length) &&
                 	notis.map((noti:Notification, index:number) => {
 						return (
-							<div key={index} className={`noti-link flex items-center text-md p-2 border-gray-300 rounded-lg ${(noti.read) ? 'bg-gray-100' : 'bg-green-400/20'}`}>
+							<div key={index} className={`noti-link flex items-center text-md p-2 lvartsmusic-card ${(!noti.read) ? 'bg-green-400/20' : ''}`}>
 								<Link href={`/user/${noti.handle}`}>
 									<img src={(noti.userdir && noti.avatar) ? `${imageUrl}/${noti.userdir}/${noti.avatar}` : '/images/melty-man.png'} alt={`${noti.displayname || noti.handle || 'Notification'} avatar`} className='avatar me-2 w-[50px] h-[50px]'/>
 								</Link>
