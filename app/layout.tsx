@@ -16,7 +16,8 @@ export const metadata: Metadata = {
 // survives client-side navigation between route groups (nested layouts
 // remount on navigation and their inline scripts don't re-run, but the
 // <html> element here never unmounts).
-const themeInitScript = `(function(){try{var t=localStorage.getItem('lvartsmusic-theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
+// Dark is the default; only an explicit 'light' choice in localStorage opts out.
+const themeInitScript = `(function(){try{var t=localStorage.getItem('lvartsmusic-theme');var d=t!=='light';if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
 
 export default async function RootLayout({
   	children,
