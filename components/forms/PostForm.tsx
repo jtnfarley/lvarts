@@ -9,7 +9,6 @@ import RTEditor from "./Fields/RichTextEditor/RTEditor";
 import User from "@/lib/models/user";
 import MediaUpload from "@/components/PostUi/MediaUpload"
 import { Spinner } from "../layout/Spinner";
-import { isSceneScheduledPostType } from "@/lib/scenePosts";
 import AudioUploadLink from "../PostUi/AudioUploadLink";
 import AddEventLink from "../PostUi/AddEventLink";
 import EventFields from "./Fields/EventFields";
@@ -76,7 +75,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
 
     const resolvedPostType = post?.posttype ?? post?.posttypes?.posttype ?? 'post';
     const [activeType, setActiveType] = useState(resolvedPostType);
-    const isScheduledPost = isSceneScheduledPostType(activeType);
+    const isScheduledPost = activeType === 'event';
 
     const parentPostId = post?.parentPostId !== undefined ? post.parentPostId?.toString() : undefined;
 
@@ -120,7 +119,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
             setInternalAddToRadio(false);
             setValue('addToRadio', false);
         }
-        if (!isSceneScheduledPostType(type)) {
+        if (type !== 'event') {
             setValue('venueid', undefined);
         }
     };

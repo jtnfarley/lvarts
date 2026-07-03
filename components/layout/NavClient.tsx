@@ -87,11 +87,6 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 							<BiSolidCalendar className={shadeClass}/>
 						</div>
 					</Link>
-					{/* <Link href="/scene" className={`leftsidebar_link flex flex-row items-center`}>
-						<div className="relative">
-							<BiSolidSearch className={shadeClass}/>
-						</div>
-					</Link> */}
 					<Link href="/gallery" className={`leftsidebar_link flex flex-row items-center`} title="Art Gallery">
 						<div className="relative">
 							<BiImage className={shadeClass}/>

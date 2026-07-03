@@ -249,7 +249,7 @@ const AccountInfo = (props:{userdetails: SidebarProfile, saveUser:(user: UpdateU
                                 <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-500">@</div>
                                 <input
                                     type='text'
-                                    className="disabled:cursor-not-allowed disabled:text-gray-500"
+                                    className="pl-7! disabled:cursor-not-allowed disabled:text-gray-500"
                                     id="handle"
                                     disabled={hasPermanentHandle}
                                     {...register('handle', { required: true })}

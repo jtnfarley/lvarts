@@ -97,7 +97,7 @@ export default function LeftSidebar(props:{currentUser:User, theme?:'lvartsmusic
 
 	return (
 		<section className={isLvartsmusic
-			? "sticky top-16 hidden h-[calc(100vh-4rem)] w-[300px] shrink-0 flex-col justify-between overflow-y-auto py-4 pr-6 lg:flex"
+			? "sticky top-16 hidden h-[calc(100vh-4rem)] w-[300px] shrink-0 flex-col justify-between overflow-y-auto pt-4 pb-[100px] pr-6 lg:flex"
 			: "leftsidebar bg-[#0c0a18]/50 backdrop-blur-sm"
 		}>
 			{!isLvartsmusic &&

@@ -9,7 +9,7 @@ export default async function BottomBar(props: {theme?:'lvartsmusic'}) {
 
 	return (
 		<section className={cn('bottombar', isLvartsmusic && 'border-t border-lvartsmusic-border bg-lvartsmusic-background')}>
-			<div className={cn('bottombar_container md:hidden', isLvartsmusic && 'bg-transparent p-2')}>
+			<div className={cn('bottombar_container md:hidden', isLvartsmusic && 'bg-transparent p-2 flex justify-center')}>
 				{user &&
 					<Nav user={user} theme={props.theme}/>
 				}

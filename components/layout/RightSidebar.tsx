@@ -1,17 +1,17 @@
 import RecUsers from '../RecUsers';
 import SidebarSearch from "@/components/layout/SidebarSearch";
-import TrendingPlaceholder from "@/components/shared/TrendingPlaceholder";
+import UpcomingEvents from "@/components/UpcomingEvents";
 
 export default async function RightSidebar() {
 	return (
-		<aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-87.5 shrink-0 flex-col gap-4 overflow-y-auto py-4 pl-6 xl:flex">
+		<aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-87.5 shrink-0 flex-col gap-4 overflow-y-auto pt-4 pb-[130px] pl-6 xl:flex">
 			<SidebarSearch />
 
 			<section className="lvartsmusic-card">
 				<h2 className="px-4 pt-3 text-xl font-extrabold text-lvartsmusic-foreground">
-					Trending in the Valley
+					Upcoming Events
 				</h2>
-				<TrendingPlaceholder />
+				<UpcomingEvents />
 			</section>
 
 			<section className="lvartsmusic-card">

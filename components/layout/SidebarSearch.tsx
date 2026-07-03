@@ -22,7 +22,7 @@ export default function SidebarSearch() {
 				value={query}
 				onChange={(event) => setQuery(event.target.value)}
 				placeholder="Search the Valley"
-				className="w-full rounded-full border border-transparent bg-lvartsmusic-card py-2.5 pl-11 pr-4 text-sm text-lvartsmusic-foreground placeholder:text-lvartsmusic-muted focus:border-lvartsmusic-accent/50 focus:outline-none"
+				className="w-full rounded-full border border-transparent bg-lvartsmusic-card py-2.5 pl-11! pr-4 text-sm text-lvartsmusic-foreground placeholder:text-lvartsmusic-muted focus:border-lvartsmusic-accent/50 focus:outline-none"
 			/>
 		</form>
 	)

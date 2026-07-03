@@ -219,6 +219,28 @@ export const getEvents = async ():Promise<FeedRow[]> => {
     )
 }
 
+export const getUpcomingEvents = async (limit: number = 5):Promise<FeedRow[]> => {
+    return await prisma.$queryRaw<FeedRow[]>(
+        Prisma.sql`
+            SELECT * FROM (
+                ${
+                    feedRowInnerQuery(
+                        Prisma.sql`
+                            FROM events ev
+                            JOIN posts p
+                                ON p.eventid = ev.id
+                        `,
+                        Prisma.sql`
+                        where ev.eventdate >= now()`
+                    )
+                }
+            ) feed
+            ORDER BY eventdate ASC
+            LIMIT ${limit}
+        `
+    )
+}
+
 export const getGallery = async ():Promise<FeedRow[]> => {
     return await prisma.$queryRaw<FeedRow[]>(
         Prisma.sql`

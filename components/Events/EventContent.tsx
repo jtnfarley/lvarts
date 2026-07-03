@@ -151,7 +151,7 @@ export default function EventContent(props:{post:FeedRow, googleMapsApiKey:strin
 				}
 				{
 					(venuename || address) &&
-						<div className='mb-4 rounded-2xl bg-gray-50 px-4 py-3 text-gray-700 flex justify-center items-center max-w-50'>
+						<div className='m-4 rounded-2xl bg-gray-50 px-4 py-3 text-gray-700 flex justify-center items-center max-w-50'>
 							<div className='flex flex-col gap-x-4 gap-y-1 items-center'>
 								{venuename && <div className='text-center'><strong>@ {venuename}</strong></div>}
 								{address && <div><strong><a href={getMapLink(address)} target='_blank' className='text-blue-600 text-sm'>Map</a></strong></div>}

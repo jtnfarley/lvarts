@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/prisma';
 import {currentUser} from "@/app/data/currentUser";
 import { revalidatePath } from "next/cache";
-import { getPostTypeLabel } from "@/lib/scenePosts";
+import { getPostTypeLabel } from "@/lib/utils";
 import { notifyMentionedUsers } from "@/app/data/postMentions";
 import { savePost, getPost } from "@/app/data/posts";
 

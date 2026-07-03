@@ -29,11 +29,12 @@ const UserCard = ({currentUser, recUserId, displayname, handle, avatar, biohtml}
     }
 
     return (
-        <article className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-black/5 dark:hover:bg-white/10">
-            <button className="flex min-w-0 flex-1 items-center gap-3 text-left cursor-pointer" onClick={viewProfile} title={displayname || (handle ? `@${handle}` : 'Profile')}>
-                <Avatar imageUrl={avatar} displayName={displayname} handle={handle} size="sm" />
+        <article className="flex flex-1 basis-0 flex-col items-center gap-1 py-1 xl:flex-row xl:basis-auto xl:items-center xl:gap-3 xl:px-4 xl:py-3 xl:transition-colors xl:hover:bg-black/5 xl:dark:hover:bg-white/10">
+            <button className="flex flex-col items-center gap-1 cursor-pointer xl:min-w-0 xl:flex-1 xl:flex-row xl:gap-3 xl:text-left" onClick={viewProfile} title={displayname || (handle ? `@${handle}` : 'Profile')}>
+                <Avatar imageUrl={avatar} displayName={displayname} handle={handle} size="md" className="xl:hidden" />
+                <Avatar imageUrl={avatar} displayName={displayname} handle={handle} size="sm" className="hidden xl:flex" />
 
-                <div className="min-w-0 flex-1">
+                <div className="hidden min-w-0 flex-1 xl:block">
                     <div className="truncate text-[15px] font-bold text-lvartsmusic-foreground">{truncateText(displayname || '', 17) || (handle ? `@${truncateText(handle, 10)}` : 'Artist')}</div>
                     {handle && <div className="truncate text-sm text-lvartsmusic-muted">@{truncateText(handle, 17)}</div>}
                     {bio && bio !== '' &&
@@ -41,7 +42,9 @@ const UserCard = ({currentUser, recUserId, displayname, handle, avatar, biohtml}
                     }
                 </div>
             </button>
-            <Follow followinguserdetailsid={recUserId} user={currentUser}/>
+            <div className="hidden xl:block">
+                <Follow followinguserdetailsid={recUserId} user={currentUser}/>
+            </div>
         </article>
     )
 }

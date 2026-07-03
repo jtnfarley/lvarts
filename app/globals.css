@@ -24,10 +24,6 @@
         @apply flex min-h-screen flex-1 flex-col items-center px-6 pt-3 max-md:pb-32 sm:px-10 overflow-auto pb-[120px];
     }
 
-    /* .center-box {
-        @apply bg-white px-5 py-5 rounded-lg mt-5 text-xl;
-    } */
-
     .rounded-box {
         @apply flex flex-col gap-2 rounded-lg p-3;
     }
@@ -103,8 +99,8 @@
 }
 
 [data-theme="lvartsmusic"].dark {
-    --lvartsmusic-background: #050403;
-    --lvartsmusic-background-light: #2a2016;
+    --lvartsmusic-background: #000000;
+    --lvartsmusic-background-light: #111;
     --lvartsmusic-foreground: #f4f4f5;
     --lvartsmusic-card: #18181b;
     --lvartsmusic-border: rgba(255,255,255,0.1);
@@ -128,9 +124,14 @@
 
 @layer components {
     /* subtle diagonal wash: same background color, lifted slightly at one edge.
-       --gradient-angle is set inline per layout so the tilt varies per visit. */
+       --gradient-angle is set inline per layout so the tilt varies per visit.
+       background-attachment: fixed pins the gradient to the viewport instead of
+       the element's full (content-length) height — otherwise on a long page the
+       viewport only ever shows a thin sliver of the gradient near one end, which
+       reads as a single flat color instead of a blend. */
     .lvartsmusic-bg-gradient {
-        background: linear-gradient(var(--gradient-angle, 135deg), var(--lvartsmusic-background), var(--lvartsmusic-background-light));
+        background: linear-gradient(0deg, var(--lvartsmusic-background), var(--lvartsmusic-background-light));
+        background-attachment: fixed;
     }
 
     .lvartsmusic-card {
@@ -331,6 +332,16 @@
 
 a.editor-link, a.link {
     color:rgb(30, 120, 255);
+}
+
+/*** calendar ***/
+
+.calendar .event {
+    background: #fff;
+}
+
+.dark .calendar .event {
+    background: #222;
 }
 
 /**** switch ***/

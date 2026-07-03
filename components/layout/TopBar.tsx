@@ -17,7 +17,7 @@ const TopBar = (props: {theme?:'lvartsmusic', user?:User}) => {
                 <div className="mx-auto flex h-16 w-full max-w-[1265px] items-center justify-between">
                     <Link href='/home' className="flex shrink-0 items-center gap-2.5">
                         <img
-                            src='/logos/map.png'
+                            src='/logos/map-trans.png'
                             alt="Lehigh Valley Arts & Music"
                             className="h-[64px]"
                         />

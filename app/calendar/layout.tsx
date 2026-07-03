@@ -16,21 +16,17 @@ export default async function CalendarLayout({
 }>) {
 	let user = await isLoggedIn();
 
-	if (!user) {
-		user = {
+	user ??= {
 			userdetails:{} as UserDetails,
 			anonymous: true,
 			id: 0,
 			createdat: new Date(),
 			updatedat: new Date()
-		}
-	}
-	const gradientAngle = Math.floor(Math.random() * 360);
+		};
 
 	return (
 		<div
 			className="min-h-screen lvartsmusic-bg-gradient text-lvartsmusic-foreground"
-			style={{ '--gradient-angle': `${gradientAngle}deg` } as React.CSSProperties}
 		>
 			<TopBar theme="lvartsmusic" user={user}/>
 			<main>
