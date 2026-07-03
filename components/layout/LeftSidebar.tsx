@@ -39,7 +39,6 @@ export default function LeftSidebar(props:{currentUser:User, theme?:'lvartsmusic
 	const loadProfile = async (handle:string, cancelled:boolean) => {
 		try {
 			const nextProfile = await getSidebarUserProfile(handle);
-			console.log(nextProfile)
 			if (!cancelled) {
 				setProfile(nextProfile || loggedInProfile)
 			}
