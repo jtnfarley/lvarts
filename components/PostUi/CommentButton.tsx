@@ -15,14 +15,11 @@ export default function CommentButton(props:{postData:FeedRow}) {
 	const [commentCount, setCommentCount] = useState<number>((post.comments) ? post.comments : 0)
 
     return (
-		<div className='grid grid-flow-col grid-rows-1 w-3'>
-			<div className='text-2xl'>
-				<Link href={`/post/${post.id}`} className='comment-link'>
-					<BiComment/>
-				</Link>
-			</div>
-			<div className='text-sm'>{commentCount}</div>
-		</div>
-						
+		<Link href={`/post/${post.id}`} className='comment-link group flex items-center gap-2 text-lvartsmusic-muted transition-colors hover:text-sky-500'>
+			<span className='rounded-full p-2 transition-colors group-hover:bg-sky-500/10'>
+				<BiComment className="h-4.5 w-4.5" />
+			</span>
+			<span className='text-sm'>{commentCount}</span>
+		</Link>
     )
 }

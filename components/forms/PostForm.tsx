@@ -9,7 +9,6 @@ import RTEditor from "./Fields/RichTextEditor/RTEditor";
 import User from "@/lib/models/user";
 import MediaUpload from "@/components/PostUi/MediaUpload"
 import { Spinner } from "../layout/Spinner";
-import { isSceneScheduledPostType } from "@/lib/scenePosts";
 import AudioUploadLink from "../PostUi/AudioUploadLink";
 import AddEventLink from "../PostUi/AddEventLink";
 import EventFields from "./Fields/EventFields";
@@ -76,7 +75,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
 
     const resolvedPostType = post?.posttype ?? post?.posttypes?.posttype ?? 'post';
     const [activeType, setActiveType] = useState(resolvedPostType);
-    const isScheduledPost = isSceneScheduledPostType(activeType);
+    const isScheduledPost = activeType === 'event';
 
     const parentPostId = post?.parentPostId !== undefined ? post.parentPostId?.toString() : undefined;
 
@@ -120,7 +119,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
             setInternalAddToRadio(false);
             setValue('addToRadio', false);
         }
-        if (!isSceneScheduledPostType(type)) {
+        if (type !== 'event') {
             setValue('venueid', undefined);
         }
     };
@@ -312,7 +311,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                         )}
 
                         {isAIIfied && (
-                            <button onClick={() => resetPost(editorRef)} type='button' className="bg-gray-900 me-2 px-2 py-2 rounded text-white font-semibold cursor-pointer disabled:bg-orange-200">
+                            <button onClick={() => resetPost(editorRef)} type='button' className="me-2 px-3.5 py-1.5 rounded-full text-white font-semibold cursor-pointer disabled:bg-orange-200">
                                 Reset
                             </button>
                         )}
@@ -341,14 +340,14 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                             <button
                                 onClick={() => setShowTones(!showTones)}
                                 type='button'
-                                className="bg-white border border-gray-500 px-2 py-2 rounded text-gray-500 uppercase font-semibold cursor-pointer disabled:bg-orange-200"
+                                className="bg-white border border-gray-500 px-3.5 py-1.5 rounded-full text-gray-500 uppercase font-semibold cursor-pointer disabled:bg-orange-200 text-sm"
                                 disabled={isSaving}
                             >
                                 AI-ify
                             </button>
                         </div>
 
-                        <button type='submit' className="bg-orange px-2 py-2 rounded text-white uppercase font-semibold cursor-pointer disabled:bg-orange-200" disabled={isSaving}>
+                        <button type='submit' className="bg-orange px-3.5 py-1.5 rounded-full text-white uppercase font-semibold cursor-pointer disabled:bg-orange-200 text-sm" disabled={isSaving}>
                             Post
                         </button>
                     </div>

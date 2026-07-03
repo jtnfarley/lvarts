@@ -47,7 +47,7 @@ export default async function Notifications() {
 	const notis = await getNotifications(user.userdetails.id);
 
 	return (
-		<div className='rounded-box'>
+		<div>
 			<NotificationsFeed user={user} notis={notis} updateNotis={updateNotis} />
 		</div>
 	);

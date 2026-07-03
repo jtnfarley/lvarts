@@ -49,7 +49,7 @@ export default async function Profile() {
 
 	return (
 		<div className='flex flex-col gap-5'>
-			<div className="rounded-box bg-[#fcf9ef] p-3 mt-5 md:p-5 sm:bg-none sm:p-0">
+			<div className="rounded-box lvartsmusic-card p-3 md:p-5 sm:bg-none sm:p-0">
 				<div className="flex flex-col items-center justify-center">
 					<h1 className="text-2xl font-bold">Profile</h1>
 				</div>

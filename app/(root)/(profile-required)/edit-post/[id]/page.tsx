@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/prisma';
 import {currentUser} from "@/app/data/currentUser";
 import { revalidatePath } from "next/cache";
-import { getPostTypeLabel } from "@/lib/scenePosts";
+import { getPostTypeLabel } from "@/lib/utils";
 import { notifyMentionedUsers } from "@/app/data/postMentions";
 import { savePost, getPost } from "@/app/data/posts";
 
@@ -26,18 +26,21 @@ export default async function EditPostPage({
     if (!post) return redirect('/home');    
 
 	return (
-        <div className="mt-5 bg-white rounded-box">
-            <div className="flex flex-row justify-center">
+        <div>
+            <div className="flex flex-row justify-center mb-5">
                 <div className="text-xl">Edit {getPostTypeLabel(post.posttype)}</div>
             </div>
-        {
-            (post && id) &&           
-                <div className='py-5 flex flex-col'>
-                    <div className='mt-2'>
-                        <EditPostForm post={post} user={user} savePost={savePost}/>
-                    </div>
-                </div>   
-            }
+
+            <div className="lvartsmusic-card">
+            {
+                (post && id) &&           
+                    <div className='flex flex-col'>
+                        <div className='mt-2'>
+                            <EditPostForm post={post} user={user} savePost={savePost}/>
+                        </div>
+                    </div>   
+                }
+            </div>
         </div>
 	);
 }

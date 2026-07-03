@@ -20,19 +20,19 @@ export default async function Calendar() {
 	const events = await getEvents();
 
 	return (
-		<div className='bg-gray-900/50 backdrop-blur-sm p-5 rounded-lg mt-5'>
+		<div className='calendar backdrop-blur-sm p-5 rounded-lg mt-5'>
 			<div>
 				<div className="flex flex-col gap-5 pb-5">
 					<CalendarTitle/>
 					{user ?
 						<div className='flex justify-end'>
 							<a href='/calendar/add-event' title='Add Event'>
-								<BiCalendarPlus className='text-4xl' color='white'/>
+								<BiCalendarPlus className='text-4xl'/>
 							</a>
 						</div>
 						:
 						<div>
-							<Link href={'/'} className='text-white'>Log in to add events</Link>
+							<Link href={'/'}>Log in to add events</Link>
 						</div>
 					}
 					<div>

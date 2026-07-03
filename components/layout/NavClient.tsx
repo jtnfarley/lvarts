@@ -1,15 +1,25 @@
 'use client'
 
-import { BiSolidHomeAlt2, BiSolidSearch, BiImage, BiSolidBell, BiSolidCalendar,  BiArrowFromLeft, BiSolidCircle } from "react-icons/bi";
+import { BiSolidHomeAlt2, BiImage, BiSolidBell, BiSolidCalendar,  BiArrowFromLeft, BiSolidCircle } from "react-icons/bi";
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import User from "@/lib/models/user";
 import { useEffect, useState } from "react";
 import SignOut from '@/components/auth/buttons/SignOut';
+import { cn } from "@/lib/utils";
 
-export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNotifications:Function, shade?:string}) {
-	const {user, hasNewNotifications} = props;
+const navLinks = [
+	{ href: '/home', label: 'Home', icon: BiSolidHomeAlt2 },
+	{ href: '/notifications', label: 'Notifications', icon: BiSolidBell },
+	{ href: '/calendar', label: 'Calendar', icon: BiSolidCalendar },
+	{ href: '/gallery', label: 'Art Gallery', icon: BiImage },
+]
+
+export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNotifications:Function, shade?:string, theme?:'lvartsmusic'}) {
+	const {user, hasNewNotifications, theme} = props;
 	const [hasNotis, setHasNotis] = useState<boolean>(props.hasNotis);
-	const [shadeClass, setShadeClass] = useState<string>((props.shade && props.shade === 'dark') ? "leftIcon_dark" : "leftIcon");
+	const shadeClass = (props.shade && props.shade === 'dark') ? "leftIcon_dark" : "leftIcon";
+	const pathname = usePathname();
 
 	const checkNotis = async () => {
 		const newNotis = await hasNewNotifications(user?.id);
@@ -24,7 +34,38 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 		}
 	}, [])
 
-	return (		
+	if (theme === 'lvartsmusic') {
+		return (
+			<div className='flex items-center gap-1'>
+				{user && navLinks.map(({ href, label, icon: Icon }) => {
+					const active = pathname === href;
+
+					return (
+						<Link
+							key={href}
+							href={href}
+							title={label}
+							onClick={() => href === '/notifications' && setHasNotis(false)}
+							className={cn(
+								'relative rounded-full p-2.5 transition-colors',
+								active
+									? 'bg-lvartsmusic-accent text-lvartsmusic-accent-foreground'
+									: 'text-lvartsmusic-muted hover:bg-black/5 dark:hover:bg-white/10'
+							)}
+						>
+							<Icon className="h-5 w-5" />
+							{label === 'Notifications' && hasNotis &&
+								<div className="absolute top-1 right-1"><BiSolidCircle color='red' className="h-2 w-2" /></div>
+							}
+						</Link>
+					)
+				})}
+				{user && <SignOut shade={props.shade}/>}
+			</div>
+		)
+	}
+
+	return (
 		<div className='flex gap-8 justify-center items-center md:mb-6'>
 			{user ?
 				<>
@@ -46,11 +87,6 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 							<BiSolidCalendar className={shadeClass}/>
 						</div>
 					</Link>
-					{/* <Link href="/scene" className={`leftsidebar_link flex flex-row items-center`}>
-						<div className="relative">
-							<BiSolidSearch className={shadeClass}/>
-						</div>
-					</Link> */}
 					<Link href="/gallery" className={`leftsidebar_link flex flex-row items-center`} title="Art Gallery">
 						<div className="relative">
 							<BiImage className={shadeClass}/>
@@ -72,7 +108,7 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 					</div>
 				</Link>
 			}
-			
+
 		</div>
 	)
 }

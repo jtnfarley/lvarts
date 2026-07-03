@@ -19,7 +19,7 @@ After changing the Prisma schema, run `npx prisma generate` before the next buil
 
 ### Route structure
 
-- `app/(root)/(profile-required)/` — auth-gated pages (home feed, user profiles, post detail, scene, search, notifications, audio upload, musikfest-scheduler)
+- `app/(root)/(profile-required)/` — auth-gated pages (home feed, user profiles, post detail, search, notifications, audio upload, musikfest-scheduler)
 - `app/(root)/profile/` — profile setup
 - `app/gallery/`, `app/calendar/` — public-facing pages
 - `app/api/auth/` — NextAuth route handler

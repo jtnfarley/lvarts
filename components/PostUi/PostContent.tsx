@@ -76,11 +76,11 @@ export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string
 					}
 
 					linkEnd = placeholder.indexOf('</span>',linkIndex);
+					console.log(placeholder.substring(linkIndex, linkEnd))
 					linkLength = placeholder.substring(linkIndex, linkEnd).length;
-					linkText = placeholder.slice(linkIndex);
-					linkText = linkText.slice(0, linkEnd)
-					linkText = linkText.substring((fullLink.match(/http:/)) ? 7 : 8,50)+'...'
-
+					linkText = placeholder.substring(linkIndex, linkEnd)
+					linkText = linkText.replace(/^https?:\/\//, '');
+					linkText = linkText.length > 50 ? linkText.substring(0, 50)+'...' : linkText;
 					placeholder = `${placeholder.slice(0, linkIndex)}${linkText}${placeholder.slice(linkIndex + linkLength)}`
 					placeholder = placeholder.slice(0, placeholder.indexOf('>',editorLinks[i].index)) + " target='_blank'" + placeholder.slice(placeholder.indexOf('>',editorLinks[i].index)) 
 				}
@@ -88,7 +88,6 @@ export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string
 
 			post = placeholder;
 		}
-
 		if (post.match(/\[(.*?)\]/g)) {
 			post = parseTemplateTags(post);
 		}
@@ -129,37 +128,37 @@ export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string
 
     return (
 		<div>
-			<div className='postContent'>
+			<div className='postContent text-lvartsmusic-foreground'>
 				{
 					displayTitle &&
-						<div className='text-2xl font-bold px-3 pt-3'><Link href={`/post/${post.id}`} title={displayTitle}>{displayTitle}</Link></div>
+						<div className='text-lg font-bold text-lvartsmusic-foreground'><Link href={`/post/${post.id}`} title={displayTitle}>{displayTitle}</Link></div>
 				}
 				{
 					post.eventdate &&
-						<div className='mb-5 text-lg px-3'>{formatDate(post.eventdate)}</div>
+						<div className='mb-3 text-sm text-lvartsmusic-muted'>{formatDate(post.eventdate)}</div>
 				}
 
 				{
 					(venuename || address) &&
-						<div className='mb-4 rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-700'>
+						<div className='mb-3 rounded-2xl bg-black/5 dark:bg-white/5 px-4 py-3 text-sm text-lvartsmusic-foreground'>
 							<div className='flex flex-col gap-x-4 gap-y-1'>
-								{venuename && <div className='text-lg'>At <strong>{venuename}</strong></div>}
-								{address && <div><strong><a href={getMapLink(address)} target='_blank' className='text-blue-600'>Map</a></strong></div>}
+								{venuename && <div className='text-base'>At <strong>{venuename}</strong></div>}
+								{address && <div><strong><a href={getMapLink(address)} target='_blank' className='text-lvartsmusic-accent'>Map</a></strong></div>}
 							</div>
 						</div>
 				}
 
 				{
 					(trackname && post.postfile) &&
-						<div className='mb-4 rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-700'>
+						<div className='mb-3 rounded-2xl bg-black/5 dark:bg-white/5 px-4 py-3 text-sm text-lvartsmusic-foreground'>
 							<div className='flex gap-x-4 gap-y-1'>
-								{coverartfile && 
+								{coverartfile &&
 									<div>
 										<Image src={coverartfile} alt={`${trackname} by ${artist}`} width={150} height={150} />
 									</div>
 								}
 								<div>
-									<div className='text-lg'><strong>{trackname}</strong></div>
+									<div className='text-base'><strong>{trackname}</strong></div>
 									{artist && <div>{artist}</div>}
 									{album && <div>{album}</div>}
 									{releaseyear && <div>{releaseyear}</div>}
@@ -168,11 +167,13 @@ export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string
 						</div>
 				}
 
-				{ cleanContent && 
+				{ cleanContent &&
 					<div>
-						<div className='flex justify-end text-xs mb-2 me-2 italic'>{post.createdat.toDateString()}</div>
 						<div>{parse(cleanContent)}</div>
-						<div className='text-sm pt-2 italic text-gray-1 px-[13px]'>{(post.edited) ? 'edited' : ''}</div>
+						<div className='mt-1 flex justify-end gap-2 text-xs text-lvartsmusic-muted'>
+							{post.edited && <span className='italic'>edited</span>}
+							<span>{post.createdat.toDateString()}</span>
+						</div>
 					</div>
 				}
 			</div>

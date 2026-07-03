@@ -10,7 +10,7 @@ const types = [
 
 export default function PostTypeSelector({ activeType, onChange }: { activeType: string, onChange: (type: string) => void }) {
     return (
-        <div className="flex rounded-lg border border-gray-200 p-0.5 gap-0.5">
+        <div className="flex rounded-lg border border-[var(--lvartsmusic-border)] p-0.5 gap-0.5">
             {types.map(({ type, label, Icon }) => (
                 <button
                     key={type}

@@ -8,7 +8,7 @@ export default function EventUi(props:{post:FeedRow}) {
 	const [post, setPost] = useState<FeedRow>(props.post);
 
     return (
-		<div key={post.id} className="w-full gap-4 bg-white">
+		<div key={post.id} className="w-full gap-4 event">
 			<EventContent post={post} googleMapsApiKey={''}/>
 		</div>		
     )

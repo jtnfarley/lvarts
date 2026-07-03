@@ -212,7 +212,7 @@ const AccountInfo = (props:{userdetails: SidebarProfile, saveUser:(user: UpdateU
                     encType="multipart/form-data"
                 >
                     <div className="mb-4">
-                        <label className="flex items-center text-gray-700 font-medium mb-2" htmlFor="avatar">
+                        <label className="flex items-center text-lvartsmusic-muted mb-2" htmlFor="avatar">
                             <div>Avatar</div>
                             <div className="text-xs ms-1">(square images work best)</div>
                         </label>
@@ -241,14 +241,15 @@ const AccountInfo = (props:{userdetails: SidebarProfile, saveUser:(user: UpdateU
                         </label>
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 font-medium mb-2" htmlFor="handle">
+                        <label className="block text-lvartsmusic-muted mb-2" htmlFor="handle">
                             Handle
                         </label>
                         <div className="flex gap-2">
                             <div className="relative flex-1">
                                 <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-500">@</div>
                                 <input
-                                    className="w-full rounded border border-gray-200 bg-gray-50 py-2 pl-7 pr-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500 disabled:cursor-not-allowed disabled:text-gray-500"
+                                    type='text'
+                                    className="pl-7! disabled:cursor-not-allowed disabled:text-gray-500"
                                     id="handle"
                                     disabled={hasPermanentHandle}
                                     {...register('handle', { required: true })}
@@ -272,7 +273,7 @@ const AccountInfo = (props:{userdetails: SidebarProfile, saveUser:(user: UpdateU
                                 </Button>
                             }
                         </div>
-                        <div className="mt-2 text-xs text-gray-500">
+                        <div className="mt-2 text-xs text-lvartsmusic-muted">
                             {hasPermanentHandle
                                 ? 'Your handle is permanent.'
                                 : 'Enter a custom handle or generate one. You can only set it once.'}
@@ -282,11 +283,11 @@ const AccountInfo = (props:{userdetails: SidebarProfile, saveUser:(user: UpdateU
                         }
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 font-medium mb-2" htmlFor="displayname">
+                        <label className="block text-lvartsmusic-muted mb-2" htmlFor="displayname">
                             Display Name
                         </label>
                         <input
-                            className="bg-white border border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
+                            type='text'
                             id="displayname"
                             {...register('displayname', { required: true })}
                         />
@@ -296,7 +297,7 @@ const AccountInfo = (props:{userdetails: SidebarProfile, saveUser:(user: UpdateU
                         }
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 font-medium mb-2" htmlFor="bio">
+                        <label className="block text-lvartsmusic-muted mb-2" htmlFor="bio">
                             Bio
                         </label>
                         <Controller
@@ -314,24 +315,24 @@ const AccountInfo = (props:{userdetails: SidebarProfile, saveUser:(user: UpdateU
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="flex justify-between text-gray-700 font-medium mb-2" htmlFor="urls">
+                        <label className="flex justify-between text-lvartsmusic-muted mb-2" htmlFor="urls">
                             <div>Links</div> 
                             <div><Button type='button' className='bg-transparent text-gray-600 cursor-pointer shadow-none hover:bg-gray-100' onClick={addLinkInput}><BiPlus /></Button></div>
                         </label>
                         <div>
                         {urlFields.map((field, index:number) => {
                             return (
-                                <div className="flex w-full" key={field.id}>
+                                <div className="flex w-full mb-2" key={field.id}>
                                     <div className="flex w-full gap-3">
                                         <input
-                                            className="bg-white border border-gray-200 rounded w-full py-2 px-3 mb-2 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
+                                            type='text'
                                             id={`urls${index}urlname`}
                                             placeholder='Link Name, e.g. Instagram'
                                             onFocus={() => setUrlsUpdated(true)}
                                             {...register(`urls.${index}.urlname`)}
                                         />
                                         <input
-                                            className="bg-white border border-gray-200 rounded w-full py-2 px-3 mb-2 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500"
+                                            type='text'
                                             id={`urls${index}url`}
                                             placeholder='Link URL'
                                             onFocus={() => setUrlsUpdated(true)}
@@ -349,8 +350,8 @@ const AccountInfo = (props:{userdetails: SidebarProfile, saveUser:(user: UpdateU
                         </div>
                     </div>
 
-                    <div className="flex">
-                        <Button type='submit' className="bg-primary cursor-pointer" disabled={(isSaving) ? true : false}>
+                    <div className="flex justify-end">
+                        <Button type='submit' className="bg-orange px-3.5 py-1.5 rounded-full text-white uppercase font-semibold cursor-pointer disabled:bg-orange-200 text-sm" disabled={(isSaving) ? true : false}>
                             Save
                         </Button>
                         {

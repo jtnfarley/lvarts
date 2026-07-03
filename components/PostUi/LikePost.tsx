@@ -48,18 +48,14 @@ export default function LikePost(props:{postData:FeedRow, user:User, currentUser
 	}, [postids, post])
 
     return (
-		<div className='grid grid-flow-col grid-rows-1 w-3'>
-			<div className='text-2xl'>
-				<button onClick={() => {(!currentUserPost) ? togglePostLike() : ''}}>
-					{(postIsLikedByUser) ?
-						<BiSolidHeart className='text-red-600'/>
-						:
-						<BiHeart/>
-					}
-				</button>
-			</div>
-			<div className='text-sm'>{postLikeCount}</div>
-		</div>
-						
+		<button
+			onClick={() => {(!currentUserPost) ? togglePostLike() : ''}}
+			className={`group flex items-center gap-2 transition-colors ${postIsLikedByUser ? 'text-rose-500' : 'text-lvartsmusic-muted hover:text-rose-500'}`}
+		>
+			<span className='rounded-full p-2 transition-colors group-hover:bg-rose-500/10'>
+				{postIsLikedByUser ? <BiSolidHeart className="h-4.5 w-4.5" /> : <BiHeart className="h-4.5 w-4.5" />}
+			</span>
+			<span className='text-sm'>{postLikeCount}</span>
+		</button>
     )
 }

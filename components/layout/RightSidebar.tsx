@@ -1,19 +1,29 @@
 import RecUsers from '../RecUsers';
-import {currentUser} from "@/app/data/currentUser";
-import Nav from "@/components/layout/Nav";
+import SidebarSearch from "@/components/layout/SidebarSearch";
+import UpcomingEvents from "@/components/UpcomingEvents";
 
 export default async function RightSidebar() {
-	const user = await currentUser();
-
 	return (
-		<div>
-			<section className="rightsidebar bg-[#0c0a18]/50 backdrop-blur-sm">
-				<div className='my-4'>
-					<Nav user={user}/>
-				</div>
-				<RecUsers/>			
+		<aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-87.5 shrink-0 flex-col gap-4 overflow-y-auto pt-4 pb-[130px] pl-6 xl:flex">
+			<SidebarSearch />
+
+			<section className="lvartsmusic-card">
+				<h2 className="px-4 pt-3 text-xl font-extrabold text-lvartsmusic-foreground">
+					Upcoming Events
+				</h2>
+				<UpcomingEvents />
 			</section>
-			
-		</div>
+
+			<section className="lvartsmusic-card">
+				<h2 className="px-4 pt-3 text-xl font-extrabold text-lvartsmusic-foreground">
+					Who to follow
+				</h2>
+				<RecUsers />
+			</section>
+
+			<p className="px-4 pb-6 text-xs text-lvartsmusic-muted">
+				Lehigh Valley Arts &amp; Music
+			</p>
+		</aside>
 	)
 }

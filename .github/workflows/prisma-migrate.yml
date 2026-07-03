@@ -1,0 +1,18 @@
+name: Prisma Migrate Deploy
+on:
+  push:
+    branches: [main]
+    paths: [prisma/migrations/**]
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npx prisma migrate deploy
+        env:
+          postgresql_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}

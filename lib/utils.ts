@@ -81,6 +81,20 @@ export const compressImage = (file:File, maxWidth = 800, maxHeight = 600):Promis
 	});
 }
 
+const postTypeLabels: Record<string, string> = {
+	post: 'Post',
+	comment: 'Comment',
+	event: 'Event'
+}
+
+export const getPostTypeLabel = (posttype?: string | null) => {
+	if (!posttype) {
+		return 'Post'
+	}
+
+	return postTypeLabels[posttype] || 'Post'
+}
+
 export const getProfileUserIdFromPath = (pathname:string) => {
 	const match = pathname.match(/^\/user\/([^/]+)$/)
 
@@ -145,6 +159,16 @@ export const parseText = (text:string):string => {
 }
 
 export const randoLineCount = () => Math.floor(Math.random() * 10) + 5;
+
+// Angle for .lvartsmusic-bg-gradient. Kept near vertical (0/180deg) rather than
+// fully random 0-360: the visible background is usually a narrow strip (sidebar
+// gutters), and angles near horizontal (90/270deg) barely change color across a
+// narrow strip's width, making the gradient look like a single flat color.
+export const getRandomGradientAngle = () => {
+	const base = Math.random() < 0.5 ? 0 : 180;
+
+	return base + Math.floor(Math.random() * 90 - 45);
+}
 
 export const shuffleArray = (array:Array<any>) => {
 	for (let i = array.length - 1; i > 0; i--) {

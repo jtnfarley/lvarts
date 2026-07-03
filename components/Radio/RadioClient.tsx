@@ -106,24 +106,24 @@ export default function RadioClient(props:{nowPlaying:any}) {
 	};
 
 	return (
-		<div className="flex justify-center w-full bg-gray-900/80">
+		<div className="flex justify-center w-full bg-gray-900/80 px-3 py-1 md:p-3">
 			{audiotrack && 
-				<div className="p-3 flex gap-2 items-center">
+				<div className="flex gap-2 items-center">
 					<div className="text-white"><Image src={coverartfile} width={75} height={75} alt={`${audiotrack.trackname} by ${audiotrack.artist}`} className="min-w-[25px]"/></div>
 					<div className="text-white text-sm max-w-[150px]">
-						<div className="text-xs"><em>Now Playing</em></div>
+						<div className="hidden md:block text-xs"><em>Now Playing</em></div>
 						<div className="flex items-center">
 							<div><Link href={`/post/${nowPlaying.id}`}><strong>{audiotrack.trackname}</strong></Link></div>
 							<div className="ms-2"><BiLinkAlt/></div>
 						</div>
 						<div>{audiotrack.artist}</div>
 						{audiotrack.album && <div>{audiotrack.album}</div>}
-						{audiotrack.releaseyear && <div>{audiotrack.releaseyear}</div>}
+						{audiotrack.releaseyear && <div className="hidden md:block text-xs">{audiotrack.releaseyear}</div>}
 					</div>
 				</div>
 			}
 
-			<div className="text-white p-3 flex items-center gap-3">
+			<div className="text-white flex items-center gap-3">
 				<button
 					type="button"
 					onClick={() => void togglePlayback()}

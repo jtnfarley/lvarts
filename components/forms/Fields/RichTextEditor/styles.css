@@ -44,14 +44,14 @@ h1 {
 
 .editor-container {
   border-radius: 10px;
-  color: #000;
+  color: #999;
   position: relative;
   line-height: 20px;
   font-weight: 400;
   text-align: left;
   /* border:1px solid #eee; */
   padding:5px;
-  background: #fff;
+  background: transparent;
 }
 
 .editor-inner {
@@ -70,6 +70,10 @@ h1 {
   outline: 0;
   padding: 15px 10px;
   caret-color: #444;
+}
+
+.dark .editor-input {
+  caret-color: #ddd;
 }
 
 .editor-placeholder {
@@ -110,11 +114,6 @@ h1 {
   padding: 1px 0.25rem;
   font-family: Menlo, Consolas, Monaco, monospace;
   font-size: 94%;
-}
-
-.editor-link {
-  color: rgb(33, 111, 219) !important;
-  text-decoration: none;
 }
 
 .editor-mention {
@@ -426,7 +425,7 @@ pre::-webkit-scrollbar-thumb {
 .toolbar {
   display: flex;
   margin-bottom: 1px;
-  background: #fff;
+  background: transparent;
   padding: 4px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
@@ -478,10 +477,18 @@ pre::-webkit-scrollbar-thumb {
   background-color: #eee;
 }
 
+.dark .toolbar .toolbar-item:hover:not([disabled]) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 .toolbar .divider {
   width: 1px;
   background-color: #eee;
   margin: 0 4px;
+}
+
+.dark .toolbar .divider {
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 .toolbar .toolbar-item .text {

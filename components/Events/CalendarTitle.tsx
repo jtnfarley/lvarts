@@ -55,8 +55,8 @@ export default function CalendarTitle() {
 	return (
 		<div>
 		{adjective !== '' &&
-			<div className={`text-xl text-gray-900 bg-white/60 p-5 shadow-xl rounded-lg ${fascinate.className} w-full lg:text-5xl`}>
-				<div className="text-lg lg:text-3xl">lehiGh VAlley</div><div>Art & Music events</div>
+			<div className={`text-xl text-gray-900 bg-white/60 p-5 shadow-xl rounded-lg w-full lg:text-5xl`}>
+				<div className="text-lg lg:text-3xl">Lehigh Valley</div><div className={fascinate.className}>Art & Music events</div>
 			</div>
 		}
 		</div>

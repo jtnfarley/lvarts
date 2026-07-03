@@ -79,7 +79,7 @@ export default function UserProfile(props:{currentUser:User, userProfile:UserDet
 		<>
             {googleMapsApiKey &&
                 <APIProvider apiKey={googleMapsApiKey || ''}>
-					<div className="xl:hidden lg:block lg:bg-white lg:rounded-xl lg:p-5 sm:bg-none sm:p-0 mt-5 mb-5 border border-orange">
+					<div className="xl:hidden lg:block lg:bg-white lg:rounded-xl lg:p-5 sm:bg-none sm:p-0 mt-5 mb-5">
 						{profile && 
 							<Profile profile={profile} user={currentUser}/>
 						}
