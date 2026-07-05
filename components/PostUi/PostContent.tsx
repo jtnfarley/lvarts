@@ -76,7 +76,6 @@ export default function PostContent(props:{post:FeedRow, googleMapsApiKey:string
 					}
 
 					linkEnd = placeholder.indexOf('</span>',linkIndex);
-					console.log(placeholder.substring(linkIndex, linkEnd))
 					linkLength = placeholder.substring(linkIndex, linkEnd).length;
 					linkText = placeholder.substring(linkIndex, linkEnd)
 					linkText = linkText.replace(/^https?:\/\//, '');
