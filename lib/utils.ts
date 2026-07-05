@@ -1,9 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import User from "./models/user";
 import SidebarProfile from "./models/sidebarProfile";
 import UserDetails from "./models/userDetails";
-import {getUserDetailsByHandleDAL} from '@/app/data/user'
 
 export function cn(...inputs: ClassValue[]) {
   	return twMerge(clsx(inputs))

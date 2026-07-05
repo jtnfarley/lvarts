@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 
 // the photos to ghost behind the app — one is picked per visit
 export const BG_IMAGES = [
-	'IMG_0492.png', 'IMG_0650.png', 'IMG_1419-2.png', 'IMG_1419.png', 'IMG_1705.png',
-	'IMG_2124.png', 'IMG_2150-2.png', 'IMG_2396.png', 'IMG_2873-2.png', 'IMG_2873.png', 'IMG_3727.png',
+	'IMG_0492.png', 'IMG_0650.png', 'IMG_1419-2.png', 'IMG_1419.png', 
+	'IMG_2124.png', 'IMG_2396.png', 'IMG_2873-2.png', 'IMG_2873.png', 'IMG_3727.png',
 ];
 
 // locked riso inks — one tints the photo per visit (orange / purple / electric blue / acid green)
