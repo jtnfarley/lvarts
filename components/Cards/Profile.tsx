@@ -9,6 +9,7 @@ import User from "@/lib/models/user";
 import createDOMPurify from "dompurify";
 import { useFollowsStore } from '@/stores/follows-store';
 import Avatar from '@/components/shared/Avatar';
+import SignOut from '@/components/auth/buttons/SignOut';
 
 export default function Profile(props:{profile:SidebarProfile, user:User, getUpdatedProfile?:Function, theme?:'lvartsmusic'}) {
 	const { profile, user, theme } = props;
@@ -93,9 +94,16 @@ export default function Profile(props:{profile:SidebarProfile, user:User, getUpd
             }
 
             {isOwnProfile &&
-                <button onClick={() => redirect(`/profile`)} className="lvartsmusic-pill-outline mt-4 w-full">
-                    <BiEdit className="inline" /> My Profile
-                </button>
+                <div>
+                    <div>
+                        <button onClick={() => redirect(`/profile`)} className="lvartsmusic-pill-outline mt-4 w-full">
+                            <BiEdit className="inline" /> My Profile
+                        </button>
+                    </div>
+                    <div>
+                        <SignOut/>
+                    </div>
+                </div>
             }
         </div>
     )

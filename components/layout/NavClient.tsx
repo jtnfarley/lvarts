@@ -5,7 +5,6 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import User from "@/lib/models/user";
 import { useEffect, useState } from "react";
-import SignOut from '@/components/auth/buttons/SignOut';
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -60,7 +59,6 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 						</Link>
 					)
 				})}
-				{user && <SignOut shade={props.shade}/>}
 			</div>
 		)
 	}
@@ -92,13 +90,6 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 							<BiImage className={shadeClass}/>
 						</div>
 					</Link>
-					{user &&
-						<>
-							<div>
-								<SignOut shade={props.shade}/>
-							</div>
-						</>
-					}
 				</>
 				:
 				<Link href='/' className='leftsidebar_link flex flex-row items-center'>

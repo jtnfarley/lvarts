@@ -17,9 +17,10 @@ export default function SignOut(props:{shade?:string}) {
     }
 
     return (
-        <button onClick={signOutUser} className='text-lg flex flex-row items-center cursor-pointer' title='Sign out'>
-            <BiExit className={shadeClass}/>
-            <div className='hidden md:block'></div>
-        </button>
+        <div className='flex justify-center mt-5'>
+            <button onClick={signOutUser} className='text-sm flex flex-row items-center cursor-pointer text-[var(--lvartsmusic-muted)]' title='Sign out'>
+                Sign Out <BiExit className={`${shadeClass} ms-2`}/>
+            </button>
+        </div>
     )
 }
