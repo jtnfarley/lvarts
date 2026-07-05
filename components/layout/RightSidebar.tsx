@@ -20,10 +20,6 @@ export default async function RightSidebar() {
 				</h2>
 				<RecUsers />
 			</section>
-
-			<p className="px-4 pb-6 text-xs text-lvartsmusic-muted">
-				Lehigh Valley Arts &amp; Music
-			</p>
 		</aside>
 	)
 }
