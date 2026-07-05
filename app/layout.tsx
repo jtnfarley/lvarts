@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 // <html> element here never unmounts).
 // Dark is the default; only an explicit 'light' choice in localStorage opts out.
 // If no choice has been made yet, persist 'dark' so the default is explicit from the first load.
-const themeInitScript = `(function(){try{var t=localStorage.getItem('lvartsmusic-theme');if(!t){t='dark';localStorage.setItem('lvartsmusic-theme',t);}if(t!=='light')document.documentElement.classList.add('dark');console.log(t)}catch(e){}})();`;
+const themeInitScript = `(function(){try{var t=localStorage.getItem('lvartsmusic-theme');if(!t){t='dark';localStorage.setItem('lvartsmusic-theme',t);}if(t!=='light')document.documentElement.classList.add('dark');console.log(document.documentElement.classList)}catch(e){}})();`;
 
 export default async function RootLayout({
   	children,
