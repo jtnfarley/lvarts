@@ -9,12 +9,13 @@ interface AIImageRequest {
     prompt: string
 }
 
-export const getTextResponse = async (prompt:string, tools?:string[]) => {
+export const getTextResponse = async (prompt:string, tools?:string[], temperature?:number) => {
     const client = new Anthropic({ timeout: 30_000, maxRetries: 1 });
 
     const message = await client.messages.create({
         model: "claude-haiku-4-5",
         max_tokens: 500,
+        temperature,
         messages: [
             {
             role: "user",

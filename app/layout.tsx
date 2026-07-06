@@ -6,6 +6,7 @@ import RandoBgs from "@/components/layout/RandoBgs";
 import { ModalProvider } from '@/app/contextProviders/modalProvider'
 import { ModalRoot } from '@/components/Modal/ModalRoot'
 import Radio from '@/components/Radio/RadioServer';
+import SupportChatServer from '@/components/SupportChat/SupportChatServer';
 
 export const metadata: Metadata = {
   title: "Lehigh Valley Art & Music",
@@ -42,6 +43,7 @@ export default async function RootLayout({
 						</div>
 					</main>
 					<Radio/>
+					<SupportChatServer/>
 					<ModalRoot/>
 				</body>
 			</html>

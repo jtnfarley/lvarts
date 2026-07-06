@@ -52,6 +52,8 @@ Server components in `components/` fetch nothing — they call functions from `a
 
 **AI persona bots:** `lib/bots/` (`hd.ts`, `imageBot.ts`, `musikfestBot.ts`) generate auto-reply posts (`posttype: 'comment'`) as fictional personas — e.g. mentioning reserved `userdetailsid` 12 ("H. D.", a poet bot) or 13/14 (painter bots that call `getImageResponse`) in post content. `notifyMentionedUsers()` in `app/data/postMentions.ts` special-cases those IDs and dispatches the bot instead of creating a normal mention notification. Bot calls must be wrapped in `after()` from `next/server`, not `.then()` — fire-and-forget promises get killed when the serverless function returns before the Anthropic/OpenAI call completes.
 
+**Support chat:** `components/SupportChat/SupportChatServer.tsx` (gated by `isLoggedIn()`) renders a client-side floating widget site-wide for logged-in users only. `sendSupportMessage()` in `app/actions/supportChat.ts` sends the (ephemeral, client-held) conversation to Claude via `getTextResponse()` at `temperature: 0`, grounded in the hand-maintained `SUPPORT_KNOWLEDGE` block (`lib/supportKnowledge.ts`) so it doesn't invent UI details — update that file when the actual posting/upload flows change. It emails an admin alert via `sendAdminAlert()` in `lib/mail.ts` when the reply is tagged `STATUS: issue` (a bug report) or `STATUS: unknown` (a question the knowledge block doesn't cover) — only `STATUS: resolved` skips the alert. No chat history or ticket data is persisted server-side.
+
 **Post types:** `posttypes` table drives type behavior. `PostForm` checks `posttype === 'audio'` to show `AudioFields` and route to the radio upload flow, and `posttype === 'event'` to show `EventFields` (venue/date-time scheduling, via `useVenueSearch`).
 
 ### Environment variables
@@ -67,7 +69,8 @@ Server components in `components/` fetch nothing — they call functions from `a
 | `UPLOAD_SECRET` | HMAC secret shared with the upload Worker for signing/verifying upload tokens |
 | `NEXT_PUBLIC_UPLOAD_WORKER_URL` | Cloudflare Worker URL that proxies client uploads to BunnyCDN |
 | `GOOGLE_MAPS` | Google Maps API key (venue/event location display) |
-| `EMAIL_SERVER`, `EMAIL_FROM` | NextAuth email provider (magic link sign-in) |
+| `EMAIL_SERVER`, `EMAIL_FROM` | NextAuth email provider (magic link sign-in); also reused by `lib/mail.ts` for admin alerts |
+| `SUPPORT_ALERT_EMAIL` | Destination inbox for support-chat technical-issue alerts |
 
 ### Database
 
