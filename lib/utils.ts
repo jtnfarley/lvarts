@@ -22,21 +22,20 @@ export const getRandomString = (length:number) => {
 export const formatDate = (date:Date | null | undefined):string => {
   	if (!date) return '';
 
-	const months = [
-		'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-	]
+	const parts = new Intl.DateTimeFormat('en-US', {
+		timeZone: 'America/New_York',
+		month: 'short',
+		day: 'numeric',
+		year: 'numeric',
+		hour: 'numeric',
+		minute: '2-digit',
+		hour12: true,
+	}).formatToParts(date).reduce((acc, part) => {
+		acc[part.type] = part.value;
+		return acc;
+	}, {} as Record<string, string>);
 
-	const hours = (date.getHours() < 12 ) ? date.getHours() : date.getHours() - 12;
-	const amPm = (date.getHours() < 12 ) ? 'AM' : 'PM';
-	const minutes = (date.getMinutes().toString().length < 2 ) ? `${date.getMinutes().toString()}0` : date.getMinutes().toString();
-
-	return `
-		${months[date.getMonth()]} 
-		${date.getDate()}, 
-		${date.getFullYear()} 
-		${hours}:${minutes}
-		${amPm}
-	`
+	return `${parts.month} ${parts.day}, ${parts.year} ${parts.hour}:${parts.minute} ${parts.dayPeriod}`;
 }
 
 export const compressImage = (file:File, maxWidth = 800, maxHeight = 600):Promise<string | undefined> => {

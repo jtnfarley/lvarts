@@ -14,6 +14,15 @@ npx cypress run --spec cypress/e2e/app.cy.ts  # Run a single e2e spec headlessly
 
 After changing the Prisma schema, run `npx prisma generate` before the next build.
 
+The `worker/` directory is a separate npm project (its own `package.json`, not part of the root workspace) containing the Cloudflare Worker source referenced below under File storage:
+
+```bash
+cd worker && npm run dev     # wrangler dev — local worker, reads worker/.dev.vars
+cd worker && npm run deploy  # wrangler deploy
+```
+
+Worker secrets (`BUNNY_KEY`, `UPLOAD_SECRET`) are set via `wrangler secret put <NAME>`, not in `wrangler.toml`.
+
 ## Architecture
 
 **Lehigh Valley Art & Music** is a Next.js 15 App Router social media platform for the local arts community.
