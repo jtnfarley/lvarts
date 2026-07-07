@@ -16,7 +16,7 @@ export default async function Home() {
 
 	if (!user) redirect('/');
 
-	const feed = await getFeedRow(user.userdetails!);
+	const feed = await getFeedRow(user.userdetails!, 0, undefined, true);
 
 	const googleMapsApiKey = process.env.GOOGLE_MAPS; //has to be handled on the server
 

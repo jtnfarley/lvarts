@@ -137,7 +137,7 @@ const paginatedFeedQuery = (innerQuery: Prisma.Sql, offset:number) => Prisma.sql
     OFFSET ${offset}
 `
 
-export const getFeedRow = async (userdetails:UserDetails, offset:number = 0, lastChecked:Date = new Date('2024-01-01')):Promise<FeedRow[]> => {
+export const getFeedRow = async (userdetails:UserDetails, offset:number = 0, lastChecked:Date = new Date('2024-01-01'), includeBoosted:boolean = false):Promise<FeedRow[]> => {
     const userdetailsid = userdetails?.id
     const hasLastChecked = !!lastChecked
 
@@ -146,6 +146,16 @@ export const getFeedRow = async (userdetails:UserDetails, offset:number = 0, las
     }
 
     if (!lastChecked) lastChecked = new Date('2024-01-01');
+
+    const boostedPostsBranch = includeBoosted ? Prisma.sql`
+        UNION
+
+        SELECT p.id
+        FROM postboosts pb
+        JOIN posts p
+            ON p.id = pb.postid
+        WHERE ${activeBoostPredicate(Prisma.sql`pb`)}
+    ` : Prisma.empty
 
     const eligiblePostsQuery = Prisma.sql`
         WITH followed AS (
@@ -187,13 +197,7 @@ export const getFeedRow = async (userdetails:UserDetails, offset:number = 0, las
                 )
             )
 
-            UNION
-
-            SELECT p.id
-            FROM postboosts pb
-            JOIN posts p
-                ON p.id = pb.postid
-            WHERE ${activeBoostPredicate(Prisma.sql`pb`)}
+            ${boostedPostsBranch}
         )
     `
 

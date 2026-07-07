@@ -77,7 +77,7 @@ export default function CommentFeed(props:{comments:FeedRow[], parentPostId:stri
                         <LoadOldPosts getOldPosts={getOldCommentsFromServer} endOfPosts={endOfPosts} />
                     </>
                     :
-                    <div className='bg-white rounded-lg px-3 py-3'>No comments yet</div>
+                    <div className='lvartsmusic-card px-3 py-3'>No comments yet</div>
             }
         </div>
     )

@@ -39,7 +39,7 @@ export default function Feed(props:{feed:FeedRow[], user:User, getFeedRow:Functi
 			}
 		}
 
-		const newPosts = await getFeedRow(user.userdetails, 0, lastCheckedRef.current);
+		const newPosts = await getFeedRow(user.userdetails, 0, lastCheckedRef.current, true);
 
 		if (newPosts && newPosts.length) {
 			queuedPostsRef.current = [];
@@ -62,7 +62,7 @@ export default function Feed(props:{feed:FeedRow[], user:User, getFeedRow:Functi
 	}
 
 	const getNewPostsFromServer = async () => {
-		const newPosts = await getFeedRow(user.userdetails, 0, lastCheckedRef.current);
+		const newPosts = await getFeedRow(user.userdetails, 0, lastCheckedRef.current, true);
 		lastCheckedRef.current = new Date();
 
 		if (newPosts && newPosts.length && queuedPostsRef.current && queuedPostsRef.current.length) {
@@ -85,7 +85,7 @@ export default function Feed(props:{feed:FeedRow[], user:User, getFeedRow:Functi
 	}
 
 	const getOldPostsFromServer = async () => {
-		const oldPosts = await getFeedRow(user.userdetails, feed.length);
+		const oldPosts = await getFeedRow(user.userdetails, feed.length, undefined, true);
 	
 		if (oldPosts && oldPosts.length && tempFeedRef.current && tempFeedRef.current.length) {
 			tempFeedRef.current = [...tempFeedRef.current, ...oldPosts];
