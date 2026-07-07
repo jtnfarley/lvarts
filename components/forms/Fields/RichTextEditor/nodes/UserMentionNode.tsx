@@ -88,7 +88,7 @@ export class UserMentionNode extends BeautifulMentionNode {
     }
 
     if (userdetailsid) {
-      element.setAttribute("href", `/user/${userdetailsid}`);
+      element.setAttribute("href", `/user/${this.getValue()}`);
     }
 
     element.textContent = this.getTextContent();
