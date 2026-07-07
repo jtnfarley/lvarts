@@ -125,7 +125,7 @@ export default function Feed(props:{feed:FeedRow[], user:User, getFeedRow:Functi
 				<>
                 	{feed.map((post:FeedRow, index:number) => {
 						return (
-							<PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={user} googleMapsApiKey={googleMapsApiKey} />
+							<PostUi key={`${post.id}-${renderKey}-${index}`} postData={post} user={user} googleMapsApiKey={googleMapsApiKey} trackImpressions />
 						)
 					})}
 					<LoadOldPosts getOldPosts={getOldPostsFromServer} endOfPosts={endOfPosts}/>

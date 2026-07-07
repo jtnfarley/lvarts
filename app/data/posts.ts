@@ -4,6 +4,7 @@ import {prisma} from '@/prisma';
 import { Prisma } from '@prisma/client';
 import { notifyMentionedUsers } from './postMentions';
 import { generateUniqueHandle } from './handles';
+import { activeBoostPredicate } from '@/lib/boostQueries';
 import { FeedRow } from '@/lib/models/initFeedRow';
 import UserDetails from '@/lib/models/userDetails';
 
@@ -59,6 +60,10 @@ const feedRowSelect = Prisma.sql`
         p.edited,
         pt.posttype,
         p.privatepost,
+        EXISTS (
+            SELECT 1 FROM postboosts pb
+            WHERE pb.postid = p.id AND ${activeBoostPredicate(Prisma.sql`pb`)}
+        ) AS isboosted,
         p.postfile,
         json_build_object(
             'id', ud.id,
@@ -181,6 +186,14 @@ export const getFeedRow = async (userdetails:UserDetails, offset:number = 0, las
                     )
                 )
             )
+
+            UNION
+
+            SELECT p.id
+            FROM postboosts pb
+            JOIN posts p
+                ON p.id = pb.postid
+            WHERE ${activeBoostPredicate(Prisma.sql`pb`)}
         )
     `
 

@@ -10,6 +10,7 @@ export interface FeedRow {
         posttype: string
     }
     privatepost: boolean | null
+    isboosted: boolean
     parentPostId: number | null
     userdetails: {
         id: number

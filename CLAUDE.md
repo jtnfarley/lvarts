@@ -35,6 +35,7 @@ Worker secrets (`BUNNY_KEY`, `UPLOAD_SECRET`) are set via `wrangler secret put <
 - `app/api/auth/` — NextAuth route handler
 - `app/api/radio/` — AzuraCast webhook endpoint (validates station ID 614)
 - `app/api/upload-token/` — issues short-lived HMAC tokens for direct-to-worker uploads (see File storage below)
+- `app/api/webhooks/stripe/` — Stripe webhook endpoint, activates boosts on `payment_intent.succeeded` (see Boosting below)
 
 ### Data flow pattern
 
@@ -65,6 +66,8 @@ Server components in `components/` fetch nothing — they call functions from `a
 
 **Post types:** `posttypes` table drives type behavior. `PostForm` checks `posttype === 'audio'` to show `AudioFields` and route to the radio upload flow, and `posttype === 'event'` to show `EventFields` (venue/date-time scheduling, via `useVenueSearch`).
 
+**Boosting:** Post authors can pay to bypass the follow-graph feed scope, priced CPM-style (pay per 1,000 impressions). `BoostPost` (in `components/PostUi/`, rendered from `PostActions` next to Edit/Delete, hidden for private posts) opens `BoostCheckoutModal`, a self-contained step machine (select an impressions tier → Stripe `<PaymentElement>` → success/error) that intentionally bypasses the shared `ModalContext`/`ModalRoot` system, since that context is built for single synchronous confirm actions, not an async multi-step payment flow. Impression tiers live in `constants/boost.ts` ($1/1,000 flat rate) — the client only ever sends a tier key, never a raw amount; `createBoostPaymentIntent` (`app/actions/boost.ts` → `app/data/boosts.ts`) resolves the real charge amount server-side and re-validates post ownership/privacy before creating a Stripe PaymentIntent. The `postboosts` row is only ever written by the `app/api/webhooks/stripe/` handler on `payment_intent.succeeded` (never at checkout time), keyed idempotently on `stripepaymentintentid`, storing `impressionspurchased` and a fixed `expiresat` backstop (`activatedat + BOOST_BACKSTOP_DAYS`, currently 30 days) so a slow boost still turns off eventually even if it never exhausts its purchased impressions. A boost is "active" (`activeBoostPredicate` in `app/data/boosts.ts`, shared between the feed query and the `isboosted` flag) only while `status = 'active' AND expiresat > now() AND` its impressions aren't exhausted — impressions-remaining is computed as a live `COUNT` against the `postboostimpressions` ledger table rather than a stored counter, to avoid a second source of truth drifting under concurrent writes. Each row in that ledger is one unique `(postboostid, userdetailsid)` pair — the unique constraint is both the dedup mechanism and the idempotency guard. Impressions are only recorded for the home feed: `PostUi` takes an opt-in `trackImpressions` prop (set only by `Feed.tsx`, not by `Search.tsx`/`SinglePost.tsx`/`CommentFeed.tsx`, and Gallery never renders `PostUi` at all), using `useInView` from `react-intersection-observer` to fire `recordBoostImpression` once a boosted post actually scrolls into view — client-side `triggerOnce` reduces call volume but the DB unique constraint, not the hook, is what makes repeated fires across remounts/polling harmless. `getFeedRow` in `app/data/posts.ts` unions currently-active boosts into `eligible_posts` (independent of the `lastChecked` freshness filter and the follow/like scope, by design), and `feedRowSelect` exposes the `isboosted` flag (consumed everywhere a post renders, not just the home feed) that drives the `BoostedBadge` shown in `PostHeader` — once a boost is exhausted, both the injection and the badge stop, though an organically-visible post is unaffected. No audience/demographic targeting exists — a boosted post's impressions can go to anyone.
+
 ### Environment variables
 
 | Variable | Purpose |
@@ -80,6 +83,9 @@ Server components in `components/` fetch nothing — they call functions from `a
 | `GOOGLE_MAPS` | Google Maps API key (venue/event location display) |
 | `EMAIL_SERVER`, `EMAIL_FROM` | NextAuth email provider (magic link sign-in); also reused by `lib/mail.ts` for admin alerts |
 | `SUPPORT_ALERT_EMAIL` | Destination inbox for support-chat technical-issue alerts |
+| `STRIPE_SECRET_KEY` | Stripe secret API key (server-side PaymentIntent creation + webhook processing) |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key (client-side Elements/Payment Element) |
+| `STRIPE_WEBHOOK_SECRET` | Signing secret for the `app/api/webhooks/stripe` endpoint |
 
 ### Database
 

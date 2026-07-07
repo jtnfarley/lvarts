@@ -1,14 +1,17 @@
 'use client'
 
 import Link from 'next/link';
+import { useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
 import User from '@/lib/models/user';
 
 import PostHeader from './PostHeader';
 import PostContent from './PostContent';
 import PostActions from './PostActions';
 import { FeedRow } from '@/lib/models/initFeedRow';
+import { recordBoostImpression } from '@/app/actions/boost';
 
-export default function PostUi(props:{postData:FeedRow, user:User, googleMapsApiKey:string | undefined}) {
+export default function PostUi(props:{postData:FeedRow, user:User, googleMapsApiKey:string | undefined, trackImpressions?:boolean}) {
 	const post = props.postData;
 	const user = props.user;
 	const currentUserParentPost = post.parentPost?.userid === user?.id;
@@ -18,6 +21,13 @@ export default function PostUi(props:{postData:FeedRow, user:User, googleMapsApi
 		: post.parentPost?.displayName
 			? `${post.parentPost.displayName}'s`
 			: "someone's";
+	const { ref, inView } = useInView({ triggerOnce: true });
+
+	useEffect(() => {
+		if (inView && props.trackImpressions && post.isboosted) {
+			recordBoostImpression(post.id);
+		}
+	}, [inView]);
 
     return (
 		<div className='mb-4'>
@@ -27,6 +37,7 @@ export default function PostUi(props:{postData:FeedRow, user:User, googleMapsApi
 				</div>
 			}
 			<div
+				ref={ref}
 				key={post.id}
 				className="lvartsmusic-card flex flex-col gap-2 px-4 py-3 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
 			>

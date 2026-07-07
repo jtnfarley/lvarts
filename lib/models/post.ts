@@ -12,6 +12,7 @@ export default interface Post {
 	postfiletypeid?: number | null
 	posttypeid?: number | null
 	privatepost?: boolean | null
+	isboosted?: boolean | null
 	eventid?: number | null
 	venueid?: number | null
 	eventname?: string | null

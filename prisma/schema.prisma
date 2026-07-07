@@ -144,6 +144,7 @@ model posts {
   posttypes                                          posttypes        @relation(fields: [posttypeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postTypeFK")
   filetypes                                          filetypes?       @relation(fields: [postfiletypeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postfiletypeFK")
   usertoposts                                        usertoposts[]
+  postboosts                                         postboosts[]
 
   @@index([postfile], map: "postfile_IX")
 }
@@ -152,6 +153,37 @@ model posttypes {
   id       Int     @id(map: "postTypes_pkey") @default(autoincrement())
   posttype String  @db.VarChar
   posts    posts[]
+}
+
+model postboosts {
+  id                    Int                     @id @default(autoincrement())
+  postid                Int
+  userdetailsid         Int
+  budgetcents           Int
+  impressionspurchased  Int
+  status                String                  @default("active") @db.VarChar
+  stripepaymentintentid String                  @unique @db.VarChar
+  activatedat           DateTime?               @db.Timestamptz(6)
+  expiresat             DateTime?               @db.Timestamptz(6)
+  createdat             DateTime                @default(now()) @db.Timestamptz(6)
+  updatedat             DateTime                @default(now()) @db.Timestamptz(6)
+  posts                 posts                   @relation(fields: [postid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postboosts_postFK")
+  userdetails           userdetails             @relation(fields: [userdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postboosts_userdetailsFK")
+  postboostimpressions  postboostimpressions[]
+
+  @@index([status, expiresat], map: "postboosts_status_expiresat_IX")
+  @@index([postid], map: "postboosts_postid_IX")
+}
+
+model postboostimpressions {
+  id            Int         @id @default(autoincrement())
+  postboostid   Int
+  userdetailsid Int
+  createdat     DateTime    @default(now()) @db.Timestamptz(6)
+  postboosts    postboosts  @relation(fields: [postboostid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postboostimpressions_postboostFK")
+  userdetails   userdetails @relation(fields: [userdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postboostimpressions_userdetailsFK")
+
+  @@unique([postboostid, userdetailsid], map: "postboostimpressions_unique")
 }
 
 model states {
@@ -181,6 +213,8 @@ model userdetails {
   userstonotifications_userstonotifications_receiveruserdetailsidTouserdetails userstonotifications[] @relation("userstonotifications_receiveruserdetailsidTouserdetails")
   userstonotifications_userstonotifications_senderuserdetailsidTouserdetails   userstonotifications[] @relation("userstonotifications_senderuserdetailsidTouserdetails")
   usertoposts                                                                  usertoposts[]
+  postboosts                                                                  postboosts[]
+  postboostimpressions                                                        postboostimpressions[]
 
   @@index([displayname, handle], map: "name_IX")
 }

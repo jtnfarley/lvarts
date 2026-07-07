@@ -6,6 +6,7 @@ import { FeedRow } from '@/lib/models/initFeedRow';
 import LikePost from './LikePost';
 import DeletePost from './DeletePost';
 import EditPost from './EditPost';
+import BoostPost from './BoostPost';
 import CommentButton from './CommentButton';
 
 export default function PostActions(props:{postData:FeedRow, user:User, currentUserPost:boolean}) {
@@ -23,6 +24,7 @@ export default function PostActions(props:{postData:FeedRow, user:User, currentU
 				currentUserPost &&
 					<div className='flex items-center gap-1'>
 						<EditPost postData={post}/>
+						{/* {!post.privatepost && <BoostPost postData={post}/>} */}
 						<DeletePost postData={post}/>
 					</div>
 			}
