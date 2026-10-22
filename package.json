@@ -7,7 +7,9 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open",
+    "test:cards": "npx tsx --test lib/cards/*.test.ts",
+    "cards:fixtures": "npx tsx --tsconfig scripts/tsconfig.json scripts/render-card-fixtures.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.106.0",
