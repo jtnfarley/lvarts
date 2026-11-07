@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "schedules": {
+    "scrape-events": {
+      "schedule": "0 5 * * *",
+      "timezone": "America/New_York",
+      "path": "/api/cron/scrape",
+      "requestMethod": "GET"
+    }
+  }
+}

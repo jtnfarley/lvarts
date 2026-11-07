@@ -9,7 +9,9 @@
     "lint": "next lint",
     "cypress:open": "cypress open",
     "test:cards": "npx tsx --test lib/cards/*.test.ts",
-    "cards:fixtures": "npx tsx --tsconfig scripts/tsconfig.json scripts/render-card-fixtures.ts"
+    "cards:fixtures": "npx tsx --tsconfig scripts/tsconfig.json scripts/render-card-fixtures.ts",
+    "test:scraper": "npx tsx --tsconfig scripts/tsconfig.json --test lib/scraper/*.test.ts lib/scraper/adapters/*.test.ts",
+    "scrape": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/scrape.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.106.0",
@@ -23,7 +25,10 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@stripe/react-stripe-js": "^6.7.0",
     "@stripe/stripe-js": "^9.9.0",
+    "@vercel/blob": "^2.8.2",
+    "@vercel/schedules": "^0.0.3",
     "@vis.gl/react-google-maps": "^1.7.1",
+    "cheerio": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dompurify": "^3.3.0",
