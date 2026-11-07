@@ -46,3 +46,6 @@ next-env.d.ts
 
 # db sync dumps (contain production data)
 /scripts/.db-sync/
+
+
+Event * Spec*
