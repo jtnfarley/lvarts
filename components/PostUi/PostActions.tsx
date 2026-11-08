@@ -8,6 +8,7 @@ import DeletePost from './DeletePost';
 import EditPost from './EditPost';
 import BoostPost from './BoostPost';
 import CommentButton from './CommentButton';
+import ReportButton from './ReportButton';
 
 export default function PostActions(props:{postData:FeedRow, user:User, currentUserPost:boolean}) {
 	const post = props.postData;
@@ -27,6 +28,9 @@ export default function PostActions(props:{postData:FeedRow, user:User, currentU
 						{/* {!post.privatepost && <BoostPost postData={post}/>} */}
 						<DeletePost postData={post}/>
 					</div>
+			}
+			{!currentUserPost && user?.userdetails?.id &&
+				<ReportButton target={{postid: post.id}} variant='icon'/>
 			}
 		</div>
     )

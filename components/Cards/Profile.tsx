@@ -10,6 +10,7 @@ import createDOMPurify from "dompurify";
 import { useFollowsStore } from '@/stores/follows-store';
 import Avatar from '@/components/shared/Avatar';
 import SignOut from '@/components/auth/buttons/SignOut';
+import ReportButton from '@/components/PostUi/ReportButton';
 
 export default function Profile(props:{profile:SidebarProfile, user:User, getUpdatedProfile?:Function, theme?:'lvartsmusic'}) {
 	const { profile, user, theme } = props;
@@ -90,6 +91,12 @@ export default function Profile(props:{profile:SidebarProfile, user:User, getUpd
                             </div>
                         ))}
                     </div>
+                </div>
+            }
+
+            {!isOwnProfile && user?.userdetails?.id && profile.id &&
+                <div className="text-center">
+                    <ReportButton target={{ userdetailsid: profile.id }} variant="text" />
                 </div>
             }
 

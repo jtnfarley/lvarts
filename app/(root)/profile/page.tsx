@@ -1,4 +1,5 @@
 import AccountInfo from '@/components/forms/AccountInfo';
+import DeleteAccount from '@/components/forms/DeleteAccount';
 import {currentUser} from "@/app/data/currentUser";
 import { updateUser, type UpdateUserParams } from "@/app/data/user"
 import { getSidebarProfile } from '@/app/data/userProfiles';
@@ -54,6 +55,7 @@ export default async function Profile() {
 					<h1 className="text-2xl font-bold">Profile</h1>
 				</div>
 				<AccountInfo userdetails={userProfile} saveUser={saveUser}/>
+				<DeleteAccount />
 			</div>
 		</div>
 	);

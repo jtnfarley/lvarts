@@ -4,6 +4,7 @@ import {prisma} from '@/prisma';
 import { Prisma } from '@prisma/client';
 import { after } from 'next/server';
 import { pushPostActivity } from '@/lib/push';
+import { deleteFromPlaylist } from '@/lib/azuracast';
 import { notifyMentionedUsers } from './postMentions';
 import { generateUniqueHandle } from './handles';
 import { activeBoostPredicate } from '@/lib/boostQueries';
@@ -763,14 +764,4 @@ const addToPlaylist = async (filename:string):Promise<number | undefined> => {
     }
 
     return;
-}
-
-const deleteFromPlaylist = async (azuracastid:bigint) => {
-    await fetch(`https://a6.asurahosting.com/api/station/614/file/${azuracastid}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${process.env.AZURACAST_API_KEY}`,
-            'Content-Type': 'application/json'
-        }
-    })
 }

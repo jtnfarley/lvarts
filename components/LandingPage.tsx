@@ -42,13 +42,6 @@ export default function LandingPage() {
         setMessage(`Lehigh Valley Art & Music is a gathering place to promote and discover the thriving Lehigh Valley art scene. It's like Twitter/X without sociopathic billionaires and Russian troll farms mucking it up. If you're not a troll bot, or a sociopathic billionaire, please join us. Promote your show. Display your work. Find your new favorite band. Post your Musikfest schedule. Engage and collaborate.`);
 	}
 
-    const setUpPrivacyModal = () => {
-		setIsOpen(true);
-        setTitle('Privacy Policy');
-        setType('GenericModal');
-        setMessage(`This site is run by a guy in Whitehall who has no interest in selling your data. With that said, this is a public website, and the Internet is overrun with bad actors. There's always a chance your data will leak out. Fortunately we don't store a lot of personal data. Just your name, email and your Google avatar, if you have one, but that's all mostly public anyway.`);
-	}
-
      const setUpCookieModal = () => {
 		setIsOpen(true);
         setTitle('Cookies! Mmmmmm');
@@ -107,7 +100,7 @@ export default function LandingPage() {
 
                     <div className='flex justify-center mt-6 gap-5'>
                         <button onClick={() => setUpAboutModal()} className="text-xs text-lvartsmusic-muted hover:text-lvartsmusic-accent cursor-pointer">What is this?</button>
-                        <button onClick={() => setUpPrivacyModal()} className="text-xs text-lvartsmusic-muted hover:text-lvartsmusic-accent cursor-pointer">Privacy Policy</button>
+                        <Link href="/privacy" className="text-xs text-lvartsmusic-muted hover:text-lvartsmusic-accent">Privacy Policy</Link>
                         <button onClick={() => setUpCookieModal()} className="text-xs text-lvartsmusic-muted hover:text-lvartsmusic-accent cursor-pointer">Cookie Policy</button>
                     </div>
                 </div>
