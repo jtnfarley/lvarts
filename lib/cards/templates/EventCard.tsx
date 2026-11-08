@@ -28,7 +28,7 @@ function Footer({ event, logoUrl }: { event: CardEvent; logoUrl: string }) {
 			{/* eslint-disable-next-line @next/next/no-img-element */}
 			<img src={logoUrl} width={Math.round(72 * theme.logoAspect)} height={72} alt="" />
 			<div style={{ display: 'flex', fontFamily: fonts.body, fontSize: 28, fontWeight: 700, color: colors.cream, marginTop: 20 }}>
-				{event.url}
+				www.{theme.siteName}
 			</div>
 		</div>
 	);

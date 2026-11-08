@@ -1,7 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/prisma';
 import imageUrl from '@/constants/imageUrl';
-import { theme } from './theme';
 import { cleanText, SNIPPET_LENGTH, truncate, VENUE_LENGTH } from './text';
 
 export type CardEvent = {
@@ -12,8 +11,6 @@ export type CardEvent = {
 	town?: string;
 	snippet?: string;
 	imageUrl?: string;
-	// Site event page, shown in the card footer.
-	url: string;
 };
 
 export type SkipReason = 'private only' | 'no title';
@@ -70,7 +67,6 @@ export const toCardEvent = (row: EventRow, includePrivate = false): CardEventRes
 			town: row.venues?.cities?.city || undefined,
 			snippet: postText ? truncate(postText, SNIPPET_LENGTH) : undefined,
 			imageUrl: publicPosts.map(postImageUrl).find(Boolean),
-			url: `${theme.siteName}/post/${primaryPost.id}`,
 		},
 	};
 };
