@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.lvartandmusic.app",
+      "sha256_cert_fingerprints": [
+        "C2:4C:A0:F2:48:28:DD:14:05:D1:60:2B:51:3E:B3:0B:7A:A9:80:55:09:30:6E:DA:0E:A9:12:A9:19:45:2B:99"
+      ]
+    }
+  }
+]
