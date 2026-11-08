@@ -16,7 +16,7 @@ const contentLines = (content: string): string[] =>
 
 function PendingCard({ item }: { item: PendingImport }) {
 	return (
-		<li className="flex flex-col gap-4 rounded border p-4 sm:flex-row">
+		<li className="flex flex-col gap-4 rounded border bg-white p-4 sm:flex-row">
 			{/* eslint-disable-next-line @next/next/no-img-element -- generated JPEG, not optimizable */}
 			<img src={`/api/cards/event/${item.eventId}?preview=1`} alt="" width={240} height={300} className="h-fit rounded border" />
 			<div className="flex flex-1 flex-col gap-2">

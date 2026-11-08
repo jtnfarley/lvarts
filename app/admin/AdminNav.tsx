@@ -10,7 +10,7 @@ export function AdminNav() {
 	const pathname = usePathname();
 
 	return (
-		<nav className="flex flex-wrap items-center gap-2 border-b p-3">
+		<nav className="flex flex-wrap items-center gap-2 border-b bg-white p-3">
 			{links.map(({ href, label }) => {
 				const active = href === '/admin' ? pathname === href : pathname.startsWith(href);
 				return (
