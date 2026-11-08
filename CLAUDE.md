@@ -87,7 +87,7 @@ Server components in `components/` fetch nothing — they call functions from `a
 | `GOOGLE_MAPS` | Google Maps API key (venue/event location display) |
 | `EMAIL_SERVER`, `EMAIL_FROM` | NextAuth email provider (magic link sign-in); also reused by `lib/mail.ts` for admin alerts |
 | `SUPPORT_ALERT_EMAIL` | Destination inbox for support-chat technical-issue alerts |
-| `ADMIN_EMAILS` | Comma-separated emails allowed to view `/admin/cards` (Instagram card previews) |
+| `ADMIN_EMAILS` | Comma-separated emails allowed to view anything under `/admin` (`app/admin/layout.tsx` gates it and renders the sub-nav; `/admin` is a plain-link dashboard; add new tools to `app/admin/adminTools.ts`) |
 | `STRIPE_SECRET_KEY` | Stripe secret API key (server-side PaymentIntent creation + webhook processing) |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key (client-side Elements/Payment Element) |
 | `CRON_SECRET` | Bearer token Vercel Cron sends to `/api/cron/scrape` |
