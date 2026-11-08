@@ -1,8 +1,8 @@
 
 import { prisma } from '@/prisma';
-import { getTextResponse } from '@/app/data/openAI';
+import { getTextResponse } from '@/lib/ai';
 import { getBotPost } from '@/app/data/botHelper';
-import { savePost } from '@/app/data/posts';
+import { saveTrustedPost } from '@/lib/posts/savePost';
 import { randoLineCount, parseText } from '../utils';
 
 export const hdBot = async (postid:number) => {
@@ -35,7 +35,7 @@ export const hdBot = async (postid:number) => {
         edited: false
     }
 
-    await savePost(postCreate);
+    await saveTrustedPost(postCreate);
 }
 
 

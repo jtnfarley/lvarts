@@ -1,11 +1,22 @@
 'use server'
 
-import { likePostDAL, unlikePostDAL } from "../data/posts"
+import { isLoggedIn } from "../data/currentUser"
+import { likePostDAL, unlikePostDAL } from "@/lib/posts/likes"
 
-export const likePost = async (postid:number, userdetailsid:number) => {
-    await likePostDAL(postid, userdetailsid);
+// The acting user is always the logged-in one; the browser does not get to say who is liking.
+const requireUserdetailsId = async (): Promise<number> => {
+    const user = await isLoggedIn()
+    const userdetailsid = user?.userdetails?.id
+    if (!userdetailsid) throw new Error('Not signed in')
+    return userdetailsid
 }
 
-export const unlikePost = async (postid:number, userdetailsid:number) => {
-    await unlikePostDAL(postid, userdetailsid);
+export const likePost = async (postid:number) => {
+    if (!Number.isInteger(postid)) return;
+    await likePostDAL(postid, await requireUserdetailsId());
+}
+
+export const unlikePost = async (postid:number) => {
+    if (!Number.isInteger(postid)) return;
+    await unlikePostDAL(postid, await requireUserdetailsId());
 }

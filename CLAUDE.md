@@ -44,6 +44,8 @@ Server components in `components/` fetch nothing — they call functions from `a
 - `app/data/` — read-only Prisma queries and raw SQL (`Prisma.sql` tagged template)
 - `app/actions/` — server actions (post creation/editing, file uploads, user updates, venue search, AI bridge)
 - `lib/models/` — TypeScript interfaces (`Post`, `User`, `UserDetails`, `FeedRow`, etc.)
+
+**Every export of a `'use server'` file is a public endpoint any browser can call with any arguments** — including `app/data/*` helpers, not just `app/actions/*`. So an exported action must never trust a user id, author, or folder from its arguments: take the acting user from the session (`isLoggedIn()` / `currentUser()`), and check ownership before changing anything (`lib/auth/canModifyPost.ts`, `lib/auth/canUploadToUserdir.ts`; admins via `isAdmin()`). Code that runs without a user session (the AI bots, the event importer) and therefore must name the author itself lives in plain modules, not `'use server'` files: `saveTrustedPost` (`lib/posts/savePost.ts`), `likePostDAL`/`unlikePostDAL` (`lib/posts/likes.ts`), `uploadFile` (`lib/bunny.ts`), `getTextResponse`/`getImageResponse` (`lib/ai.ts`). The public `savePost` in `app/data/posts.ts` is the guarded wrapper around `saveTrustedPost`.
 - `lib/utils.ts` — `cn()`, `compressImage()`, `formatDate()`, Lexical JSON parser, word lists for AI prompts
 
 ### Key subsystems
@@ -52,13 +54,13 @@ Server components in `components/` fetch nothing — they call functions from `a
 
 **File storage:** BunnyCDN (`lvartsmusic-ny` zone, NY region), CDN base URL `constants/imageUrl.ts` → `https://lvartsmusic-ny.b-cdn.net`. Files are stored at `{userdir}/{filename}` paths. Two upload paths exist:
   - Client-initiated uploads (user posting media) go through `uploadViaWorker()` in `lib/clientUpload.ts`: the client first calls `POST /api/upload-token` to get a 5-minute HMAC-signed token (`UPLOAD_SECRET`), then `PUT`s the file directly to a Cloudflare Worker (`NEXT_PUBLIC_UPLOAD_WORKER_URL`) that forwards it to BunnyCDN. This bypasses Vercel's request body size limit.
-  - Server-initiated uploads (AI bot-generated images) use `uploadFile()` in `app/actions/fileUploader.ts`, which `PUT`s directly to BunnyCDN from the server action — fine there since the file never crosses the Vercel body-size limit.
+  - Server-initiated uploads (AI bot-generated images) use `uploadFile()` in `lib/bunny.ts` (a trusted server-only helper, see below), which `PUT`s directly to BunnyCDN — fine there since the file never crosses the Vercel body-size limit.
 
 **Radio:** AzuraCast station 614 at `https://a6.asurahosting.com:6870/radio.mp3`. Audio posts are submitted to the radio via `radioUpload()` in `app/actions/fileUploader.ts`, which re-fetches the already-uploaded file from BunnyCDN and forwards it to the AzuraCast API (so audio data never passes through Vercel twice). The `RadioServer` → `Tracks` → `RadioClient` chain renders a fixed player at the bottom of every page (above the mobile nav). `RadioServer` passes a `getAudioTrack` server function as a prop to `Tracks` to avoid serialization issues with Prisma results.
 
 **Rich text:** Lexical editor (`@lexical/react`) with `lexical-beautiful-mentions` for `@` mentions. Post content is stored as both sanitized HTML (`content`) and Lexical JSON (`lexical`) in the `posts` table. `parseText()` in `lib/utils.ts` extracts plain text from Lexical JSON.
 
-**AI features:** `app/data/openAI.ts` uses `@anthropic-ai/sdk` (claude-haiku-4-5) for text responses and `openai` SDK (gpt-image-1-mini) for image generation. The "AI-ify" button in `PostForm` rewrites post content in a selected tone via the Anthropic client.
+**AI features:** `lib/ai.ts` (a trusted server-only module, not an endpoint) uses `@anthropic-ai/sdk` (claude-haiku-4-5) for text responses and `openai` SDK (gpt-image-1-mini) for image generation. The "AI-ify" button in `PostForm` rewrites post content in a selected tone through the `aiIfyPost` action (`app/actions/openAIBridge.ts`), which requires a login, accepts only a known tone, caps the text, and builds the prompt on the server so it can't be used as a free general-purpose chat.
 
 **AI persona bots:** `lib/bots/` (`hd.ts`, `imageBot.ts`, `musikfestBot.ts`) generate auto-reply posts (`posttype: 'comment'`) as fictional personas — e.g. mentioning reserved `userdetailsid` 12 ("H. D.", a poet bot) or 13/14 (painter bots that call `getImageResponse`) in post content. `notifyMentionedUsers()` in `app/data/postMentions.ts` special-cases those IDs and dispatches the bot instead of creating a normal mention notification. Bot calls must be wrapped in `after()` from `next/server`, not `.then()` — fire-and-forget promises get killed when the serverless function returns before the Anthropic/OpenAI call completes.
 

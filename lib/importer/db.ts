@@ -1,5 +1,5 @@
 import { prisma } from '@/prisma';
-import { savePost } from '@/app/data/posts';
+import { saveTrustedPost } from '@/lib/posts/savePost';
 import { extractSourceUrl } from './postContent';
 import type { ExistingEvent, ImportStore } from './sync';
 
@@ -51,9 +51,9 @@ export const loadExistingEvents = async (account: CalendarAccount): Promise<Exis
 };
 
 export const createPrismaImportStore = (account: CalendarAccount, venueId: number): ImportStore => ({
-	// Goes through the same savePost the event form uses, so imported posts look like normal ones.
+	// Goes through the same save code the event form uses, so imported posts look like normal ones.
 	create: async (input) => {
-		await savePost({
+		await saveTrustedPost({
 			content: input.content,
 			lexical: input.lexical,
 			userdetailsid: account.id,

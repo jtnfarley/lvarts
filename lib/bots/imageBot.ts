@@ -1,9 +1,9 @@
 
 import { prisma } from '@/prisma';
-import { getImageResponse } from '@/app/data/openAI';
-import { uploadFile } from '@/app/actions/fileUploader';
+import { getImageResponse } from '@/lib/ai';
+import { uploadFile } from '@/lib/bunny';
 import { getBotPost } from '@/app/data/botHelper';
-import { savePost } from '@/app/data/posts';
+import { saveTrustedPost } from '@/lib/posts/savePost';
 import { parseText } from '../utils';
 
 export const imageBot = async (postObj:{postid:number, prompt:string, userdetailsid:number, userdir:string}) => {
@@ -51,7 +51,7 @@ export const imageBot = async (postObj:{postid:number, prompt:string, userdetail
             postfiletype: file.type
         }
 
-        await savePost(postCreate);
+        await saveTrustedPost(postCreate);
     }
 }
 

@@ -23,14 +23,14 @@ export default function LikePost(props:{postData:FeedRow, user:User, currentUser
 	const togglePostLike = async () => {
 		if (userdetails && userdetails.id) {
 			if (postIsLikedByUser) {
-				await unlikePost(post.id, userdetails.id);
+				await unlikePost(post.id);
 				removeLike(post.id);
 				setPostIsLikedByUser(false);
 				setPostLikeCount(postLikeCount - 1);
 				return;
 			}
 
-			await likePost(post.id, userdetails.id);
+			await likePost(post.id);
 			addLike(post.id);
 			setPostIsLikedByUser(true);
 			setPostLikeCount(postLikeCount + 1);

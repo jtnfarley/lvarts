@@ -1,5 +1,5 @@
 import imageUrl from '@/constants/imageUrl';
-import { uploadFile } from '@/app/actions/fileUploader';
+import { uploadFile } from '@/lib/bunny';
 import type { PoliteFetcher } from '../scraper/http';
 import type { ScrapedEvent } from '../scraper/types';
 import type { StoredImage } from './sync';

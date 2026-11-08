@@ -1,5 +1,7 @@
-'use server'
-
+// Trusted: these spend Anthropic and OpenAI credits for whatever prompt the caller passes,
+// with NO authorization. Only server code that has already decided the prompt is allowed
+// may call them (the AI bots and the guarded actions in app/actions). They must never be
+// exported from a 'use server' file, because every export of one is callable by any browser.
 import OpenAI from 'openai';
 import sharp from 'sharp';
 import Anthropic from "@anthropic-ai/sdk";

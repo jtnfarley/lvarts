@@ -42,10 +42,13 @@ export default async function Profile() {
 			urls: []
 		};
 
-	const saveUser = async (user:UpdateUserParams) => {
+	const saveUser = async (profile:UpdateUserParams) => {
 		'use server'
-		
-		return updateUser(user);
+
+		// This is a server action: who is being updated comes from the session, never from
+		// the ids the browser sends, or anyone could edit anyone's profile.
+		const current = await currentUser();
+		return updateUser({ ...profile, userid: Number(current.id), id: current.userdetails?.id });
 	}
 
 	return (

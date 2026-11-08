@@ -3,6 +3,7 @@ import {prisma} from '@/prisma'
 import UserDetails from '@/lib/models/userDetails'
 import { generateUniqueHandle, resolveHandle } from './handles'
 import { normalizeHandle } from '@/lib/handles'
+import { isSafeUserdir } from '@/lib/userdir'
 import User from '@/lib/models/user'
 
 export interface UpdateUserParams {
@@ -39,6 +40,21 @@ export const updateUser = async ({
 
     let userdetails: UserDetails;
     try {
+        // A user's userdir decides which upload folder they may write to, so it must be a
+        // safe name that no other user already owns.
+        if (userdir) {
+            if (!isSafeUserdir(userdir)) {
+                throw new Error('Invalid upload folder name.')
+            }
+            const ownedByAnotherUser = await prisma.userdetails.findFirst({
+                where: { userdir, userid: { not: userid } },
+                select: { id: true }
+            })
+            if (ownedByAnotherUser) {
+                throw new Error('That upload folder is already in use.')
+            }
+        }
+
         const existingUserDetails = id === undefined
             ? null
             : await prisma.userdetails.findFirst({

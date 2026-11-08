@@ -1,23 +1,18 @@
 'use server'
 
-export const uploadFile = async (params: { file: File; userdir: string }) => {
-    const { file, userdir } = params;
-    const url = `https://ny.storage.bunnycdn.com/lvartsmusic-ny/${userdir}/${file.name}`;
-    const ACCESS_KEY = process.env.BUNNY_KEY;
-    if (!ACCESS_KEY) throw new Error('Missing BUNNY_KEY environment variable');
-
-    await fetch(url, {
-        method: 'PUT',
-        headers: { 'AccessKey': ACCESS_KEY, 'Content-Type': 'application/octet-stream' },
-        body: Buffer.from(await file.arrayBuffer()),
-    });
-};
+import { canUploadToUserdir } from '@/lib/auth/canUploadToUserdir';
+import { isSafeFilename } from '@/lib/bunny';
 
 // Fetches an audio file already on BunnyCDN and forwards it to AzuraCast.
 // Called after the client has completed a direct CDN upload, so no file data
 // passes through Vercel — only the filename + a server-to-server relay.
+// This is a server action, so the folder must be one the caller may use.
 export const radioUpload = async (filename: string, userdir: string) => {
-    const cdnUrl = `https://lvartsmusic-ny.b-cdn.net/${userdir}/${filename}`;
+    if (!isSafeFilename(filename) || !(await canUploadToUserdir(userdir))) {
+        throw new Error('Not allowed to send this file to the radio');
+    }
+
+    const cdnUrl = `https://lvartsmusic-ny.b-cdn.net/${userdir}/${encodeURIComponent(filename)}`;
 
     const fileRes = await fetch(cdnUrl);
     if (!fileRes.ok) throw new Error(`Failed to fetch audio from CDN: ${fileRes.status}`);

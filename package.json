@@ -9,6 +9,7 @@
     "lint": "next lint",
     "cypress:open": "cypress open",
     "test:cards": "npx tsx --test lib/cards/*.test.ts",
+    "test:auth": "npx tsx --test lib/auth/*.test.ts",
     "cards:fixtures": "npx tsx --tsconfig scripts/tsconfig.json scripts/render-card-fixtures.ts",
     "test:scraper": "npx tsx --tsconfig scripts/tsconfig.json --test lib/scraper/*.test.ts lib/scraper/adapters/*.test.ts",
     "scrape": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/scrape.ts",

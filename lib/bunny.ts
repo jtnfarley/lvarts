@@ -1,7 +1,7 @@
+import { isSafeUserdir } from '@/lib/userdir';
+
 const STORAGE_URL = 'https://ny.storage.bunnycdn.com/lvartsmusic-ny';
 const BUNNY_TIMEOUT_MS = 15000;
-// userdirs are random alphanumerics (or a short fixed name for the bot accounts).
-const SAFE_USERDIR = /^[A-Za-z0-9_-]+$/;
 
 // A deliberately plain module, not a 'use server' file: these delete helpers must
 // never become endpoints a client can call.
@@ -21,7 +21,7 @@ const deleteFromStorage = async (path: string) => {
 };
 
 const assertSafeUserdir = (userdir: string) => {
-    if (!SAFE_USERDIR.test(userdir)) throw new Error(`Refusing to delete unsafe userdir: ${userdir}`);
+    if (!isSafeUserdir(userdir)) throw new Error(`Refusing to use unsafe userdir: ${userdir}`);
 };
 
 // Removes the directory and everything in it. The trailing slash is what makes
@@ -31,10 +31,29 @@ export const deleteUserDirectory = async (userdir: string) => {
     await deleteFromStorage(`${userdir}/`);
 };
 
+export const isSafeFilename = (filename: string): boolean =>
+    filename !== '' && filename !== '.' && filename !== '..' && !/[\\/]/.test(filename);
+
 export const deleteUserFile = async (userdir: string, filename: string) => {
     assertSafeUserdir(userdir);
-    if (filename === '.' || filename === '..' || /[\\/]/.test(filename)) {
-        throw new Error(`Refusing to delete unsafe filename: ${filename}`);
-    }
+    if (!isSafeFilename(filename)) throw new Error(`Refusing to delete unsafe filename: ${filename}`);
     await deleteFromStorage(`${userdir}/${encodeURIComponent(filename)}`);
+};
+
+// Trusted: writes to whichever folder the caller names, with NO authorization. Only server
+// code that has already decided where the file belongs (the AI bots, the event importer)
+// may call this. It must not live in a 'use server' file, where any browser could call it.
+export const uploadFile = async (params: { file: File; userdir: string }) => {
+    const { file, userdir } = params;
+    assertSafeUserdir(userdir);
+    if (!isSafeFilename(file.name)) throw new Error(`Refusing to upload unsafe filename: ${file.name}`);
+
+    const accessKey = process.env.BUNNY_KEY;
+    if (!accessKey) throw new Error('Missing BUNNY_KEY environment variable');
+
+    await fetch(`${STORAGE_URL}/${userdir}/${encodeURIComponent(file.name)}`, {
+        method: 'PUT',
+        headers: { AccessKey: accessKey, 'Content-Type': 'application/octet-stream' },
+        body: Buffer.from(await file.arrayBuffer()),
+    });
 };

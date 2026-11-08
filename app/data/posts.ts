@@ -2,15 +2,14 @@
 
 import {prisma} from '@/prisma';
 import { Prisma } from '@prisma/client';
-import { after } from 'next/server';
-import { pushPostActivity } from '@/lib/push';
 import { deleteFromPlaylist } from '@/lib/azuracast';
-import { notifyMentionedUsers } from './postMentions';
-import { generateUniqueHandle } from './handles';
+import { saveTrustedPost } from '@/lib/posts/savePost';
 import { activeBoostPredicate } from '@/lib/boostQueries';
 import { FeedRow } from '@/lib/models/initFeedRow';
 import UserDetails from '@/lib/models/userDetails';
 import { isAdmin } from '@/lib/auth/isAdmin';
+import { canModifyPost } from '@/lib/auth/canModifyPost';
+import { isLoggedIn } from './currentUser';
 
 const parentPostJoin = Prisma.sql`
     LEFT JOIN LATERAL (
@@ -347,253 +346,47 @@ export const getCommentFeedRow = async (postid:number, offset:number = 0, lastCh
 }
 
 
+// This is a server action, so any client can call it with any data: authorize here.
+// The author comes from the session, never from the request. The exception is admins,
+// who may post as another account (the admin event form posts as the calendar account)
+// and may edit any post. Server code that has no session uses saveTrustedPost instead.
 export const savePost = async (postData:any) => {
-    const {
-        id,
-        content, 
-        lexical, 
-        userdetailsid, 
-        posttype, 
-        postfile, 
-        postfiletype, 
-        isgalleryfile,
-        parentPostId, 
-        edited,
-        eventname,
-        eventdate,  
-        privatepost, 
-        venuename,
-        address,
-        trackname,
-        artist,
-        album,
-        releaseyear,
-        coverartfile,
-        addToRadio
-    } = postData
+    const user = await isLoggedIn()
+    const sessionUserdetailsId = user?.userdetails?.id
+    if (!sessionUserdetailsId) {
+        throw new Error('Not signed in')
+    }
 
-    let {venueid, eventid} = postData
+    const admin = await isAdmin()
 
-    const date = new Date()
-    const createdat = date
-    const updatedat = date
+    if (postData?.id !== undefined) {
+        const author = await prisma.usertoposts.findFirst({
+            where: { postid: postData.id },
+            orderBy: { id: 'asc' },
+            select: { userdetailsid: true }
+        })
 
-    let posttypeid = 1;
-    
-    const postTypeQuery = await prisma.posttypes.findFirst({
-        where: {
-            posttype
-        },
-        select: {
-            id: true
-        }
-    })
-
-    if ((posttype && posttype === 'event') || (posttypeid && posttypeid === 3)) {
-        if (!venueid && venuename) {
-            const vid = await saveVenue({
-                venuename,
-                address
-            });
-
-            if (vid) {
-                venueid = vid.id
-            }
-        }
-
-        if (venueid) {
-            eventid = await saveEvent({
-                eventdate,
-                eventname,
-                venueid,
-                eventid,
-            })
+        if (!canModifyPost({
+            authorUserdetailsId: author?.userdetailsid,
+            userdetailsid: sessionUserdetailsId,
+            isAdmin: admin
+        })) {
+            console.warn(`Refused edit of post ${postData.id} by user ${sessionUserdetailsId}`)
+            throw new Error('You can only edit your own posts')
         }
     }
 
-    let postfiletypeid;
-    if (postfile && postfiletype) {
-        postfiletypeid = await prisma.filetypes.findFirst({
-            where:{
-                filetype: postfiletype
-            }
-        })
-    }
+    const userdetailsid = admin && postData?.userdetailsid ? postData.userdetailsid : sessionUserdetailsId
 
-    if (postTypeQuery?.id) posttypeid = postTypeQuery.id;
-
-    const postDataCreate = {
-        content,
-        lexical: lexical ?? null,
-        posttypeid,
-        edited, 
-        createdat,
-        updatedat,
-        privatepost,
-        eventid: (eventid) ? eventid : null,
-        postfiletypeid: (postfiletypeid?.id) ? postfiletypeid.id : null,
-        postfile,
-        isgalleryfile
-    }
-
-    let post;
-    if (id) {
-        post = await prisma.posts.update({
-            where: {
-                id
-            },
-            data: postDataCreate,
-        })
-    } else {
-        post = await prisma.posts.create({
-            data: postDataCreate,
-        })
-    }
-
-    if (post && post.id) {
-        await prisma.usertoposts.create({
-            data: {
-                postid: post.id,
-                userdetailsid
-            },
-        })
-
-        if (trackname && postfile) { //assume this is an audiotrack
-            const audiotrack = await prisma.audiotracks.create({
-                data: {
-                    postid: post.id,
-                    trackname,
-                    album,
-                    artist,
-                    releaseyear: Number.parseInt(releaseyear),
-                    coverartfile: coverartfile.name || undefined
-                }
-            })
-
-            if (audiotrack?.id && addToRadio) {
-                const azuracastid = await addToPlaylist(postfile);
-
-                await prisma.audiotracks.update({
-                data: {
-                    azuracastid
-                },
-                where: {
-                    id: audiotrack.id
-                }
-            })
-            }
-        }
-
-        if (posttype === 'comment' && parentPostId) {
-            await prisma.commentstopost.create({
-                data: {
-                    postid: Number.parseInt(parentPostId),
-                    commentpostid: post.id
-                }
-            })
-
-            await notifyParentPostAuthor(Number.parseInt(parentPostId), userdetailsid);
-        }
-
-        await notifyMentionedUsers({
-            postid: post.id,
-            authorUserDetailsId: userdetailsid,
-            lexical
-        })
-    }
-    
-    return post
+    return saveTrustedPost({ ...postData, userdetailsid })
 }
 
-const notifyParentPostAuthor = async (postid:number, senderuserdetailsid:number) => {
-    const postAuthor = await prisma.$queryRaw<Array<{ userdetailsid: number }>>`
-        select userdetailsid
-        from usertoposts
-        where postid = ${postid}
-    `
-
-    if (postAuthor && postAuthor.length) {
-        const notificationid = await prisma.notifications.create({
-            data: {
-                notificationtypeid: 2,
-                createdat: new Date(),
-                postid
-            }
-        })
-
-        if (notificationid && notificationid.id) {
-            await prisma.userstonotifications.create({
-                data: {
-                    notificationid: notificationid.id,
-                    senderuserdetailsid,
-                    receiveruserdetailsid: postAuthor[0].userdetailsid
-                }
-            })
-
-            after(() => pushPostActivity(postAuthor[0].userdetailsid, senderuserdetailsid, postid, 'commented on your post'))
-        }
-    }
-}
-
-export const likePostDAL = async (postid:number, userdetailsid:number) => {
-    const userAlreadyLiked = await prisma.postlikes.findFirst({
-        where: {
-            postid,
-            userdetailsid
-        }
-    })
-
-    if (userAlreadyLiked) return;
-
-    await prisma.postlikes.create({
-        data: {
-            postid,
-            userdetailsid
-        }
-    })
-
-    /***** notify post author */
-
-    const postAuthor = await prisma.usertoposts.findFirst({
-        where: {
-            postid
-        }
-    })
-
-    if (postAuthor) {
-        const notification = await prisma.notifications.create({
-            data: {
-                notificationtypeid: 1,
-                read: false,
-                createdat: new Date(),
-                postid
-            }
-        })
-
-        if (notification) {
-            await prisma.userstonotifications.create({
-                data: {
-                    notificationid: notification.id,
-                    senderuserdetailsid: userdetailsid,
-                    receiveruserdetailsid: postAuthor.userdetailsid
-                }
-            })
-
-            after(() => pushPostActivity(postAuthor.userdetailsid, userdetailsid, postid, 'liked your post'))
-        }
-    }
-}
-
-export const unlikePostDAL = async  (postid:number, userdetailsid:number) => {
-    await prisma.postlikes.deleteMany({
-        where: {
-            postid,
-            userdetailsid
-        }
-    })
-}
-
+// This is a server action, so any client can call it with any id: authorize here.
+// Returns null when the post is missing or the caller may not delete it.
 export const deletePost = async (postid:number) => {
+    if (!Number.isInteger(postid)) {
+        return null
+    }
 
     const post = await prisma.posts.findFirst({
         where: {
@@ -602,6 +395,22 @@ export const deletePost = async (postid:number) => {
     })
 
     if (!post) {
+        return null
+    }
+
+    const user = await isLoggedIn()
+    const author = await prisma.usertoposts.findFirst({
+        where: { postid },
+        orderBy: { id: 'asc' },
+        select: { userdetailsid: true }
+    })
+
+    if (!canModifyPost({
+        authorUserdetailsId: author?.userdetailsid,
+        userdetailsid: user?.userdetails?.id,
+        isAdmin: await isAdmin()
+    })) {
+        console.warn(`Refused delete of post ${postid} by user ${user?.userdetails?.id ?? 'anonymous'}`)
         return null
     }
 
@@ -683,85 +492,4 @@ export const deletePost = async (postid:number) => {
 
     return true;
 }
-
-const saveVenue = async (venueData:{venuename: string, address?: string}) => {
-    const {venuename, address} = venueData;
-
-    return await prisma.venues.create({
-        data: {
-            venuename, 
-            address: address ?? null
-        }
-    })
-}
-
-const saveEvent = async (eventData:{eventname:string, eventdate:Date, venueid:number, eventid?:number}) => {
-    const {eventdate, eventname, venueid} = eventData;
-
-    let {eventid} = eventData;
-
-    if (eventid) {
-        await prisma.events.update({
-            where: {
-                id: eventid
-            },
-            data:{
-                eventdate,
-                eventname,
-                venueid
-            }
-        })
-    } else {
-        const event = await prisma.events.create({
-            data:{
-                eventdate,
-                eventname,
-                venueid
-            }
-        })
-
-        if (event) eventid = event.id;
-    }
-
-    return eventid;
-}
-
-
-const addToPlaylist = async (filename:string):Promise<number | undefined> => {
-    //here we're adding the audio track to the playlist
-    const files = await fetch('https://a6.asurahosting.com/api/station/614/files',{
-        headers: {
-            'Authorization': `Bearer ${process.env.AZURACAST_API_KEY}`
-        }
-    })
-    .then(res => res.json())
-    .then(res2 => res2)
-    .catch(err => console.log(err));
-
-    if (files.length) {
-        
-        const file = files.find((item:any) => item.path === filename.toLowerCase())
-
-        if (!file?.playlists?.length) {
-            file.playlists = [{id: 6820}];
-            // PHP requires "length" as float; JSON.stringify drops the decimal for whole numbers
-            const body = JSON.stringify(file).replace(/"length":(\d+)(?=[,}])/g, '"length":$1.0');
-            
-            await fetch(`https://a6.asurahosting.com/api/station/614/file/${file.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${process.env.AZURACAST_API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body
-            })
-            .then(res => res.json())
-            .then(res2 => res2)
-            .catch(err => console.log(err));
-
-            return file.id;
-        }
-    }
-
-    return;
-}
+

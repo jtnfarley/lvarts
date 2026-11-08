@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { $createParagraphNode, $createTextNode, $getRoot, LexicalEditor } from "lexical";
 import { boringAdjectives } from "@/lib/utils";
-import { getAITextResponse } from "@/app/actions/openAIBridge";
+import { aiIfyPost } from "@/app/actions/openAIBridge";
 
 export const useAIIfy = (setIsSaving: (saving: boolean) => void) => {
     const [isAIIfied, setIsAIIfied] = useState(false);
@@ -21,10 +21,8 @@ export const useAIIfy = (setIsSaving: (saving: boolean) => void) => {
         setIsSaving(true);
         contentBackup.current.push(text);
 
-        const prompt = `You are a ${adjective} person. Rewrite this post in a ${adjective} tone: ${text}. keep the response under 400 characters. if ${adjective} === 'weird', then get weird with it.`;
-
         try {
-            const res = await getAITextResponse(prompt);
+            const res = await aiIfyPost(text, adjective);
 
             editorRef.current.update(() => {
                 const root = $getRoot();

@@ -30,7 +30,7 @@ export default function Follow(props:{followinguserdetailsid:number, user:User})
 
 		try {
 			if (isFollowing) {
-				const success = await unfollowUser({userdetailsid:user.userdetails.id, followinguserdetailsid});
+				const success = await unfollowUser({followinguserdetailsid});
 
 				if (!success) return;
 
@@ -39,7 +39,7 @@ export default function Follow(props:{followinguserdetailsid:number, user:User})
 				return;
 			}
 
-			const success = await followUser({userdetailsid:user.userdetails.id, followinguserdetailsid});
+			const success = await followUser({followinguserdetailsid});
 
 			if (!success) return;
 
