@@ -39,3 +39,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Firebase config; EAS cloud builds get it from the GOOGLE_SERVICES_JSON file secret
+google-services.json
+lvarts-push-firebase-adminsdk-fbsvc-a85872b58b.json

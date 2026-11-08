@@ -17,7 +17,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { WebView } from 'react-native-webview';
 import type { WebViewNavigation } from 'react-native-webview';
 import type { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes';
-import { shouldOpenInApp } from './navigationRules';
+import * as Notifications from 'expo-notifications';
+import { isSiteUrl, shouldOpenInApp } from './navigationRules';
+import { getPushToken, registrationScript, tappedPath } from './pushNotifications';
 
 const SITE_URL = 'https://www.lvartandmusic.com';
 // The site can detect the app from this suffix in the user-agent (e.g. to hide UI).
@@ -40,6 +42,16 @@ export default function App() {
   const [hasTimedOut, setHasTimedOut] = useState(false);
   const [sourceUrl, setSourceUrl] = useState(SITE_URL);
   const loadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pushTokenRef = useRef<string | null>(null);
+  const currentUrlRef = useRef(SITE_URL);
+
+  // Tell the site which device belongs to the logged-in user. Safe to repeat: the
+  // server upserts, and ignores (and unlinks) the token when nobody is logged in.
+  const registerPushToken = useCallback(() => {
+    const token = pushTokenRef.current;
+    if (!token || !isSiteUrl(currentUrlRef.current)) return;
+    webViewRef.current?.injectJavaScript(registrationScript(SITE_URL, token));
+  }, []);
 
   const clearLoadTimeout = useCallback(() => {
     if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
@@ -52,7 +64,7 @@ export default function App() {
   // load it in the WebView so the session cookie is set here, not in the browser.
   useEffect(() => {
     const openIncomingUrl = (url: string) => {
-      if (shouldOpenInApp(url)) setSourceUrl(url);
+      if (isSiteUrl(url)) setSourceUrl(url);
     };
     Linking.getInitialURL()
       .then((url) => {
@@ -62,6 +74,24 @@ export default function App() {
     const subscription = Linking.addEventListener('url', ({ url }) => openIncomingUrl(url));
     return () => subscription.remove();
   }, []);
+
+  useEffect(() => {
+    getPushToken()
+      .then((token) => {
+        pushTokenRef.current = token;
+        registerPushToken();
+      })
+      .catch((error: unknown) => console.warn('Push notifications unavailable', error));
+  }, [registerPushToken]);
+
+  // Tapping a push opens the post it is about; this also covers a cold start from a tap.
+  const lastNotificationResponse = Notifications.useLastNotificationResponse();
+  useEffect(() => {
+    const path = tappedPath(lastNotificationResponse);
+    if (!path) return;
+    const url = new URL(path, SITE_URL).href;
+    if (isSiteUrl(url)) setSourceUrl(url);
+  }, [lastNotificationResponse]);
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -87,14 +117,19 @@ export default function App() {
     loadTimeoutRef.current = setTimeout(() => setHasTimedOut(true), LOAD_TIMEOUT_MS);
   }, [clearLoadTimeout]);
 
-  const handleLoadEnd = useCallback(() => {
-    clearLoadTimeout();
-    setIsRefreshing(false);
-    setHasTimedOut(false);
-    SplashScreen.hideAsync().catch((error: unknown) => {
-      console.warn('Could not hide the splash screen', error);
-    });
-  }, [clearLoadTimeout]);
+  const handleLoadEnd = useCallback(
+    (event: { nativeEvent: { url: string } }) => {
+      clearLoadTimeout();
+      setIsRefreshing(false);
+      setHasTimedOut(false);
+      currentUrlRef.current = event.nativeEvent.url;
+      registerPushToken();
+      SplashScreen.hideAsync().catch((error: unknown) => {
+        console.warn('Could not hide the splash screen', error);
+      });
+    },
+    [clearLoadTimeout, registerPushToken]
+  );
 
   // Keep the site's own pages in the app; hand everything else (other websites,
   // mailto:, tel:, geo:, Maps links) to the system.

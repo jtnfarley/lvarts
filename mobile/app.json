@@ -38,6 +38,13 @@
     },
     "plugins": [
       [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-monochrome.png",
+          "color": "#eb7f2e"
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#000000",
