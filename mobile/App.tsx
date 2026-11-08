@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   BackHandler,
+  Linking,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
   Pressable,
@@ -15,12 +16,16 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { WebView } from 'react-native-webview';
 import type { WebViewNavigation } from 'react-native-webview';
+import type { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes';
+import { shouldOpenInApp } from './navigationRules';
 
 const SITE_URL = 'https://www.lvartandmusic.com';
 // The site can detect the app from this suffix in the user-agent (e.g. to hide UI).
 const USER_AGENT_SUFFIX = 'LVArtMusicApp';
 const BACKGROUND_COLOR = '#000000';
 const ACCENT_COLOR = '#eb7f2e';
+// A page that hasn't finished loading by now is treated as unreachable.
+const LOAD_TIMEOUT_MS = 30000;
 
 SplashScreen.preventAutoHideAsync().catch((error: unknown) => {
   console.warn('Could not hold the splash screen', error);
@@ -32,6 +37,15 @@ export default function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   // Pull-to-refresh must only trigger when the page itself is scrolled to the top.
   const [isAtTop, setIsAtTop] = useState(true);
+  const [hasTimedOut, setHasTimedOut] = useState(false);
+  const loadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearLoadTimeout = useCallback(() => {
+    if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+    loadTimeoutRef.current = null;
+  }, []);
+
+  useEffect(() => clearLoadTimeout, [clearLoadTimeout]);
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -48,14 +62,32 @@ export default function App() {
 
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
+    setHasTimedOut(false);
     webViewRef.current?.reload();
   }, []);
 
+  const handleLoadStart = useCallback(() => {
+    clearLoadTimeout();
+    loadTimeoutRef.current = setTimeout(() => setHasTimedOut(true), LOAD_TIMEOUT_MS);
+  }, [clearLoadTimeout]);
+
   const handleLoadEnd = useCallback(() => {
+    clearLoadTimeout();
     setIsRefreshing(false);
+    setHasTimedOut(false);
     SplashScreen.hideAsync().catch((error: unknown) => {
       console.warn('Could not hide the splash screen', error);
     });
+  }, [clearLoadTimeout]);
+
+  // Keep the site's own pages in the app; hand everything else (other websites,
+  // mailto:, tel:, geo:, Maps links) to the system.
+  const handleShouldStartLoad = useCallback((request: ShouldStartLoadRequest) => {
+    if (!request.isTopFrame || shouldOpenInApp(request.url)) return true;
+    Linking.openURL(request.url).catch((error: unknown) => {
+      console.warn('No app could open', request.url, error);
+    });
+    return false;
   }, []);
 
   return (
@@ -81,11 +113,16 @@ export default function App() {
             applicationNameForUserAgent={USER_AGENT_SUFFIX}
             onNavigationStateChange={handleNavigationStateChange}
             onScroll={(event: NativeSyntheticEvent<NativeScrollEvent>) => setIsAtTop(event.nativeEvent.contentOffset.y <= 0)}
+            onLoadStart={handleLoadStart}
             onLoadEnd={handleLoadEnd}
+            onShouldStartLoadWithRequest={handleShouldStartLoad}
+            // Open target="_blank" links in the same view so the rules above apply to them.
+            setSupportMultipleWindows={false}
             renderError={() => <OfflineScreen onRetry={handleRefresh} />}
             startInLoadingState={false}
           />
         </ScrollView>
+        {hasTimedOut && <OfflineScreen onRetry={handleRefresh} />}
       </SafeAreaView>
     </SafeAreaProvider>
   );
