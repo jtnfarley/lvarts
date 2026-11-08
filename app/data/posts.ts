@@ -7,6 +7,7 @@ import { generateUniqueHandle } from './handles';
 import { activeBoostPredicate } from '@/lib/boostQueries';
 import { FeedRow } from '@/lib/models/initFeedRow';
 import UserDetails from '@/lib/models/userDetails';
+import { isAdmin } from '@/lib/auth/isAdmin';
 
 const parentPostJoin = Prisma.sql`
     LEFT JOIN LATERAL (
@@ -98,9 +99,11 @@ const feedRowSelect = Prisma.sql`
         ${parentPostSelect}
 `
 
-const feedRowSharedJoins = Prisma.sql`
+// Private posts (e.g. imported events waiting for review) are left out of every feed by default.
+const feedRowSharedJoins = (includePrivate: boolean) => Prisma.sql`
     JOIN posttypes pt
         ON pt.id = p.posttypeid
+        ${includePrivate ? Prisma.empty : Prisma.sql`AND p.privatepost IS NOT TRUE`}
     LEFT JOIN filetypes ft
         ON ft.id = p.postfiletypeid
     LEFT JOIN events e
@@ -119,10 +122,10 @@ const feedRowSharedJoins = Prisma.sql`
     ${parentPostJoin}
 `
 
-const feedRowInnerQuery = (fromClause: Prisma.Sql, whereClause: Prisma.Sql = Prisma.empty) => Prisma.sql`
+const feedRowInnerQuery = (fromClause: Prisma.Sql, whereClause: Prisma.Sql = Prisma.empty, includePrivate = false) => Prisma.sql`
     ${feedRowSelect}
     ${fromClause}
-    ${feedRowSharedJoins}
+    ${feedRowSharedJoins(includePrivate)}
     ${whereClause}
     ORDER BY p.id, p.createdat DESC
 `
@@ -303,6 +306,7 @@ export const searchPosts = async (queryString:string):Promise<FeedRow[]> => {
 }
 
 export const getPost = async (postid:number):Promise<FeedRow> => {
+    // Only admins can open a private post, so pending imports can be previewed and edited.
     const post = await prisma.$queryRaw<FeedRow[]>(
         feedRowInnerQuery(
             Prisma.sql`
@@ -310,7 +314,8 @@ export const getPost = async (postid:number):Promise<FeedRow> => {
             `,
             Prisma.sql`
                 WHERE p.id = ${postid}
-            `
+            `,
+            await isAdmin()
         )
     )
 

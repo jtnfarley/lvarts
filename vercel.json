@@ -6,6 +6,12 @@
       "timezone": "America/New_York",
       "path": "/api/cron/scrape",
       "requestMethod": "GET"
+    },
+    "import-events": {
+      "schedule": "30 5 * * *",
+      "timezone": "America/New_York",
+      "path": "/api/cron/import-events",
+      "requestMethod": "GET"
     }
   }
 }

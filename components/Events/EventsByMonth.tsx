@@ -12,18 +12,24 @@ export default function EventsByMonth(props:{events:FeedRow[]}) {
 
 	const months = ["January", "February", "March", 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-	const eventsByMonth:Array<{name:string,events:FeedRow[]}> = [];
+	// Bucket by year + month so e.g. January 2027 sorts after December 2026.
+	const eventsByMonth:Array<{name:string,year:string,events:FeedRow[]}> = [];
 
-	const getEventsByMonth = () => {
-		months.map((month, i) => {
-			eventsByMonth.push({
-				name: month,
-				events: events.filter(event => event.eventdate?.getMonth() === i)
-			})
-		})
+	const sortedEvents = events
+		.filter(event => event.eventdate)
+		.sort((a, b) => a.eventdate!.getTime() - b.eventdate!.getTime());
+
+	for (const event of sortedEvents) {
+		const date = event.eventdate!;
+		const name = months[date.getMonth()];
+		const year = date.getFullYear().toString();
+		const lastBucket = eventsByMonth[eventsByMonth.length - 1];
+		if (lastBucket?.name === name && lastBucket.year === year) {
+			lastBucket.events.push(event);
+		} else {
+			eventsByMonth.push({ name, year, events: [event] });
+		}
 	}
-
-	getEventsByMonth()
 
 	const scrollToMonth = (index: number) => {
 		const container = monthsRef.current;
@@ -34,7 +40,7 @@ export default function EventsByMonth(props:{events:FeedRow[]}) {
 
 	const forward = () => {
 		setCurrentMonthIndex(prev => {
-			const next = Math.min(prev + 1, months.length - 1);
+			const next = Math.min(prev + 1, eventsByMonth.length - 1);
 			scrollToMonth(next);
 			return next;
 		});
@@ -48,10 +54,6 @@ export default function EventsByMonth(props:{events:FeedRow[]}) {
 		});
 	};
 
-	const getYear = (events:any[] | undefined):string => {
-		return (events && events.length) ? events[0].eventdate?.getFullYear().toString() : new Date().getFullYear().toString()
-	}
-	
     return (
 		<div className='max-h-screen overflow-x-hidden overflow-y-scroll relative'>
 			<div
@@ -61,11 +63,11 @@ export default function EventsByMonth(props:{events:FeedRow[]}) {
 			>
 				{
 					(eventsByMonth && eventsByMonth.length) &&
-						eventsByMonth.map(({name, events}, i) => {
+						eventsByMonth.map(({name, year, events}) => {
 							if (events && events.length) {
 								return (	
-									<div className='month w-full flex flex-col flex-shrink-0 items-center' key={i}>
-										<EventsByMonthHeader month={name} year={getYear(events)} forward={forward} back={back}/>
+									<div className='month w-full flex flex-col flex-shrink-0 items-center' key={`${year}-${name}`}>
+										<EventsByMonthHeader month={name} year={year} forward={forward} back={back}/>
 										<div  className="flex flex-col gap-10 w-full">
 										{
 											events.map((post:FeedRow) => {

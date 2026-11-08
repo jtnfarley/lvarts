@@ -11,7 +11,10 @@
     "test:cards": "npx tsx --test lib/cards/*.test.ts",
     "cards:fixtures": "npx tsx --tsconfig scripts/tsconfig.json scripts/render-card-fixtures.ts",
     "test:scraper": "npx tsx --tsconfig scripts/tsconfig.json --test lib/scraper/*.test.ts lib/scraper/adapters/*.test.ts",
-    "scrape": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/scrape.ts"
+    "scrape": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/scrape.ts",
+    "test:importer": "npx tsx --tsconfig scripts/tsconfig.json --test lib/importer/*.test.ts",
+    "import-events": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/import-events.ts",
+    "seed:calendar": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/seed-calendar.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.106.0",

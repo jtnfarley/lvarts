@@ -50,8 +50,8 @@ export const renderCardForEvent = async (event: CardEvent): Promise<Buffer> => {
 };
 
 // Returns null when the event doesn't exist or can't be rendered.
-export const renderEventCard = async (id: number): Promise<Buffer | null> => {
-	const result = await getCardEvent(id);
+export const renderEventCard = async (id: number, includePrivate = false): Promise<Buffer | null> => {
+	const result = await getCardEvent(id, includePrivate);
 	if (!result?.ok) return null;
 	return renderCardForEvent(result.event);
 };

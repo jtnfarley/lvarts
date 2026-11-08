@@ -70,6 +70,8 @@ Server components in `components/` fetch nothing — they call functions from `a
 
 **Event scraper (phase 1, dry-run only):** `lib/scraper/` scrapes venue sites (currently Godfrey Daniels, HTML parsing — its `/wp-json/` is locked) via `SourceAdapter`s registered in `sources.ts`, and writes JSON snapshots + diffs to a private Vercel Blob store (`scraper/<source>/<timestamp>.json`, `latest.json`, `scraper/index.json`). It never touches Prisma/Postgres. Daily Vercel Cron (`vercel.json`) hits `app/api/cron/scrape` (Bearer `CRON_SECRET`); `/admin/scraper` (ADMIN_EMAILS) reviews runs and has a Run now button. CLI: `npm run scrape -- --source=godfrey --no-save`; tests: `npm run test:scraper` (fixtures in `lib/scraper/__fixtures__/`). Spec: `Event Scraper Spec (Phase 1).md`.
 
+**Event importer (phase 2):** `lib/importer/` turns the scraper's `latest.json` snapshots into event posts authored by the "LV Art & Music Calendar" account (`calendar@lvartandmusic.com`, created by `npm run seed:calendar`). The sync rules live in `sync.ts` (pure planning + apply); posts are created through `savePost`, and images are re-hosted via `uploadFile`. Posts are pending (`privatepost = true`) until published on `/admin/imports`; rejecting sets the `event_import_rejected` post type. The importer recognizes its posts by the last content line `More info and tickets: <url>` plus the Eastern date, and treats `edited = true` as an admin edit it must not overwrite. `privatepost` posts are hidden from every feed query in `app/data/posts.ts` (only admins can open one via `getPost`). Per-source `autoPublish` is in `lib/importer/sources.ts`; `IMPORT_AUTO_PUBLISH=off` overrides it. CLI: `npm run import-events -- --dry-run`; tests: `npm run test:importer`. Spec: `Event Import Spec (Phase 2).md`.
+
 ### Environment variables
 
 | Variable | Purpose |
@@ -89,6 +91,7 @@ Server components in `components/` fetch nothing — they call functions from `a
 | `STRIPE_SECRET_KEY` | Stripe secret API key (server-side PaymentIntent creation + webhook processing) |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key (client-side Elements/Payment Element) |
 | `CRON_SECRET` | Bearer token Vercel Cron sends to `/api/cron/scrape` |
+| `IMPORT_AUTO_PUBLISH` | Set to `off` to stop all sources from auto-publishing imported events |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob (private store) token for scraper snapshots |
 | `STRIPE_WEBHOOK_SECRET` | Signing secret for the `app/api/webhooks/stripe` endpoint |
 

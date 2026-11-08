@@ -8,6 +8,7 @@ import type { ListingItem, RunIndexEntry, Snapshot } from './types';
 
 const fakeFetcher = (): PoliteFetcher => ({
 	getHtml: async () => '',
+	getBinary: async () => ({ data: new Uint8Array(), contentType: '' }),
 	stats: { requests: 0, failedRequests: 0 },
 	errors: [],
 });

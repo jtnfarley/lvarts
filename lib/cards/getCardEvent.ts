@@ -47,8 +47,9 @@ const postImageUrl = (post: PostRow): string | undefined => {
 	return `${imageUrl}/${userdir}/${encodeURIComponent(post.postfile)}`;
 };
 
-export const toCardEvent = (row: EventRow): CardEventResult => {
-	const publicPosts = row.posts.filter((post) => !post.privatepost);
+// includePrivate is for the admin preview of events waiting for review.
+export const toCardEvent = (row: EventRow, includePrivate = false): CardEventResult => {
+	const publicPosts = includePrivate ? row.posts : row.posts.filter((post) => !post.privatepost);
 	const primaryPost = publicPosts[0];
 	if (!primaryPost) return { ok: false, id: row.id, title: row.eventname ?? undefined, reason: 'private only' };
 
@@ -74,9 +75,9 @@ export const toCardEvent = (row: EventRow): CardEventResult => {
 	};
 };
 
-export const getCardEvent = async (id: number): Promise<CardEventResult | null> => {
+export const getCardEvent = async (id: number, includePrivate = false): Promise<CardEventResult | null> => {
 	const row = await prisma.events.findUnique({ where: { id }, include: eventInclude });
-	return row ? toCardEvent(row) : null;
+	return row ? toCardEvent(row, includePrivate) : null;
 };
 
 export const getCardEventsBetween = async (startsAt: Date, endsAt: Date): Promise<CardEventResult[]> => {
@@ -85,5 +86,5 @@ export const getCardEventsBetween = async (startsAt: Date, endsAt: Date): Promis
 		orderBy: [{ eventdate: 'asc' }, { id: 'asc' }],
 		include: eventInclude,
 	});
-	return rows.map(toCardEvent);
+	return rows.map((row) => toCardEvent(row));
 };

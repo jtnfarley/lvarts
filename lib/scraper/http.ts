@@ -55,8 +55,11 @@ export type PoliteFetcherOptions = {
 	delayMs?: number;
 };
 
+export type BinaryResponse = { data: Uint8Array<ArrayBuffer>; contentType: string };
+
 export type PoliteFetcher = {
 	getHtml: GetHtml;
+	getBinary: (url: string) => Promise<BinaryResponse>;
 	stats: { requests: number; failedRequests: number };
 	errors: string[];
 };
@@ -73,7 +76,7 @@ export const createPoliteFetcher = ({
 	const robotsByOrigin = new Map<string, RobotsRule[]>();
 	let lastRequestAt: number | undefined;
 
-	const fetchText = async (url: string): Promise<string> => {
+	const fetchOnce = async <T>(url: string, read: (response: Response) => Promise<T>): Promise<T> => {
 		if (lastRequestAt !== undefined) {
 			const wait = lastRequestAt + delayMs - now();
 			if (wait > 0) await sleep(wait);
@@ -85,17 +88,17 @@ export const createPoliteFetcher = ({
 			signal: AbortSignal.timeout(TIMEOUT_MS),
 		});
 		if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
-		return response.text();
+		return read(response);
 	};
 
-	const fetchWithRetry = async (url: string): Promise<string> => {
+	const fetchWithRetry = async <T>(url: string, read: (response: Response) => Promise<T>): Promise<T> => {
 		stats.requests += 1;
 		try {
-			return await fetchText(url);
+			return await fetchOnce(url, read);
 		} catch {
-			// One retry; the delay in fetchText spaces it from the failed attempt.
+			// One retry; the delay in fetchOnce spaces it from the failed attempt.
 			try {
-				return await fetchText(url);
+				return await fetchOnce(url, read);
 			} catch (error) {
 				stats.failedRequests += 1;
 				throw error;
@@ -109,7 +112,7 @@ export const createPoliteFetcher = ({
 
 		let rules: RobotsRule[] = [];
 		try {
-			rules = parseRobots(await fetchWithRetry(`${origin}/robots.txt`));
+			rules = parseRobots(await fetchWithRetry(`${origin}/robots.txt`, (response) => response.text()));
 		} catch (error) {
 			// A missing robots.txt means everything is allowed; other failures are logged and the run continues.
 			errors.push(`robots.txt unavailable for ${origin}: ${error instanceof Error ? error.message : String(error)}`);
@@ -118,15 +121,23 @@ export const createPoliteFetcher = ({
 		return rules;
 	};
 
-	const getHtml: GetHtml = async (url) => {
+	const fetchAllowed = async <T>(url: string, read: (response: Response) => Promise<T>): Promise<T> => {
 		const { origin, pathname } = new URL(url);
 		if (!isPathAllowed(await loadRobots(origin), pathname)) {
 			const message = `robots.txt disallows ${url}`;
 			errors.push(message);
 			throw new RobotsDisallowedError(message);
 		}
-		return fetchWithRetry(url);
+		return fetchWithRetry(url, read);
 	};
 
-	return { getHtml, stats, errors };
+	const getHtml: GetHtml = (url) => fetchAllowed(url, (response) => response.text());
+
+	const getBinary = (url: string): Promise<BinaryResponse> =>
+		fetchAllowed(url, async (response) => ({
+			data: new Uint8Array(await response.arrayBuffer()),
+			contentType: response.headers.get('content-type') ?? '',
+		}));
+
+	return { getHtml, getBinary, stats, errors };
 };

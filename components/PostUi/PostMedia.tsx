@@ -6,7 +6,7 @@ import { FeedRow } from '@/lib/models/initFeedRow';
 function PostMedia(props:{post:FeedRow}) {
     return (
         <>
-            {(props.post.filetype === 'image/webp') ?
+            {(props.post.filetype?.startsWith('image/')) ?
                 <PostMediaImage post={props.post} />
                 :
                 (props.post.filetype === 'audio/mpeg') ?
