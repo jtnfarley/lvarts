@@ -29,7 +29,6 @@ const base: CardEvent = {
 	venueName: 'Godfrey Daniels',
 	town: 'Bethlehem',
 	snippet: 'Bring an instrument, a poem, or just your ears. Sign-up starts at 7 and the stage is yours until close.',
-	url: 'lvartandmusic.com/post/1',
 };
 
 const longTitle =
