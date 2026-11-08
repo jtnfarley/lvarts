@@ -38,6 +38,7 @@ export default function App() {
   // Pull-to-refresh must only trigger when the page itself is scrolled to the top.
   const [isAtTop, setIsAtTop] = useState(true);
   const [hasTimedOut, setHasTimedOut] = useState(false);
+  const [sourceUrl, setSourceUrl] = useState(SITE_URL);
   const loadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearLoadTimeout = useCallback(() => {
@@ -46,6 +47,21 @@ export default function App() {
   }, []);
 
   useEffect(() => clearLoadTimeout, [clearLoadTimeout]);
+
+  // Android App Links (e.g. the emailed sign-in link) launch the app with a URL;
+  // load it in the WebView so the session cookie is set here, not in the browser.
+  useEffect(() => {
+    const openIncomingUrl = (url: string) => {
+      if (shouldOpenInApp(url)) setSourceUrl(url);
+    };
+    Linking.getInitialURL()
+      .then((url) => {
+        if (url) openIncomingUrl(url);
+      })
+      .catch((error: unknown) => console.warn('Could not read the launch URL', error));
+    const subscription = Linking.addEventListener('url', ({ url }) => openIncomingUrl(url));
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -108,7 +124,7 @@ export default function App() {
         >
           <WebView<object>
             ref={webViewRef}
-            source={{ uri: SITE_URL }}
+            source={{ uri: sourceUrl }}
             style={styles.container}
             applicationNameForUserAgent={USER_AGENT_SUFFIX}
             onNavigationStateChange={handleNavigationStateChange}

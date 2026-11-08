@@ -6,7 +6,9 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "backgroundColor": "#000000",
-    "platforms": ["android"],
+    "platforms": [
+      "android"
+    ],
     "android": {
       "package": "com.lvartandmusic.app",
       "adaptiveIcon": {
@@ -15,7 +17,24 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "www.lvartandmusic.com",
+              "pathPrefix": "/api/auth/callback"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "plugins": [
       [
@@ -26,6 +45,12 @@
           "imageWidth": 200
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "58343648-26b0-40fb-bf1a-96775ccd282d"
+      }
+    },
+    "owner": "jtnfarley"
   }
 }
