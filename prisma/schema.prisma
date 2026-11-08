@@ -186,6 +186,16 @@ model postboostimpressions {
   @@unique([postboostid, userdetailsid], map: "postboostimpressions_unique")
 }
 
+model pushtokens {
+  id            Int         @id @default(autoincrement())
+  userdetailsid Int
+  token         String      @unique(map: "pushtokens_token_unique") @db.VarChar
+  createdat     DateTime    @default(now()) @db.Timestamptz(6)
+  userdetails   userdetails @relation(fields: [userdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "pushtokens_userdetailsFK")
+
+  @@index([userdetailsid], map: "pushtokens_userdetailsid_idx")
+}
+
 model states {
   id            Int      @id @default(autoincrement())
   stateabbr     String   @db.VarChar
@@ -215,6 +225,7 @@ model userdetails {
   usertoposts                                                                  usertoposts[]
   postboosts                                                                  postboosts[]
   postboostimpressions                                                        postboostimpressions[]
+  pushtokens                                                                  pushtokens[]
 
   @@index([displayname, handle], map: "name_IX")
 }

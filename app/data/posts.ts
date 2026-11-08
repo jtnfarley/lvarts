@@ -2,6 +2,8 @@
 
 import {prisma} from '@/prisma';
 import { Prisma } from '@prisma/client';
+import { after } from 'next/server';
+import { pushPostActivity } from '@/lib/push';
 import { notifyMentionedUsers } from './postMentions';
 import { generateUniqueHandle } from './handles';
 import { activeBoostPredicate } from '@/lib/boostQueries';
@@ -526,6 +528,8 @@ const notifyParentPostAuthor = async (postid:number, senderuserdetailsid:number)
                     receiveruserdetailsid: postAuthor[0].userdetailsid
                 }
             })
+
+            after(() => pushPostActivity(postAuthor[0].userdetailsid, senderuserdetailsid, postid, 'commented on your post'))
         }
     }
 }
@@ -573,6 +577,8 @@ export const likePostDAL = async (postid:number, userdetailsid:number) => {
                     receiveruserdetailsid: postAuthor.userdetailsid
                 }
             })
+
+            after(() => pushPostActivity(postAuthor.userdetailsid, userdetailsid, postid, 'liked your post'))
         }
     }
 }
