@@ -16,7 +16,7 @@ const pushResponseSchema = z.object({
     ),
 });
 
-type PostActivity = 'liked your post' | 'commented on your post';
+type PostActivity = 'liked your post' | 'commented on your post' | 'mentioned you';
 
 // Never throws: a failed push must not break the like or comment that triggered it.
 export const pushPostActivity = async (

@@ -3,6 +3,7 @@ import { extractMentionedUserIdsFromLexical } from "@/lib/mentions";
 import { hdBot } from "@/lib/bots/hd";
 import { imageBot } from "@/lib/bots/imageBot";
 import { prisma } from "@/prisma";
+import { pushPostActivity } from "@/lib/push";
 
 interface NotifyMentionedUsersParams {
   postid: number;
@@ -63,6 +64,8 @@ export const notifyMentionedUsers = async ({
 					receiveruserdetailsid: mentionedUserId
 				}
 			})
+
+			after(() => pushPostActivity(mentionedUserId, authorUserDetailsId, postid, 'mentioned you'))
 		}
 	}
 };
