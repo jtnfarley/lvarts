@@ -4,6 +4,7 @@ import UserDetails from '@/lib/models/userDetails'
 import { generateUniqueHandle, resolveHandle } from './handles'
 import { normalizeHandle } from '@/lib/handles'
 import { isSafeUserdir } from '@/lib/userdir'
+import { hasBlockBetween } from '@/lib/blocks'
 import User from '@/lib/models/user'
 
 export interface UpdateUserParams {
@@ -182,6 +183,10 @@ const hasValidFollowUsers = async ({userdetailsid, followinguserdetailsid}: Foll
 
 export const followUserDAL = async ({userdetailsid, followinguserdetailsid}:FollowUserParams): Promise<boolean> => {
     if (!await hasValidFollowUsers({ userdetailsid, followinguserdetailsid })) {
+        return false
+    }
+
+    if (await hasBlockBetween(userdetailsid, followinguserdetailsid)) {
         return false
     }
 

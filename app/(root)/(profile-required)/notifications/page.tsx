@@ -16,6 +16,10 @@ const getNotifications = async (userdetailsid:number):Promise<Notification[]> =>
 		join userdetails ud on ud.id = un.senderuserdetailsid
 		join notificationtypes nt on nt.id = n.notificationtypeid
 		where receiveruserdetailsid = ${userdetailsid}
+		and not exists (
+			select 1 from userblocks ub
+			where ub.blockeruserdetailsid = ${userdetailsid} and ub.blockeduserdetailsid = un.senderuserdetailsid
+		)
 		order by n.createdat desc
 	`
 

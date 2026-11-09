@@ -11,6 +11,7 @@ import { useFollowsStore } from '@/stores/follows-store';
 import Avatar from '@/components/shared/Avatar';
 import SignOut from '@/components/auth/buttons/SignOut';
 import ReportButton from '@/components/PostUi/ReportButton';
+import BlockButton from '@/components/PostUi/BlockButton';
 
 export default function Profile(props:{profile:SidebarProfile, user:User, getUpdatedProfile?:Function, theme?:'lvartsmusic'}) {
 	const { profile, user, theme } = props;
@@ -95,8 +96,9 @@ export default function Profile(props:{profile:SidebarProfile, user:User, getUpd
             }
 
             {!isOwnProfile && user?.userdetails?.id && profile.id &&
-                <div className="text-center">
+                <div className="flex flex-col items-center text-center">
                     <ReportButton target={{ userdetailsid: profile.id }} variant="text" />
+                    <BlockButton key={profile.id} userdetailsid={profile.id} handle={profile.handle} isBlocked={profile.isBlocked} />
                 </div>
             }
 
@@ -105,6 +107,11 @@ export default function Profile(props:{profile:SidebarProfile, user:User, getUpd
                     <div>
                         <button onClick={() => redirect(`/profile`)} className="lvartsmusic-pill-outline mt-4 w-full">
                             <BiEdit className="inline" /> My Profile
+                        </button>
+                    </div>
+                    <div>
+                        <button onClick={() => redirect(`/settings`)} className="lvartsmusic-pill-outline mt-2 w-full">
+                            Settings
                         </button>
                     </div>
                     <div>

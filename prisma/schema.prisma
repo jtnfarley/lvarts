@@ -218,6 +218,20 @@ model reports {
   @@index([status, createdat], map: "reports_status_createdat_IX")
 }
 
+// The blocker no longer sees the blocked user's content or notifications. Foreign keys
+// cascade so deleting either account removes the block.
+model userblocks {
+  id                    Int         @id @default(autoincrement())
+  blockeruserdetailsid  Int
+  blockeduserdetailsid  Int
+  createdat             DateTime    @default(now()) @db.Timestamptz(6)
+  blocker               userdetails @relation("userblocks_blocker", fields: [blockeruserdetailsid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "userblocks_blockerFK")
+  blocked               userdetails @relation("userblocks_blocked", fields: [blockeduserdetailsid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "userblocks_blockedFK")
+
+  @@unique([blockeruserdetailsid, blockeduserdetailsid], map: "userblocks_pair_unique")
+  @@index([blockeduserdetailsid], map: "userblocks_blocked_IX")
+}
+
 model states {
   id            Int      @id @default(autoincrement())
   stateabbr     String   @db.VarChar
@@ -250,6 +264,8 @@ model userdetails {
   pushtokens                                                                  pushtokens[]
   reportsmade                                                                 reports[]              @relation("reports_reporter")
   reportsreceived                                                             reports[]              @relation("reports_reported")
+  blocksmade                                                                  userblocks[]           @relation("userblocks_blocker")
+  blocksreceived                                                              userblocks[]           @relation("userblocks_blocked")
 
   @@index([displayname, handle], map: "name_IX")
 }

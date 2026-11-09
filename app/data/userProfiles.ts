@@ -1,5 +1,7 @@
 import type SidebarProfile from '@/lib/models/sidebarProfile'
 import { prisma } from '@/prisma'
+import { hasBlocked } from '@/lib/blocks'
+import { isLoggedIn } from './currentUser'
 
 export const getSidebarProfile = async (handle:string): Promise<SidebarProfile | null> => {
     const profile = await prisma.userdetails.findFirst({
@@ -44,8 +46,12 @@ export const getSidebarProfile = async (handle:string): Promise<SidebarProfile |
         }
     })
 
+    const viewerId = (await isLoggedIn())?.userdetails?.id
+    const isBlocked = viewerId ? await hasBlocked(viewerId, profile.id) : false
+
     return {
         ...profile,
+        isBlocked,
         followers: [],
         following: [],
         postcount,

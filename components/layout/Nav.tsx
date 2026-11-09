@@ -11,6 +11,10 @@ const hasNewNotifications = async (userdetailsid:number):Promise<boolean> => {
 		select count(n.id) from notifications n
 		join userstonotifications un on n.id = un.notificationid
 		where read = false and receiveruserdetailsid = ${userdetailsid}
+		and not exists (
+			select 1 from userblocks ub
+			where ub.blockeruserdetailsid = ${userdetailsid} and ub.blockeduserdetailsid = un.senderuserdetailsid
+		)
 	`
 	return (notifications && notifications.length && Number.parseInt(notifications[0].count) > 0) ? true : false
 }

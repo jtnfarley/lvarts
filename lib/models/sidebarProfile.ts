@@ -12,6 +12,8 @@ export default interface SidebarProfile {
     postcount: number
     followerscount: number
     followingcount: number
+    // Whether the logged-in viewer has blocked this user.
+    isBlocked?: boolean
     urls: {
         id?: number
         urlname: string

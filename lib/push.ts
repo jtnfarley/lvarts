@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { prisma } from '@/prisma';
+import { hasBlocked } from '@/lib/blocks';
 
 const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
 const PUSH_TIMEOUT_MS = 10000;
@@ -28,6 +29,8 @@ export const pushPostActivity = async (
     if (receiverUserdetailsId === senderUserdetailsId) return;
 
     try {
+        if (await hasBlocked(receiverUserdetailsId, senderUserdetailsId)) return;
+
         const devices = await prisma.pushtokens.findMany({
             where: { userdetailsid: receiverUserdetailsId },
             select: { token: true },

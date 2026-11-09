@@ -10,6 +10,7 @@ import UserDetails from '@/lib/models/userDetails';
 import { isAdmin } from '@/lib/auth/isAdmin';
 import { canModifyPost } from '@/lib/auth/canModifyPost';
 import { isLoggedIn } from './currentUser';
+import { notBlockedByViewer } from '@/lib/blocks';
 
 const parentPostJoin = Prisma.sql`
     LEFT JOIN LATERAL (
@@ -40,7 +41,9 @@ const parentPostSelect = Prisma.sql`
     END AS "parentPost"
 `
 
-const authorDetailsJoin = Prisma.sql`
+// Joining on the author is also where posts by users the viewer has blocked drop out,
+// so every feed query that uses this join hides them.
+const authorDetailsJoin = (viewerId?: number) => Prisma.sql`
     JOIN LATERAL (
         SELECT ud.*
         FROM usertoposts utp
@@ -50,8 +53,11 @@ const authorDetailsJoin = Prisma.sql`
         ORDER BY utp.id
         LIMIT 1
     ) ud
-        ON true
+        ON ${viewerId ? notBlockedByViewer(viewerId, Prisma.sql`ud.id`) : Prisma.sql`true`}
 `
+
+// The viewer comes from the session, never from an argument.
+const viewerUserdetailsId = async (): Promise<number | undefined> => (await isLoggedIn())?.userdetails?.id
 
 const feedRowSelect = Prisma.sql`
     SELECT DISTINCT ON (p.id)
@@ -102,7 +108,7 @@ const feedRowSelect = Prisma.sql`
 `
 
 // Private posts (e.g. imported events waiting for review) are left out of every feed by default.
-const feedRowSharedJoins = (includePrivate: boolean) => Prisma.sql`
+const feedRowSharedJoins = (includePrivate: boolean, viewerId?: number) => Prisma.sql`
     JOIN posttypes pt
         ON pt.id = p.posttypeid
         ${includePrivate ? Prisma.empty : Prisma.sql`AND p.privatepost IS NOT TRUE`}
@@ -120,14 +126,14 @@ const feedRowSharedJoins = (includePrivate: boolean) => Prisma.sql`
        -- ON s.id = v.stateid
     --LEFT JOIN zipcodes z
         --ON z.id = v.zipcodeid
-    ${authorDetailsJoin}
+    ${authorDetailsJoin(viewerId)}
     ${parentPostJoin}
 `
 
-const feedRowInnerQuery = (fromClause: Prisma.Sql, whereClause: Prisma.Sql = Prisma.empty, includePrivate = false) => Prisma.sql`
+const feedRowInnerQuery = (fromClause: Prisma.Sql, whereClause: Prisma.Sql = Prisma.empty, includePrivate = false, viewerId?: number) => Prisma.sql`
     ${feedRowSelect}
     ${fromClause}
-    ${feedRowSharedJoins(includePrivate)}
+    ${feedRowSharedJoins(includePrivate, viewerId)}
     ${whereClause}
     ORDER BY p.id, p.createdat DESC
 `
@@ -206,6 +212,8 @@ export const getFeedRow = async (userdetails:UserDetails, offset:number = 0, las
         )
     `
 
+    const viewerId = await viewerUserdetailsId()
+
     return await prisma.$queryRaw<FeedRow[]>(
         Prisma.sql`
             ${eligiblePostsQuery}
@@ -215,7 +223,10 @@ export const getFeedRow = async (userdetails:UserDetails, offset:number = 0, las
                         FROM eligible_posts ep
                         JOIN posts p
                             ON p.id = ep.id
-                    `
+                    `,
+                    Prisma.empty,
+                    false,
+                    viewerId
                 ),
                 offset
             )}
@@ -224,6 +235,8 @@ export const getFeedRow = async (userdetails:UserDetails, offset:number = 0, las
 }
 
 export const getEvents = async ():Promise<FeedRow[]> => {
+    const viewerId = await viewerUserdetailsId()
+
     return await prisma.$queryRaw<FeedRow[]>(
         Prisma.sql`
             ${
@@ -234,7 +247,9 @@ export const getEvents = async ():Promise<FeedRow[]> => {
                             ON p.eventid = ev.id
                     `,
                     Prisma.sql`
-                    where ev.eventdate >= now()`
+                    where ev.eventdate >= now()`,
+                    false,
+                    viewerId
                 )
             }
         `
@@ -242,6 +257,8 @@ export const getEvents = async ():Promise<FeedRow[]> => {
 }
 
 export const getUpcomingEvents = async (limit: number = 5):Promise<FeedRow[]> => {
+    const viewerId = await viewerUserdetailsId()
+
     return await prisma.$queryRaw<FeedRow[]>(
         Prisma.sql`
             SELECT * FROM (
@@ -253,7 +270,9 @@ export const getUpcomingEvents = async (limit: number = 5):Promise<FeedRow[]> =>
                                 ON p.eventid = ev.id
                         `,
                         Prisma.sql`
-                        where ev.eventdate >= now()`
+                        where ev.eventdate >= now()`,
+                        false,
+                        viewerId
                     )
                 }
             ) feed
@@ -264,6 +283,8 @@ export const getUpcomingEvents = async (limit: number = 5):Promise<FeedRow[]> =>
 }
 
 export const getGallery = async ():Promise<FeedRow[]> => {
+    const viewerId = await viewerUserdetailsId()
+
     return await prisma.$queryRaw<FeedRow[]>(
         Prisma.sql`
             ${
@@ -272,7 +293,9 @@ export const getGallery = async ():Promise<FeedRow[]> => {
                         FROM posts p
                     `,
                     Prisma.sql`
-                    where p.isgalleryfile = true`
+                    where p.isgalleryfile = true`,
+                    false,
+                    viewerId
                 )
             }
         `
@@ -285,6 +308,8 @@ export const searchPosts = async (queryString:string):Promise<FeedRow[]> => {
     if (!trimmedQuery) {
         return []
     }
+
+    const viewerId = await viewerUserdetailsId()
 
     return await prisma.$queryRaw<FeedRow[]>(
         paginatedFeedQuery(
@@ -300,7 +325,9 @@ export const searchPosts = async (queryString:string):Promise<FeedRow[]> => {
                         OR e.eventname ILIKE ${`%${trimmedQuery}%`}
                         OR v.venuename ILIKE ${`%${trimmedQuery}%`}
                         OR v.address ILIKE ${`%${trimmedQuery}%`}
-                `
+                `,
+                false,
+                viewerId
             ),
             0
         )
@@ -317,7 +344,8 @@ export const getPost = async (postid:number):Promise<FeedRow> => {
             Prisma.sql`
                 WHERE p.id = ${postid}
             `,
-            await isAdmin()
+            await isAdmin(),
+            await viewerUserdetailsId()
         )
     )
 
@@ -326,6 +354,8 @@ export const getPost = async (postid:number):Promise<FeedRow> => {
 
 export const getCommentFeedRow = async (postid:number, offset:number = 0, lastChecked:Date = new Date('2024-01-01')):Promise<FeedRow[]> => {
     if (!lastChecked) lastChecked = new Date('2024-01-01');
+
+    const viewerId = await viewerUserdetailsId()
 
     return await prisma.$queryRaw<FeedRow[]>(
         paginatedFeedQuery(
@@ -338,7 +368,9 @@ export const getCommentFeedRow = async (postid:number, offset:number = 0, lastCh
                 Prisma.sql`
                     WHERE cp.postid = ${postid}::int
                     AND p.createdat >= ${lastChecked}
-                `
+                `,
+                false,
+                viewerId
             ),
             offset
         )
