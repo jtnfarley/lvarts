@@ -2,6 +2,7 @@
 // chosen by output quality, not guesswork. Costs a few cents at most.
 //   npm run try-models -- model-a model-b ...        (text models)
 //   npm run try-models -- --image google/gemini-2.5-flash-image
+import { buildAiIfyPrompt } from '../lib/aiIfyPrompt';
 import { SUPPORT_KNOWLEDGE } from '../lib/supportKnowledge';
 
 const apiKey = process.env.OPENROUTER_API_KEY;
@@ -30,8 +31,8 @@ STATUS: resolved|unknown|issue
 - Use "resolved" only if you gave a complete answer grounded in the information above.`;
 
 const cases = [
-	{ name: 'aiify weird', prompt: `You are a weird person. Rewrite this post in a weird tone: ${post}. keep the response under 400 characters. if weird === 'weird', then get weird with it.` },
-	{ name: 'aiify deadpan', prompt: `You are a deadpan person. Rewrite this post in a deadpan tone: ${post}. keep the response under 400 characters.` },
+	{ name: 'aiify weird', prompt: buildAiIfyPrompt('weird', post) },
+	{ name: 'aiify deadpan', prompt: buildAiIfyPrompt('deadpan', post) },
 	{ name: 'hd poem', prompt: `You are the imagist poet H. D. Write a 6-line poem about ${post}` },
 	{ name: 'support resolved', prompt: supportPrompt('How do I add an image to the gallery?'), expectStatus: 'resolved' },
 	{ name: 'support issue', prompt: supportPrompt('My image upload keeps failing with an error'), expectStatus: 'issue' },

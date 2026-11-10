@@ -2,6 +2,7 @@
 
 import { isLoggedIn } from "@/app/data/currentUser";
 import { getTextResponse } from "@/lib/ai";
+import { buildAiIfyPrompt } from "@/lib/aiIfyPrompt";
 import { boringAdjectives } from "@/lib/utils";
 
 // Longer posts are cut off here; the rewrite is capped at 400 characters anyway.
@@ -17,7 +18,5 @@ export const aiIfyPost = async (text: string, tone: string): Promise<string> => 
     if (!boringAdjectives.includes(tone)) throw new Error('Unknown tone');
 
     const post = text.trim().slice(0, MAX_AIIFY_CHARACTERS);
-    const prompt = `You are a ${tone} person. Rewrite this post in a ${tone} tone: ${post}. keep the response under 400 characters. if ${tone} === 'weird', then get weird with it.`;
-
-    return getTextResponse(prompt);
+    return getTextResponse(buildAiIfyPrompt(tone, post));
 }
