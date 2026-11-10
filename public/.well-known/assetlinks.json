@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "com.lvartandmusic.app",
       "sha256_cert_fingerprints": [
-        "C2:4C:A0:F2:48:28:DD:14:05:D1:60:2B:51:3E:B3:0B:7A:A9:80:55:09:30:6E:DA:0E:A9:12:A9:19:45:2B:99"
+        "C2:4C:A0:F2:48:28:DD:14:05:D1:60:2B:51:3E:B3:0B:7A:A9:80:55:09:30:6E:DA:0E:A9:12:A9:19:45:2B:99",
+        "7E:16:5B:B7:C5:38:52:83:AB:ED:93:28:0E:D2:83:6E:DD:9C:24:4F:79:34:6F:B5:27:6A:20:E2:3F:06:04:34"
       ]
     }
   }
