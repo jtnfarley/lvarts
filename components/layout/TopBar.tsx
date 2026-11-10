@@ -34,10 +34,10 @@ const TopBar = (props: {theme?:'lvartsmusic', user?:User}) => {
                         <ThemeToggle />
                         {userdetails &&
                             <>
-                                <div className="md:hidden">
+                                <div className="lg:hidden">
                                     <UserMenu avatarUrl={avatar} displayName={userdetails.displayname} handle={userdetails.handle} />
                                 </div>
-                                <Link href="/profile" className="hidden rounded-full p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/10 md:block" title="Your profile">
+                                <Link href="/profile" className="hidden rounded-full p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/10 lg:block" title="Your profile">
                                     <Avatar imageUrl={avatar} displayName={userdetails.displayname} handle={userdetails.handle} size="sm" />
                                 </Link>
                             </>
