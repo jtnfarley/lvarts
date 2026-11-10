@@ -157,19 +157,19 @@ model posttypes {
 }
 
 model postboosts {
-  id                    Int                     @id @default(autoincrement())
+  id                    Int                    @id @default(autoincrement())
   postid                Int
   userdetailsid         Int
   budgetcents           Int
   impressionspurchased  Int
-  status                String                  @default("active") @db.VarChar
-  stripepaymentintentid String                  @unique @db.VarChar
-  activatedat           DateTime?               @db.Timestamptz(6)
-  expiresat             DateTime?               @db.Timestamptz(6)
-  createdat             DateTime                @default(now()) @db.Timestamptz(6)
-  updatedat             DateTime                @default(now()) @db.Timestamptz(6)
-  posts                 posts                   @relation(fields: [postid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postboosts_postFK")
-  userdetails           userdetails             @relation(fields: [userdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postboosts_userdetailsFK")
+  status                String                 @default("active") @db.VarChar
+  stripepaymentintentid String                 @unique @db.VarChar
+  activatedat           DateTime?              @db.Timestamptz(6)
+  expiresat             DateTime?              @db.Timestamptz(6)
+  createdat             DateTime               @default(now()) @db.Timestamptz(6)
+  updatedat             DateTime               @default(now()) @db.Timestamptz(6)
+  posts                 posts                  @relation(fields: [postid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postboosts_postFK")
+  userdetails           userdetails            @relation(fields: [userdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "postboosts_userdetailsFK")
   postboostimpressions  postboostimpressions[]
 
   @@index([status, expiresat], map: "postboosts_status_expiresat_IX")
@@ -221,15 +221,28 @@ model reports {
 // The blocker no longer sees the blocked user's content or notifications. Foreign keys
 // cascade so deleting either account removes the block.
 model userblocks {
-  id                    Int         @id @default(autoincrement())
-  blockeruserdetailsid  Int
-  blockeduserdetailsid  Int
-  createdat             DateTime    @default(now()) @db.Timestamptz(6)
-  blocker               userdetails @relation("userblocks_blocker", fields: [blockeruserdetailsid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "userblocks_blockerFK")
-  blocked               userdetails @relation("userblocks_blocked", fields: [blockeduserdetailsid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "userblocks_blockedFK")
+  id                   Int         @id @default(autoincrement())
+  blockeruserdetailsid Int
+  blockeduserdetailsid Int
+  createdat            DateTime    @default(now()) @db.Timestamptz(6)
+  blocker              userdetails @relation("userblocks_blocker", fields: [blockeruserdetailsid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "userblocks_blockerFK")
+  blocked              userdetails @relation("userblocks_blocked", fields: [blockeduserdetailsid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "userblocks_blockedFK")
 
   @@unique([blockeruserdetailsid, blockeduserdetailsid], map: "userblocks_pair_unique")
   @@index([blockeduserdetailsid], map: "userblocks_blocked_IX")
+}
+
+// One row per costly AI request (kind 'image' for the painter bots), used to rate limit by
+// user and site-wide. Rows are deleted again when the request fails, and cascade with the user.
+model aiusage {
+  id            Int         @id @default(autoincrement())
+  userdetailsid Int
+  kind          String      @db.VarChar
+  createdat     DateTime    @default(now()) @db.Timestamptz(6)
+  userdetails   userdetails @relation(fields: [userdetailsid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "aiusage_userdetailsFK")
+
+  @@index([userdetailsid, kind, createdat], map: "aiusage_user_kind_createdat_IX")
+  @@index([kind, createdat], map: "aiusage_kind_createdat_IX")
 }
 
 model states {
@@ -259,13 +272,14 @@ model userdetails {
   userstonotifications_userstonotifications_receiveruserdetailsidTouserdetails userstonotifications[] @relation("userstonotifications_receiveruserdetailsidTouserdetails")
   userstonotifications_userstonotifications_senderuserdetailsidTouserdetails   userstonotifications[] @relation("userstonotifications_senderuserdetailsidTouserdetails")
   usertoposts                                                                  usertoposts[]
-  postboosts                                                                  postboosts[]
-  postboostimpressions                                                        postboostimpressions[]
-  pushtokens                                                                  pushtokens[]
-  reportsmade                                                                 reports[]              @relation("reports_reporter")
-  reportsreceived                                                             reports[]              @relation("reports_reported")
-  blocksmade                                                                  userblocks[]           @relation("userblocks_blocker")
-  blocksreceived                                                              userblocks[]           @relation("userblocks_blocked")
+  postboosts                                                                   postboosts[]
+  postboostimpressions                                                         postboostimpressions[]
+  pushtokens                                                                   pushtokens[]
+  reportsmade                                                                  reports[]              @relation("reports_reporter")
+  reportsreceived                                                              reports[]              @relation("reports_reported")
+  blocksmade                                                                   userblocks[]           @relation("userblocks_blocker")
+  blocksreceived                                                               userblocks[]           @relation("userblocks_blocked")
+  aiusage                                                                      aiusage[]
 
   @@index([displayname, handle], map: "name_IX")
 }

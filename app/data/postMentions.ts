@@ -1,7 +1,7 @@
 import { after } from "next/server";
 import { extractMentionedUserIdsFromLexical } from "@/lib/mentions";
 import { hdBot } from "@/lib/bots/hd";
-import { imageBot } from "@/lib/bots/imageBot";
+import { requestPainting } from "@/lib/bots/imageBot";
 import { prisma } from "@/prisma";
 import { pushPostActivity } from "@/lib/push";
 
@@ -40,11 +40,11 @@ export const notifyMentionedUsers = async ({
 				return;
 			case 13:
 				const prompt = `You are the painter Walter Emerson Baum who founded the Baum School of Art and the Allentown Art Museum. Create a painting about`;
-				after(() => imageBot({postid, prompt, userdetailsid: 13, userdir: 'baum'}));
+				after(() => requestPainting({postid, prompt, userdetailsid: 13, userdir: 'baum', requesterUserdetailsId: authorUserDetailsId}));
 				return;
 			case 14:
 				const prompt2 = `You are the painter Ella Sophonisba Hergesheimer. Create a painting about`;
-				after(() => imageBot({postid, prompt: prompt2, userdetailsid: 14, userdir: 'hergesheimer'}));
+				after(() => requestPainting({postid, prompt: prompt2, userdetailsid: 14, userdir: 'hergesheimer', requesterUserdetailsId: authorUserDetailsId}));
 				return;
 		}
 

@@ -53,7 +53,7 @@ STATUS: resolved|unknown|issue
 - Use "unknown" if their question isn't covered by the information above and you can't confidently answer it.
 - Use "resolved" only if you gave a complete answer grounded in the information above.`;
 
-    const response = await getTextResponse(prompt, undefined, 0);
+    const response = await getTextResponse(prompt, { temperature: 0, kind: 'support' });
     const [firstLine, ...rest] = response.split('\n');
     const statusMatch = /^STATUS:\s*(resolved|unknown|issue)/i.exec(firstLine);
     const status = statusMatch ? statusMatch[1].toLowerCase() : 'resolved';

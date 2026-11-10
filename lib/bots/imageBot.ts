@@ -1,12 +1,58 @@
 
 import { prisma } from '@/prisma';
 import { getImageResponse } from '@/lib/ai';
+import { claimAiUse, releaseAiUse, type UsageRules } from '@/lib/aiUsage';
 import { uploadFile } from '@/lib/bunny';
 import { getBotPost } from '@/app/data/botHelper';
 import { saveTrustedPost } from '@/lib/posts/savePost';
 import { parseText } from '../utils';
 
-export const imageBot = async (postObj:{postid:number, prompt:string, userdetailsid:number, userdir:string}) => {
+type PaintingRequest = { postid: number; prompt: string; userdetailsid: number; userdir: string };
+
+// Each painting costs real money, so it is limited per person and across the whole site.
+// Both painters share one pool. At the site limit the worst case is about $0.13 a day.
+const PAINTING_RULES: UsageRules = { perUserLimit: 3, siteLimit: 60, windowHours: 24 };
+
+const DECLINED_REPLIES = {
+    user: "I've painted enough for one day. Ask me again tomorrow.",
+    site: 'The studio has run out of paint for today. Try again tomorrow.',
+};
+
+const saveBotComment = async (params: { postid: number; userdetailsid: number; content: string; file?: File }) => {
+    const { postid, userdetailsid, content, file } = params;
+    const formattedPost = getBotPost(content);
+
+    await saveTrustedPost({
+        content: formattedPost.content,
+        lexical: JSON.stringify(formattedPost.lexical),
+        userdetailsid,
+        posttype: 'comment',
+        parentPostId: postid,
+        edited: false,
+        ...(file ? { postfile: file.name, postfiletype: file.type } : {}),
+    });
+};
+
+// The entry point for mentions of a painter: counts the request against the requester's
+// limits, and answers in character instead of staying silent when it is over them.
+export const requestPainting = async (request: PaintingRequest & { requesterUserdetailsId: number }) => {
+    const { requesterUserdetailsId, ...painting } = request;
+
+    const claim = await claimAiUse('image', requesterUserdetailsId, PAINTING_RULES);
+    if (!claim.ok) {
+        await saveBotComment({ postid: painting.postid, userdetailsid: painting.userdetailsid, content: DECLINED_REPLIES[claim.reason] });
+        return;
+    }
+
+    try {
+        await imageBot(painting);
+    } catch (error) {
+        await releaseAiUse(claim.id);
+        throw error;
+    }
+};
+
+export const imageBot = async (postObj: PaintingRequest) => {
     const {postid, prompt, userdetailsid, userdir} = postObj;
 
     if (!postid || !prompt || !userdetailsid || !userdir) return;
@@ -29,30 +75,15 @@ export const imageBot = async (postObj:{postid:number, prompt:string, userdetail
     const fullPrompt = `${prompt} ${text}`;
 
     const response = await getImageResponse(fullPrompt);
+    if (!response) throw new Error('The image model returned no image');
 
-    if (response) {
+    const name = `${Math.random().toString(36).substring(2, 10)}.webp`;
 
-        const name = `${Math.random().toString(36).substring(2, 10)}.webp`;
+    const file = new File([response], name, {type: 'image/webp'})
 
-        const file = new File([response], name, {type: 'image/webp'})
+    await uploadFile({file, userdir})
 
-        await uploadFile({file, userdir})
-
-        const formattedPost = getBotPost('');
-        
-        const postCreate = {
-            content: formattedPost.content, 
-            lexical: JSON.stringify(formattedPost.lexical), 
-            userdetailsid, 
-            posttype: 'comment', 
-            parentPostId: postid, 
-            edited: false,
-            postfile: file.name,
-            postfiletype: file.type
-        }
-
-        await saveTrustedPost(postCreate);
-    }
+    await saveBotComment({ postid, userdetailsid, content: '', file });
 }
 
 

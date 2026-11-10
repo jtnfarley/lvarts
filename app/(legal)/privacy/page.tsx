@@ -78,9 +78,12 @@ export default function PrivacyPolicy() {
 				<li>Google: sign-in, Google Analytics, and Google Maps for event locations.</li>
 				<li>Expo and Google Firebase Cloud Messaging: delivery of push notifications.</li>
 				<li>AzuraCast: the online radio station that plays audio posts.</li>
-				<li>Anthropic and OpenAI: AI features. The text of a post you choose to rewrite, your support
-					chat messages, and the text of a post that mentions one of our AI persona accounts is sent to
-					Anthropic or OpenAI to generate a response.</li>
+				<li>OpenRouter and the AI model companies it routes to: AI features. The text of a post you
+					choose to rewrite, your support chat messages, and the text of a post that mentions one of
+					our AI persona accounts is sent to an AI model to generate a response. Support chat messages
+					are only sent to providers that do not retain them. Post text for the AI features may go to
+					free models whose providers can handle it under their own terms, so do not put private
+					information in a post you send to an AI feature.</li>
 				<li>Stripe: payments for post boosts.</li>
 				<li>Our email provider: sign-in links and administrator alerts.</li>
 			</ul>

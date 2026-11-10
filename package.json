@@ -15,10 +15,10 @@
     "scrape": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/scrape.ts",
     "test:importer": "npx tsx --tsconfig scripts/tsconfig.json --test lib/importer/*.test.ts",
     "import-events": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/import-events.ts",
-    "seed:calendar": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/seed-calendar.ts"
+    "seed:calendar": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/seed-calendar.ts",
+    "try-models": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/try-models.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.106.0",
     "@auth/prisma-adapter": "^2.11.2",
     "@hookform/resolvers": "^5.2.1",
     "@lexical/react": "^0.38.2",
@@ -49,7 +49,6 @@
     "next": "^15.0.0",
     "next-auth": "^5.0.0-beta.29",
     "nodemailer": "^6.10.1",
-    "openai": "^6.38.0",
     "react": "^19.1.0",
     "react-datepicker": "^9.1.0",
     "react-dom": "^19.1.0",
