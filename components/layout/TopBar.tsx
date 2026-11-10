@@ -4,6 +4,7 @@ import ThemeToggle from "./ThemeToggle"
 import Avatar from "@/components/shared/Avatar"
 import imageUrl from '@/constants/imageUrl'
 import Link from "next/link"
+import UserMenu from "./UserMenu"
 
 const TopBar = (props: {theme?:'lvartsmusic', user?:User}) => {
     if (props.theme === 'lvartsmusic') {
@@ -32,9 +33,14 @@ const TopBar = (props: {theme?:'lvartsmusic', user?:User}) => {
                     <div className="flex shrink-0 items-center gap-1">
                         <ThemeToggle />
                         {userdetails &&
-                            <Link href="/profile" className="rounded-full p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/10" title="Your profile">
-                                <Avatar imageUrl={avatar} displayName={userdetails.displayname} handle={userdetails.handle} size="sm" />
-                            </Link>
+                            <>
+                                <div className="md:hidden">
+                                    <UserMenu avatarUrl={avatar} displayName={userdetails.displayname} handle={userdetails.handle} />
+                                </div>
+                                <Link href="/profile" className="hidden rounded-full p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/10 md:block" title="Your profile">
+                                    <Avatar imageUrl={avatar} displayName={userdetails.displayname} handle={userdetails.handle} size="sm" />
+                                </Link>
+                            </>
                         }
                     </div>
                 </div>
