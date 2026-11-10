@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { currentUser } from '@/app/data/currentUser';
 import BlockedUsers from '@/components/forms/BlockedUsers';
+import ExportData from '@/components/forms/ExportData';
 import NotificationSettingsForm from '@/components/forms/NotificationSettingsForm';
 import { getBlockedUsers } from '@/lib/blocks';
 import { getNotificationSettings } from '@/lib/notificationSettings';
@@ -37,6 +38,14 @@ export default async function Settings() {
 					You don&apos;t see posts or notifications from people you block, and they can&apos;t follow you.
 				</p>
 				<BlockedUsers users={blockedUsers} />
+			</section>
+			<section className="mt-8">
+				<h2 className="text-lg font-semibold">Your data</h2>
+				<p className="mt-1 text-sm text-lvartsmusic-muted">
+					We&apos;ll email you a link to download a copy of your profile, posts, comments, likes, follows and
+					more as a JSON file. Your uploaded files are listed as links.
+				</p>
+				<ExportData />
 			</section>
 			<section className="mt-8">
 				<h2 className="text-lg font-semibold">Account</h2>
