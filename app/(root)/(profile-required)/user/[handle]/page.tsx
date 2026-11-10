@@ -1,7 +1,7 @@
 import UserProfile from '@/components/UserProfile';
 import {currentUser} from "@/app/data/currentUser";
 import { getUserDAL } from "@/app/data/user";
-import { getFeedRow } from '@/app/data/posts';
+import { getUserPosts } from '@/app/data/posts';
 
 export default async function UserProfilePage({
   params,
@@ -16,7 +16,7 @@ export default async function UserProfilePage({
 
 	if (!userProfile) return null;
 
-	const userPosts = await getFeedRow(userProfile);
+	const userPosts = await getUserPosts(userProfile.id);
 
 	const googleMapsApiKey = process.env.GOOGLE_MAPS; //has to be handled on the server
 
@@ -25,7 +25,7 @@ export default async function UserProfilePage({
             {
 			googleMapsApiKey && user && userProfile &&
 				<div className='pb-5'>
-					<UserProfile currentUser={user} userProfile={userProfile} posts={userPosts} getOldPosts={getFeedRow} googleMapsApiKey={googleMapsApiKey}/>
+					<UserProfile currentUser={user} userProfile={userProfile} posts={userPosts} getOldPosts={getUserPosts} googleMapsApiKey={googleMapsApiKey}/>
 				</div>
 			}
 		</>

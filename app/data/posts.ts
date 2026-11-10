@@ -234,6 +234,36 @@ export const getFeedRow = async (userdetails:UserDetails, offset:number = 0, las
     )
 }
 
+// A profile shows only what the user authored (posts and their own comments), never follow-graph
+// or liked posts. The author is the first usertoposts row, matching authorDetailsJoin.
+export const getUserPosts = async (userdetailsid:number, offset:number = 0):Promise<FeedRow[]> => {
+    const viewerId = await viewerUserdetailsId()
+
+    return await prisma.$queryRaw<FeedRow[]>(
+        Prisma.sql`
+            ${paginatedFeedQuery(
+                feedRowInnerQuery(
+                    Prisma.sql`
+                        FROM posts p
+                    `,
+                    Prisma.sql`
+                        WHERE (
+                            SELECT utp.userdetailsid
+                            FROM usertoposts utp
+                            WHERE utp.postid = p.id
+                            ORDER BY utp.id
+                            LIMIT 1
+                        ) = ${userdetailsid}
+                    `,
+                    false,
+                    viewerId
+                ),
+                offset
+            )}
+        `
+    )
+}
+
 export const getEvents = async ():Promise<FeedRow[]> => {
     const viewerId = await viewerUserdetailsId()
 

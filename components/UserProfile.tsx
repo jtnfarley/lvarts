@@ -28,7 +28,7 @@ export default function UserProfile(props:{currentUser:User, userProfile:UserDet
 	const [endOfPosts, setEndOfPosts] = useState(false);
 
 	const getOldPostsFromServer = async () => {
-		const oldPosts = await getOldPosts(profile?.userid, posts.length);
+		const oldPosts = await getOldPosts(userProfile.id, posts.length);
 	
 		if (oldPosts && oldPosts.length && tempFeedRef.current && tempFeedRef.current.length) {
 			tempFeedRef.current = [...tempFeedRef.current, ...oldPosts];
