@@ -1,35 +1,39 @@
 import {currentUser} from "@/app/data/currentUser";
 import Search from '@/components/Search';
 import { searchPosts } from '@/app/data/posts';
-import type { FeedRow } from '@/lib/models/initFeedRow';
+import { searchProfiles } from '@/lib/searchProfiles';
 
 export default async function SearchPage({
   params,
+  searchParams,
 }: {
-  params: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: Promise<{ query: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
     const user = await currentUser();
 
-    const { query } = await params;
-
-    const googleMapsApiKey = process.env.GOOGLE_MAPS; 
-
-    let posts: FeedRow[] = [];
-
-    if (query) { 
-        posts = await searchPosts(query.toString())
+    const { query: encodedQuery } = await params;
+    const { tab } = await searchParams;
+    // A hand-typed URL like /search/100% is not valid percent-encoding; fall back to the raw text.
+    let query = encodedQuery;
+    try {
+        query = decodeURIComponent(encodedQuery);
+    } catch {
+        // keep the raw text
     }
 
+    const googleMapsApiKey = process.env.GOOGLE_MAPS;
+
+    if (!googleMapsApiKey) {
+        return null;
+    }
+
+    const [posts, profiles] = await Promise.all([searchPosts(query), searchProfiles(query)]);
+
+    // An explicit tab wins; otherwise land on profiles only when there are no posts to show.
+    const activeTab = tab === 'profiles' || (tab !== 'posts' && !posts.length && profiles.length) ? 'profiles' : 'posts';
+
 	return (
-		<>
-            {googleMapsApiKey &&
-                <div className="flex flex-col gap-5 py-3">
-                    {user && 
-                        posts &&
-                        <Search query={query?.toString() || ''} user={user} posts={posts} googleMapsApiKey={googleMapsApiKey}/>
-                    }
-                </div>
-            }
-		</>
+		<Search query={query} tab={activeTab} user={user} posts={posts} profiles={profiles} googleMapsApiKey={googleMapsApiKey} />
 	);
 }

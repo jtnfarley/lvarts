@@ -350,8 +350,6 @@ export const searchPosts = async (queryString:string):Promise<FeedRow[]> => {
                 Prisma.sql`
                     WHERE
                         p.content ILIKE ${`%${trimmedQuery}%`}
-                        OR ud.displayname ILIKE ${`%${trimmedQuery}%`}
-                        OR ud.handle ILIKE ${`%${trimmedQuery}%`}
                         OR e.eventname ILIKE ${`%${trimmedQuery}%`}
                         OR v.venuename ILIKE ${`%${trimmedQuery}%`}
                         OR v.address ILIKE ${`%${trimmedQuery}%`}
