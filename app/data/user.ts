@@ -1,4 +1,6 @@
 import { Prisma } from '@prisma/client'
+import { after } from 'next/server'
+import { pushFollow } from '@/lib/push'
 import {prisma} from '@/prisma'
 import UserDetails from '@/lib/models/userDetails'
 import { generateUniqueHandle, resolveHandle } from './handles'
@@ -234,6 +236,8 @@ export const followUserDAL = async ({userdetailsid, followinguserdetailsid}:Foll
 
         throw error
     }
+
+    after(() => pushFollow(followinguserdetailsid, userdetailsid))
 
     return true
 }

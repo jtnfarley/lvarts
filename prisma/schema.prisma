@@ -197,6 +197,18 @@ model pushtokens {
   @@index([userdetailsid], map: "pushtokens_userdetailsid_idx")
 }
 
+// Push preferences. A user with no row gets every push, so existing users need no backfill.
+// Foreign key cascades so deleting the account removes the row.
+model notificationsettings {
+  userdetailsid Int         @id
+  pushpaused    Boolean     @default(false)
+  pushlikes     Boolean     @default(true)
+  pushcomments  Boolean     @default(true)
+  pushmentions  Boolean     @default(true)
+  pushfollows   Boolean     @default(true)
+  userdetails   userdetails @relation(fields: [userdetailsid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "notificationsettings_userdetailsFK")
+}
+
 // A report is about a post or a user. Foreign keys cascade so deleting the reported
 // content, or either user, also removes the report without extra deletion code.
 model reports {
@@ -275,7 +287,8 @@ model userdetails {
   postboosts                                                                   postboosts[]
   postboostimpressions                                                         postboostimpressions[]
   pushtokens                                                                   pushtokens[]
-  reportsmade                                                                  reports[]              @relation("reports_reporter")
+  notificationsettings                                                         notificationsettings?
+  reportsmade                                                                 reports[]              @relation("reports_reporter")
   reportsreceived                                                              reports[]              @relation("reports_reported")
   blocksmade                                                                   userblocks[]           @relation("userblocks_blocker")
   blocksreceived                                                               userblocks[]           @relation("userblocks_blocked")
