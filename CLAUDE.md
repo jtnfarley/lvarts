@@ -76,6 +76,10 @@ Server components in `components/` fetch nothing — they call functions from `a
 
 **User blocking:** `blockUser`/`unblockUser` (`app/actions/blocks.ts`, blocker taken from the session) write the `userblocks` table and drop follows in both directions. Blocking is one-way hiding: the blocker no longer sees the blocked user's posts, because `authorDetailsJoin` in `app/data/posts.ts` filters the author through `notBlockedByViewer` (`lib/blocks.ts`) for every feed query, with the viewer read from the session, not an argument. The blocker also gets no notification list entries, unread badge or push from them (`getNotifications`, `Nav`, `pushPostActivity`), and `followUserDAL` refuses when either side blocked the other. The blocked user can still view the blocker's public posts. Entry point is `BlockButton` on other users' profile cards only; the list with Unblock lives at `/settings`.
 
+**Settings page:** `/settings` (`app/(root)/(profile-required)/settings/page.tsx`) has push notification toggles, blocked users, "Your data" and a link to `/profile` (where account deletion lives). Push goes through `lib/push.ts`: `pushPostActivity` (like, comment, mention) and `pushFollow` share one `sendPush`, which skips blocked senders, then checks the receiver's `notificationsettings` row (`getNotificationSettings` in `lib/notificationSettings.ts`: `pushpaused` plus one boolean per type) before sending to the Expo tokens in `pushtokens`. A user with no row gets every push, so there is no backfill; `saveNotificationSettings` (`app/actions/notificationSettings.ts`) upserts the row for the session user. The in-app notification list and badge are not affected by these settings. A new notification type needs a column here, an entry in `SETTING_BY_ACTIVITY` in `lib/push.ts` and a toggle in `NotificationSettingsForm`.
+
+**Data export:** "Email me my data" (`emailMyDataExport` in `app/actions/dataExport.ts`) emails the account's own address a link to `/api/account/export?token=…`. The token (`lib/exportToken.ts`) is a stateless HMAC of the user id and an expiry (1 hour), signed with `AUTH_SECRET` or `NEXTAUTH_SECRET`; it is not single-use because mail scanners open links first. The route needs no session, since the link opens in whatever browser the email app uses, and returns a JSON download built by `buildAccountExport` (`lib/accountExport.ts`). The export holds the user's own data only: other users appear as handles, never emails or their comments on the user's posts, and push tokens are reduced to a count. Uploaded files are CDN URLs, not bundled. It lists the user's tables separately from `lib/accountDeletion.ts`, so a new per-user table must be added to both. Old comments and old like notifications (before about May 2026) have no parent post link in the data, so `repliedToPostId` / `postId` are null for them.
+
 ### Environment variables
 
 | Variable | Purpose |
@@ -85,7 +89,7 @@ Server components in `components/` fetch nothing — they call functions from `a
 | `AZURACAST_API_KEY` | AzuraCast bearer token for radio uploads |
 | `OPENROUTER_API_KEY` | OpenRouter API key for all AI text and image generation |
 | `AI_CREATIVE_MODELS`, `AI_SUPPORT_MODELS`, `AI_IMAGE_MODEL` | Optional overrides of the model lists/model in `lib/ai.ts` (comma-separated, tried in order) |
-| `AUTH_SECRET` | NextAuth secret |
+| `AUTH_SECRET` | NextAuth secret (`NEXTAUTH_SECRET` also works); also signs data-export links |
 | `UPLOAD_SECRET` | HMAC secret shared with the upload Worker for signing/verifying upload tokens |
 | `NEXT_PUBLIC_UPLOAD_WORKER_URL` | Cloudflare Worker URL that proxies client uploads to BunnyCDN |
 | `GOOGLE_MAPS` | Google Maps API key (venue/event location display) |
