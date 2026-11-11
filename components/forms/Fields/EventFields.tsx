@@ -34,7 +34,7 @@ const EventFields = (props: {
     } = props;
     return (
         <div>
-            <div className="mb-4 grid gap-4 md:grid-cols-2">
+            <div className="mb-4 grid gap-4 md:grid-cols-2 px-3">
                 <div>
                     <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Title</div>
                     <input
@@ -63,7 +63,7 @@ const EventFields = (props: {
                 </div>
             </div>
 
-            <div className="mb-4 grid gap-4 md:grid-cols-2">
+            <div className="mb-4 grid gap-4 md:grid-cols-2 px-3">
                 <div>
                     <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Venue</div>
                     <div className="relative">
