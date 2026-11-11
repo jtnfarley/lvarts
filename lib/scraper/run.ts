@@ -40,9 +40,9 @@ export const scrapeSource = async (
 	fetcher: PoliteFetcher,
 	startedAt: Date,
 ): Promise<Snapshot> => {
-	const listing = await source.adapter.fetchListing(fetcher.getHtml);
-	const previousByKey = new Map((previous?.events ?? []).map((event) => [event.matchKey, event]));
 	const errors: string[] = [];
+	const listing = await source.adapter.fetchListing(fetcher.getHtml, (message) => errors.push(message));
+	const previousByKey = new Map((previous?.events ?? []).map((event) => [event.matchKey, event]));
 	const events = new Map<string, ScrapedEvent>();
 	let detailsFetched = 0;
 

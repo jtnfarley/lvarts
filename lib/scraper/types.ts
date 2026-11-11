@@ -80,6 +80,7 @@ export type EventDetail = {
 export type GetHtml = (url: string) => Promise<string>;
 
 export type SourceAdapter = {
-	fetchListing(getHtml: GetHtml): Promise<ListingItem[]>;
+	// `report` records a note (e.g. a skipped item) in the run's errors list without failing the run.
+	fetchListing(getHtml: GetHtml, report: (message: string) => void): Promise<ListingItem[]>;
 	fetchDetail(url: string, getHtml: GetHtml): Promise<EventDetail>;
 };

@@ -8,6 +8,7 @@ export type ImportSource = {
 
 export const IMPORT_SOURCES: ImportSource[] = [
 	{ scraperKey: 'godfrey', venueName: 'Godfrey Daniels', autoPublish: false },
+	{ scraperKey: 'inkwell', venueName: 'Inkwell.', autoPublish: false },
 ];
 
 // IMPORT_AUTO_PUBLISH=off is a kill switch that overrides every source without a deploy.
