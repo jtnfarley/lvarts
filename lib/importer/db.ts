@@ -19,7 +19,7 @@ export const getCalendarAccount = async (): Promise<CalendarAccount> => {
 };
 
 export const findVenueId = async (venueName: string): Promise<number> => {
-	const venue = await prisma.venues.findFirst({ where: { venuename: venueName }, select: { id: true } });
+	const venue = await prisma.venues.findFirst({ where: { venuename: { equals: venueName, mode: 'insensitive' } }, select: { id: true } });
 	if (!venue) throw new Error(`Venue "${venueName}" not found. Run scripts/seed-calendar.ts first.`);
 	return venue.id;
 };
