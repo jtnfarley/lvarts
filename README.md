@@ -20,6 +20,43 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Importing events
+
+Venue sites are scraped into snapshots, then the importer turns the snapshots into event posts. See `Event Scraper Spec (Phase 1).md` and `Event Import Spec (Phase 2).md` for the full design.
+
+### Add a venue
+
+1. Write a scraper adapter in `lib/scraper/adapters/` and register it in `lib/scraper/sources.ts`. Add a fixture and a test next to it.
+2. Create the venue in the `venues` table (add an event for it through the site, or extend `scripts/seed-calendar.ts`). The importer finds the venue by name, ignoring case.
+3. Register the source in `lib/importer/sources.ts` with the venue name. Leave `autoPublish: false` so new events wait for review on `/admin/imports`.
+
+### Run it
+
+Run these from the project root on Node 20 or later. The import scripts use whatever database `.env` points at.
+
+```bash
+npm run test:scraper                                # scraper and adapter tests
+npm run scrape -- --source=inkwell --no-save        # scrape without saving a snapshot
+npm run import-events -- --dry-run --source=inkwell # preview what would be created
+npm run import-events -- --source=inkwell           # create the posts
+```
+
+The importer reads the latest saved snapshot (`scraper/<source>/latest.json` in Vercel Blob). Snapshots are saved by the daily scrape cron or by **Run now** on `/admin/scraper`, not by `--no-save` runs. New posts are pending until you publish them on `/admin/imports`. The daily cron at `app/api/cron/import-events` runs the import for every registered source, so a deployed source needs no manual run.
+
+### Run against production
+
+`.env` points at the dev database. Node does not override variables that are already set, so set the production URL for one shell session:
+
+```powershell
+$env:postgresql_DATABASE_URL = "<production connection string>"
+([uri]$env:postgresql_DATABASE_URL).Host   # confirm it is db.prisma.io, not localhost
+npm run import-events -- --dry-run --source=inkwell
+npm run import-events -- --source=inkwell
+Remove-Item Env:postgresql_DATABASE_URL
+```
+
+Production needs the calendar account (`npm run seed:calendar`), the venue, and a snapshot saved by the production scraper. The code for a new source must be deployed before `/admin/scraper` and `/admin/imports` list it. Always run the dry run first.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
