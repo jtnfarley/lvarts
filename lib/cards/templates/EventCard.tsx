@@ -27,7 +27,7 @@ function Footer({ event, logoUrl }: { event: CardEvent; logoUrl: string }) {
 		>
 			{/* eslint-disable-next-line @next/next/no-img-element */}
 			<img src={logoUrl} width={Math.round(72 * theme.logoAspect)} height={72} alt="" />
-			<div style={{ display: 'flex', fontFamily: fonts.body, fontSize: 28, fontWeight: 700, color: colors.cream, marginTop: 20 }}>
+			<div style={{ display: 'flex', fontFamily: fonts.body, fontSize: 28, fontWeight: 700, color: colors.paper, marginTop: 20 }}>
 				www.{theme.siteName}
 			</div>
 		</div>
@@ -76,16 +76,17 @@ function WithImage({ event, image, logoUrl }: EventCardProps & { image: Prepared
 					flexDirection: 'column',
 					flex: 1,
 					padding: `34px ${margin}px 0`,
-					backgroundColor: colors.cream,
+					backgroundColor: colors.paper,
 				}}
 			>
-				<div style={{ display: 'flex', fontFamily: fonts.body, fontSize: 34, fontWeight: 700, color: colors.orange }}>
+				<div style={{ display: 'flex', fontFamily: fonts.body, fontSize: 34, fontWeight: 700, color: colors.orangeText }}>
 					{formatDateLine(event.date)}
 				</div>
 				<div
 					style={{
 						display: 'flex',
 						fontFamily: fonts.display,
+						fontWeight: 600,
 						fontSize: title.fontSize,
 						lineHeight: 1.1,
 						color: colors.ink,
@@ -122,18 +123,19 @@ function WithoutImage({ event, logoUrl }: Omit<EventCardProps, 'image'>) {
 					flex: 1,
 					margin: `${margin}px ${margin}px 0`,
 					padding: 56,
-					backgroundColor: colors.cream,
+					backgroundColor: colors.paper,
 					overflow: 'hidden',
 				}}
 			>
 				<Star size={520} color={colors.star} opacity={0.22} style={{ position: 'absolute', right: -110, bottom: -110 }} />
-				<div style={{ display: 'flex', fontFamily: fonts.body, fontSize: 38, fontWeight: 700, color: colors.orange }}>
+				<div style={{ display: 'flex', fontFamily: fonts.body, fontSize: 38, fontWeight: 700, color: colors.orangeText }}>
 					{formatDateLine(event.date)}
 				</div>
 				<div
 					style={{
 						display: 'flex',
 						fontFamily: fonts.display,
+						fontWeight: 600,
 						fontSize: title.fontSize,
 						lineHeight: 1.08,
 						color: colors.ink,

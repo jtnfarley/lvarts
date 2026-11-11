@@ -28,7 +28,7 @@ export const prepareImage = async (url: string): Promise<PreparedImage | null> =
 		const fitted = await oriented
 			.clone()
 			.resize({ width: theme.width, height: IMAGE_PANEL_HEIGHT, fit: 'inside' })
-			.flatten({ background: theme.colors.cream })
+			.flatten({ background: theme.colors.paper })
 			.jpeg({ quality: 88 })
 			.toBuffer({ resolveWithObject: true });
 

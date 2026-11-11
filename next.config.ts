@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['ssh2-sftp-client', 'ssh2', 'cpu-features'],
   // Fonts and logos are read from disk at render time, so the tracer can't see them.
   outputFileTracingIncludes: {
-    '/api/cards/**': ['./assets/fonts/**', './public/brand/**', './public/logos/arts-abbr-sq.png'],
+    '/api/cards/**': ['./assets/fonts/**', './public/brand/**', './public/logos/arts-abbr-sq.png', './public/logos/insta cards.png'],
   },
   experimental: {
     serverActions: {

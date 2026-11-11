@@ -2,10 +2,11 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { theme } from './theme';
 
-type CardFont = { name: string; data: Buffer; weight: 400 | 700; style: 'normal' };
+type CardFont = { name: string; data: Buffer; weight: 400 | 600 | 700; style: 'normal' };
 
 const FONT_FILES = [
-	{ name: theme.fonts.display, file: 'SpecialElite-Regular.ttf', weight: 400 },
+	{ name: theme.fonts.display, file: 'Gilroy-SemiBold.ttf', weight: 600 },
+	{ name: theme.fonts.cover, file: 'ChelseaMarket-Regular.ttf', weight: 400 },
 	{ name: theme.fonts.body, file: 'CourierPrime-Regular.ttf', weight: 400 },
 	{ name: theme.fonts.body, file: 'CourierPrime-Bold.ttf', weight: 700 },
 ] as const;

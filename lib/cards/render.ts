@@ -31,12 +31,21 @@ const loadLogoUrl = async (): Promise<string> => {
 
 const getLogoUrl = (): Promise<string> => (cachedLogoUrl ??= loadLogoUrl());
 
+const COVER_LOGO_PATH = 'public/logos/insta cards.png';
+
+let cachedCoverLogoUrl: Promise<string> | undefined;
+
+const getCoverLogoUrl = (): Promise<string> =>
+	(cachedCoverLogoUrl ??= readFile(path.join(process.cwd(), COVER_LOGO_PATH)).then(
+		(file) => `data:image/png;base64,${file.toString('base64')}`,
+	));
+
 // Instagram's API only accepts JPEG, so the PNG from satori is flattened and converted.
 const renderToJpeg = async (card: ReactElement): Promise<Buffer> => {
 	const response = new ImageResponse(card, { width: theme.width, height: theme.height, fonts: await getFonts() });
 	const png = Buffer.from(await response.arrayBuffer());
 	return sharp(png)
-		.flatten({ background: theme.colors.cream })
+		.flatten({ background: theme.colors.paper })
 		.jpeg({ quality: theme.jpegQuality, mozjpeg: true })
 		.toBuffer();
 };
@@ -64,7 +73,7 @@ export const renderCoverForRoundup = async (roundup: Roundup): Promise<Buffer> =
 			dateLabel: roundup.dateLabel,
 			shownCount: roundup.events.length,
 			moreCount: roundup.moreCount,
-			logoUrl: await getLogoUrl(),
+			logoUrl: await getCoverLogoUrl(),
 		}),
 	);
 
