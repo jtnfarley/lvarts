@@ -80,7 +80,8 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
     const parentPostId = post?.parentPostId !== undefined ? post.parentPostId?.toString() : undefined;
 
     const defaultValues = {
-        userdetailsid: user.userdetails?.id,
+        // Keep the post's author when an admin edits it; savePost only honors this for admins.
+        userdetailsid: post?.userdetails?.id ?? user.userdetails?.id,
         posttype: resolvedPostType,
         edited: edited ?? false,
         parentPostId,

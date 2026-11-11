@@ -58,7 +58,8 @@ export const useFileUpload = (post: Partial<FeedRow> | undefined, user: User, ad
     };
 
     const handleUpload = async (values: any): Promise<{ postfile?: string; postfiletype?: string; addToRadio?: boolean }> => {
-        const userdir = user?.userdetails?.userdir;
+        // When an admin edits someone else's post, files belong in the post author's folder.
+        const userdir = post?.userdetails?.userdir ?? user?.userdetails?.userdir;
         if (!tempFile || !userdir) return {};
 
         const isAudio = /audio/.test(tempFile.type);
