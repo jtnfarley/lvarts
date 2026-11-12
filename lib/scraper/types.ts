@@ -3,6 +3,16 @@ import { z } from 'zod';
 // Bump when the snapshot shape changes; phase 2 imports consume this format.
 export const SCHEMA_VERSION = 1;
 
+// Where an event happens, for sources whose events are at many venues. Adapters fill what they know.
+export const scrapedVenueSchema = z.object({
+	name: z.string(),
+	address: z.string().optional(),
+	city: z.string().optional(),
+	state: z.string().optional(),
+	zip: z.string().optional(),
+});
+export type ScrapedVenue = z.infer<typeof scrapedVenueSchema>;
+
 export const scrapedEventSchema = z.object({
 	sourceKey: z.string(),
 	sourceUrl: z.string(),
@@ -16,6 +26,8 @@ export const scrapedEventSchema = z.object({
 	notices: z.array(z.string()),
 	description: z.string().nullable(),
 	imageUrl: z.string().nullable(),
+	// Added after schema version 1 shipped; the default keeps older snapshots readable without a version bump.
+	venue: scrapedVenueSchema.nullable().default(null),
 	detailFetchedAt: z.string().nullable(),
 	warnings: z.array(z.string()),
 });
@@ -75,6 +87,9 @@ export type EventDetail = {
 	startsAt: Date | null;
 	imageUrl: string | null;
 	description: string | null;
+	// Only per-venue-event sources set this: undefined means the adapter doesn't track venues,
+	// null means it tried and found none.
+	venue?: ScrapedVenue | null;
 };
 
 export type GetHtml = (url: string) => Promise<string>;

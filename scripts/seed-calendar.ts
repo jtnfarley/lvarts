@@ -1,5 +1,6 @@
 import { prisma } from '@/prisma';
 import { CALENDAR_EMAIL, REJECTED_POST_TYPE } from '@/lib/importer/db';
+import { ensureVenue } from '@/lib/importer/venueRecords';
 
 // Creates the calendar account, the Godfrey Daniels venue details, and the rejected post type.
 // Safe to run more than once: it only adds what is missing.
@@ -27,26 +28,9 @@ const ensureAccount = async (): Promise<void> => {
 	console.log(`created calendar account (userdetails ${details.id})`);
 };
 
-const ensureVenue = async (): Promise<void> => {
-	const city = (await prisma.cities.findFirst({ where: { city: VENUE.city } })) ?? (await prisma.cities.create({ data: { city: VENUE.city } }));
-	const zip = (await prisma.zipcodes.findFirst({ where: { zipcode: VENUE.zip } })) ?? (await prisma.zipcodes.create({ data: { zipcode: VENUE.zip } }));
-	const state = (await prisma.states.findFirst({ where: { stateabbr: VENUE.state } })) ?? (await prisma.states.create({ data: { stateabbr: VENUE.state, statefullname: 'Pennsylvania' } }));
-
-	const venue = await prisma.venues.findFirst({ where: { venuename: VENUE.name } });
-	if (!venue) {
-		await prisma.venues.create({
-			data: { venuename: VENUE.name, address: VENUE.address, cityid: city.id, stateid: state.id, zipcodeid: zip.id },
-		});
-		console.log('created venue');
-		return;
-	}
-
-	// An existing venue keeps its name and address; only empty location fields are filled in.
-	await prisma.venues.update({
-		where: { id: venue.id },
-		data: { cityid: venue.cityid ?? city.id, stateid: venue.stateid ?? state.id, zipcodeid: venue.zipcodeid ?? zip.id },
-	});
-	console.log(`venue exists (id ${venue.id}), filled in any missing city, state and zip`);
+const seedVenue = async (): Promise<void> => {
+	const { id, created } = await ensureVenue({ ...VENUE, stateName: 'Pennsylvania' });
+	console.log(created ? 'created venue' : `venue exists (id ${id}), filled in any missing city, state and zip`);
 };
 
 const ensureRejectedPostType = async (): Promise<void> => {
@@ -58,7 +42,7 @@ const ensureRejectedPostType = async (): Promise<void> => {
 
 const main = async (): Promise<void> => {
 	await ensureAccount();
-	await ensureVenue();
+	await seedVenue();
 	await ensureRejectedPostType();
 };
 

@@ -16,6 +16,7 @@ const event = (overrides: Partial<ScrapedEvent> = {}): ScrapedEvent => ({
 	notices: [],
 	description: 'desc',
 	imageUrl: 'https://example.com/a.png',
+	venue: null,
 	detailFetchedAt: '2026-11-01T10:00:00Z',
 	warnings: [],
 	...overrides,

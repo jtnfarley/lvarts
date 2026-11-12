@@ -10,6 +10,7 @@ export const DETAIL_FETCH_CAP = 20;
 
 const WARNING_TIMES_DIFFER = 'listing and detail times differ';
 const WARNING_NO_IMAGE = 'no image';
+const WARNING_NO_VENUE = 'venue not found in listing';
 const WARNING_NO_DESCRIPTION = 'no description';
 const WARNING_DETAIL_FAILED = 'detail fetch failed';
 const WARNING_DETAIL_PENDING = 'details not fetched yet';
@@ -60,6 +61,7 @@ export const scrapeSource = async (
 			...cleanTitle(item.rawTitle),
 			description: null,
 			imageUrl: null,
+			venue: null,
 			detailFetchedAt: null,
 			warnings: [],
 		};
@@ -68,6 +70,7 @@ export const scrapeSource = async (
 			// Already seen with the same time: reuse its details without a request.
 			event.description = earlier.description;
 			event.imageUrl = earlier.imageUrl;
+			event.venue = earlier.venue;
 			event.detailFetchedAt = earlier.detailFetchedAt;
 			event.warnings = earlier.warnings;
 		} else if (detailsFetched < DETAIL_FETCH_CAP) {
@@ -76,9 +79,11 @@ export const scrapeSource = async (
 				const detail = await source.adapter.fetchDetail(item.sourceUrl, fetcher.getHtml);
 				event.description = detail.description;
 				event.imageUrl = detail.imageUrl;
+				event.venue = detail.venue ?? null;
 				event.detailFetchedAt = new Date().toISOString();
 				if (!detail.imageUrl) event.warnings.push(WARNING_NO_IMAGE);
 				if (!detail.description) event.warnings.push(WARNING_NO_DESCRIPTION);
+				if (detail.venue === null) event.warnings.push(WARNING_NO_VENUE);
 				if (detail.startsAt && detail.startsAt.getTime() !== item.startsAt.getTime()) {
 					// The detail page wins when the two disagree.
 					event.startsAt = toEasternIso(detail.startsAt);

@@ -1,7 +1,7 @@
 import { createPoliteFetcher } from '../scraper/http';
 import { blobSnapshotStore, type SnapshotStore } from '../scraper/snapshots';
 import { SCHEMA_VERSION, type ScrapedEvent, type Snapshot } from '../scraper/types';
-import { createPrismaImportStore, findVenueId, getCalendarAccount, loadExistingEvents } from './db';
+import { createPrismaImportStore, findVenueId, getCalendarAccount, loadExistingEvents, loadVenueLookup } from './db';
 import { downloadAndStoreImage } from './images';
 import { IMPORT_SOURCES, shouldAutoPublish, type ImportSource } from './sources';
 import {
@@ -15,6 +15,7 @@ import {
 	type SyncAction,
 	type SyncCounts,
 } from './sync';
+import { resolveVenueId } from './venues';
 
 export const MAX_SNAPSHOT_AGE_MS = 36 * 60 * 60 * 1000;
 
@@ -29,6 +30,7 @@ export type ImportDeps = {
 	snapshots: Pick<SnapshotStore, 'readLatest'>;
 	loadExisting: () => Promise<ExistingEvent[]>;
 	store: ImportStore;
+	venueIdFor: (event: ScrapedEvent) => number | null;
 	storeImage: (event: ScrapedEvent) => Promise<StoredImage | null>;
 	now: Date;
 };
@@ -69,7 +71,10 @@ export const importSource = async (
 			return { summary, actions: [] };
 		}
 
-		const actions = planSync(snapshot.events, await deps.loadExisting(), { autoPublish: shouldAutoPublish(source) });
+		const actions = planSync(snapshot.events, await deps.loadExisting(), {
+			autoPublish: shouldAutoPublish(source),
+			venueIdFor: deps.venueIdFor,
+		});
 		if (options.dryRun) return { summary: { ...summary, ...countActions(actions) }, actions };
 
 		const applied = await applyActions(actions, { store: deps.store, storeImage: deps.storeImage });
@@ -81,6 +86,15 @@ export const importSource = async (
 	}
 };
 
+const venueResolverFor = async (source: ImportSource): Promise<ImportDeps['venueIdFor']> => {
+	if (source.venue === 'fixed') {
+		const venueId = await findVenueId(source.venueName);
+		return () => venueId;
+	}
+	const lookup = await loadVenueLookup(source.scraperKey);
+	return (event) => resolveVenueId(lookup, event);
+};
+
 export const runImport = async (options: { dryRun: boolean; sourceKey?: string }): Promise<SourceImportResult[]> => {
 	const sources = IMPORT_SOURCES.filter((source) => !options.sourceKey || source.scraperKey === options.sourceKey);
 	if (sources.length === 0) throw new Error(`Unknown source: ${options.sourceKey}`);
@@ -89,7 +103,6 @@ export const runImport = async (options: { dryRun: boolean; sourceKey?: string }
 	for (const source of sources) {
 		try {
 			const account = await getCalendarAccount();
-			const venueId = await findVenueId(source.venueName);
 			const fetcher = createPoliteFetcher();
 			results.push(
 				await importSource(
@@ -97,7 +110,8 @@ export const runImport = async (options: { dryRun: boolean; sourceKey?: string }
 					{
 						snapshots: blobSnapshotStore,
 						loadExisting: () => loadExistingEvents(account),
-						store: createPrismaImportStore(account, venueId),
+						store: createPrismaImportStore(account),
+						venueIdFor: await venueResolverFor(source),
 						storeImage: (event) => downloadAndStoreImage(event, fetcher, account.userdir),
 						now: new Date(),
 					},

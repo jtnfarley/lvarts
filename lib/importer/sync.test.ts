@@ -28,8 +28,14 @@ const existingFor = (event: ScrapedEvent, overrides: Partial<ExistingEvent> = {}
 	...overrides,
 });
 
-const plan = (events: ScrapedEvent[], existing: ExistingEvent[] = [], autoPublish = false): SyncAction[] =>
-	planSync(events, existing, { autoPublish });
+const VENUE_ID = 7;
+
+const plan = (
+	events: ScrapedEvent[],
+	existing: ExistingEvent[] = [],
+	autoPublish = false,
+	venueIdFor: (event: ScrapedEvent) => number | null = () => VENUE_ID,
+): SyncAction[] => planSync(events, existing, { autoPublish, venueIdFor });
 
 const only = (actions: SyncAction[]): SyncAction => {
 	assert.equal(actions.length, 1, `expected one action, got ${JSON.stringify(actions.map((action) => action.kind))}`);
@@ -37,6 +43,21 @@ const only = (actions: SyncAction[]): SyncAction => {
 };
 
 describe('new events', () => {
+	it('creates the event at the venue the source resolves', () => {
+		const action = only(plan([fixture('new-show')]));
+		assert.equal(action.kind === 'create' && action.venueId, VENUE_ID);
+	});
+
+	it('skips a new event whose venue is unresolved instead of creating it', () => {
+		const action = only(plan([fixture('new-show')], [], false, () => null));
+		assert.deepEqual(action.kind === 'skip' && action.reason, 'venue unresolved');
+	});
+
+	it('does not need a venue for an event that already exists', () => {
+		const event = fixture('unchanged');
+		assert.deepEqual(plan([event], [existingFor(event)], false, () => null), []);
+	});
+
 	it('creates a new event as pending', () => {
 		const action = only(plan([fixture('new-show')]));
 		assert.equal(action.kind, 'create');

@@ -9,7 +9,7 @@ import { shouldAutoPublish } from './sources';
 import { type ExistingEvent, type ImportStore } from './sync';
 
 const baseSnapshot: Snapshot = JSON.parse(readFileSync(path.join(__dirname, '__fixtures__', 'snapshot.json'), 'utf8'));
-const source = { scraperKey: 'test', venueName: 'Test Venue', autoPublish: false };
+const source = { scraperKey: 'test', venue: 'fixed' as const, venueName: 'Test Venue', autoPublish: false };
 const now = new Date('2026-11-08T10:30:00.000Z');
 
 const memoryStore = (initial: ExistingEvent[] = []) => {
@@ -44,6 +44,7 @@ const depsFor = (snapshot: Snapshot | null, memory = memoryStore(), storeImage: 
 	snapshots: { readLatest: async () => snapshot },
 	loadExisting: async () => memory.rows,
 	store: memory.store,
+	venueIdFor: () => 1,
 	storeImage,
 	now,
 });
@@ -119,6 +120,25 @@ describe('importSource', () => {
 		} finally {
 			delete process.env.IMPORT_AUTO_PUBLISH;
 		}
+	});
+
+	it('creates a new event at the venue the deps resolve for it', async () => {
+		const memory = memoryStore();
+		const created: number[] = [];
+		const store: ImportStore = { ...memory.store, create: async (input) => { created.push(input.venueId); await memory.store.create(input); } };
+		const deps = { ...depsFor(withEvents(['new-show']), { ...memory, store }), venueIdFor: () => 42 };
+		await importSource(source, deps, { dryRun: false });
+		assert.deepEqual(created, [42]);
+	});
+
+	it('creates nothing for an event whose venue is unresolved and reports it as skipped', async () => {
+		const memory = memoryStore();
+		const deps = { ...depsFor(withEvents(['new-show']), memory), venueIdFor: () => null };
+		const { summary, actions } = await importSource(source, deps, { dryRun: false });
+		assert.equal(summary.created, 0);
+		assert.equal(summary.skipped, 1);
+		assert.equal(actions[0].kind === 'skip' && actions[0].reason, 'venue unresolved');
+		assert.equal(memory.rows.length, 0);
 	});
 
 	it('a dry run plans the work and writes nothing', async () => {

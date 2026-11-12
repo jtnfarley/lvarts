@@ -5,7 +5,7 @@ import { formatDateLine } from '@/lib/cards/text';
 import { SOURCES, type Source } from '@/lib/scraper/sources';
 import { readDiff, readIndex, readSnapshot } from '@/lib/scraper/snapshots';
 import type { RunDiff, RunIndexEntry, ScrapedEvent, Snapshot } from '@/lib/scraper/types';
-import { runScraperNow } from './actions';
+import { runScraperNow, runSourceNow } from './actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -191,7 +191,14 @@ async function SourceSection({ source, runs, selectedPath }: { source: Source; r
 
 	return (
 		<section className="flex flex-col gap-4">
-			<h2 className="text-xl">{source.displayName}</h2>
+			<div className="flex items-center justify-between">
+				<h2 className="text-xl">{source.displayName}</h2>
+				<form action={runSourceNow.bind(null, source.key)}>
+					<button type="submit" className="rounded border px-3 py-1.5 text-sm">
+						Run {source.displayName} now
+					</button>
+				</form>
+			</div>
 			<RunHistory source={source} runs={sourceRuns} selectedPath={selected?.snapshotPath} />
 
 			{selected && snapshot && (
@@ -228,7 +235,7 @@ export default async function ScraperPage({ searchParams }: { searchParams: Sear
 				<h1 className="text-2xl">Event scraper</h1>
 				<form action={runScraperNow}>
 					<button type="submit" className="rounded border px-3 py-1.5 text-sm">
-						Run now
+						Run all now
 					</button>
 				</form>
 			</div>

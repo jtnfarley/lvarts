@@ -107,6 +107,28 @@ describe('scrapeSource', () => {
 		assert.equal(event.startsAt, '2026-12-01T20:00:00-05:00');
 		assert.deepEqual(event.warnings, ['no image', 'no description', 'listing and detail times differ']);
 	});
+
+	it('keeps the venue an adapter finds, and warns when a venue-aware adapter finds none', async () => {
+		const venue = { name: 'The Venue', city: 'Easton' };
+		const source = makeSource(2);
+		source.adapter.fetchDetail = async (url) => ({
+			startsAt: null,
+			imageUrl: 'img',
+			description: 'desc',
+			venue: url.endsWith('/0/') ? venue : null,
+		});
+		const [found, missing] = (await scrapeSource(source, null, fakeFetcher(), new Date())).events;
+		assert.deepEqual(found.venue, venue);
+		assert.deepEqual(found.warnings, []);
+		assert.equal(missing.venue, null);
+		assert.deepEqual(missing.warnings, ['venue not found in listing']);
+	});
+
+	it('does not warn about venues for adapters that do not track them', async () => {
+		const [event] = (await scrapeSource(makeSource(1), null, fakeFetcher(), new Date())).events;
+		assert.equal(event.venue, null);
+		assert.deepEqual(event.warnings, []);
+	});
 });
 
 describe('runSource', () => {

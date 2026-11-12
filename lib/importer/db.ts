@@ -2,6 +2,7 @@ import { prisma } from '@/prisma';
 import { saveTrustedPost } from '@/lib/posts/savePost';
 import { extractSourceUrl } from './postContent';
 import type { ExistingEvent, ImportStore } from './sync';
+import type { VenueLookup } from './venues';
 
 export const CALENDAR_EMAIL = 'calendar@lvartandmusic.com';
 export const REJECTED_POST_TYPE = 'event_import_rejected';
@@ -22,6 +23,17 @@ export const findVenueId = async (venueName: string): Promise<number> => {
 	const venue = await prisma.venues.findFirst({ where: { venuename: { equals: venueName, mode: 'insensitive' } }, select: { id: true } });
 	if (!venue) throw new Error(`Venue "${venueName}" not found. Run scripts/seed-calendar.ts first.`);
 	return venue.id;
+};
+
+export const loadVenueLookup = async (sourceKey: string): Promise<VenueLookup> => {
+	const [venues, mappings] = await Promise.all([
+		prisma.venues.findMany({ select: { id: true, venuename: true, cities: { select: { city: true } } } }),
+		prisma.importvenuemaps.findMany({ where: { sourcekey: sourceKey }, select: { lookupkey: true, venueid: true } }),
+	]);
+	return {
+		mappings: new Map(mappings.map((mapping) => [mapping.lookupkey, mapping.venueid])),
+		venues: venues.map((venue) => ({ id: venue.id, name: venue.venuename, city: venue.cities?.city ?? null })),
+	};
 };
 
 // Every event post by the calendar account, including rejected ones (they still count for dedupe).
@@ -50,7 +62,7 @@ export const loadExistingEvents = async (account: CalendarAccount): Promise<Exis
 	return existing;
 };
 
-export const createPrismaImportStore = (account: CalendarAccount, venueId: number): ImportStore => ({
+export const createPrismaImportStore = (account: CalendarAccount): ImportStore => ({
 	// Goes through the same save code the event form uses, so imported posts look like normal ones.
 	create: async (input) => {
 		await saveTrustedPost({
@@ -66,7 +78,7 @@ export const createPrismaImportStore = (account: CalendarAccount, venueId: numbe
 			privatepost: input.isPrivate,
 			eventname: input.eventName,
 			eventdate: input.eventDate,
-			venueid: venueId,
+			venueid: input.venueId,
 		});
 	},
 

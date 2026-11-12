@@ -16,10 +16,10 @@ export type ExistingEvent = {
 	rejected: boolean;
 };
 
-export type SkipReason = 'canceled at source' | 'rejected' | 'details pending';
+export type SkipReason = 'canceled at source' | 'rejected' | 'details pending' | 'venue unresolved';
 
 export type SyncAction =
-	| { kind: 'create'; event: ScrapedEvent; isPrivate: boolean }
+	| { kind: 'create'; event: ScrapedEvent; isPrivate: boolean; venueId: number }
 	| {
 			kind: 'update';
 			event: ScrapedEvent;
@@ -39,6 +39,7 @@ export type NewEventInput = {
 	content: string;
 	lexical: string;
 	isPrivate: boolean;
+	venueId: number;
 	image: StoredImage | null;
 };
 
@@ -101,7 +102,7 @@ const planForExisting = (event: ScrapedEvent, existing: ExistingEvent): SyncActi
 export const planSync = (
 	events: ScrapedEvent[],
 	existing: ExistingEvent[],
-	options: { autoPublish: boolean },
+	options: { autoPublish: boolean; venueIdFor: (event: ScrapedEvent) => number | null },
 ): SyncAction[] => {
 	const existingByKey = indexExisting(existing);
 	const actions: SyncAction[] = [];
@@ -118,7 +119,10 @@ export const planSync = (
 			// The scraper hasn't fetched this event's image and description yet; import it once it has.
 			actions.push({ kind: 'skip', event, reason: 'details pending' });
 		} else {
-			actions.push({ kind: 'create', event, isPrivate: !options.autoPublish });
+			// A post is never created without a venue; an admin resolves the venue and a later run picks the event up.
+			const venueId = options.venueIdFor(event);
+			if (venueId === null) actions.push({ kind: 'skip', event, reason: 'venue unresolved' });
+			else actions.push({ kind: 'create', event, isPrivate: !options.autoPublish, venueId });
 		}
 	}
 	return actions;
@@ -160,6 +164,7 @@ export const applyActions = async (
 					eventDate: new Date(action.event.startsAt),
 					...buildPostContent(action.event),
 					isPrivate: action.isPrivate,
+					venueId: action.venueId,
 					image,
 				});
 				counts.created += 1;

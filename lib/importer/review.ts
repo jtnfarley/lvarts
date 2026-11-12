@@ -1,11 +1,12 @@
 import { prisma } from '@/prisma';
 import { blobSnapshotStore } from '../scraper/snapshots';
-import type { ScrapedEvent } from '../scraper/types';
-import { getCalendarAccount, REJECTED_POST_TYPE } from './db';
+import type { ScrapedEvent, ScrapedVenue } from '../scraper/types';
+import { getCalendarAccount, loadExistingEvents, loadVenueLookup, REJECTED_POST_TYPE, type CalendarAccount } from './db';
 import { extractSourceUrl } from './postContent';
 import { unusableSnapshotReason } from './run';
 import { IMPORT_SOURCES } from './sources';
-import { matchKeyFor, pendingReason, type PendingReason } from './sync';
+import { matchKeyFor, pendingReason, planSync, type PendingReason } from './sync';
+import { resolveVenueId, venueLookupKey } from './venues';
 
 export type PendingImport = {
 	postId: number;
@@ -13,6 +14,7 @@ export type PendingImport = {
 	eventName: string;
 	eventDate: Date;
 	venueName: string | null;
+	venueCity: string | null;
 	content: string;
 	sourceUrl: string | null;
 	hasImage: boolean;
@@ -26,7 +28,21 @@ export type MissingFromSource = {
 	sourceUrl: string;
 };
 
+// Events of one source that name (or lack) the same unknown venue, so an admin answers once for all of them.
+export type UnresolvedVenue = {
+	sourceKey: string;
+	lookupKey: string;
+	// What the scraper found, to prefill the create form; null when it found nothing.
+	venue: ScrapedVenue | null;
+	label: string;
+	events: { headline: string; startsAt: string; sourceUrl: string }[];
+};
+
+export type VenueOption = { id: number; name: string; city: string | null };
+
 export type ReviewData = {
+	unresolvedVenues: UnresolvedVenue[];
+	venueOptions: VenueOption[];
 	pending: PendingImport[];
 	missing: MissingFromSource[];
 	notes: string[];
@@ -56,6 +72,43 @@ const loadSnapshotEvents = async (): Promise<{ all: Map<string, ScrapedEvent>; f
 	return { all, fresh, notes };
 };
 
+// Asks the importer's own planner which events it would skip for want of a venue, so this list cannot drift from it.
+const findUnresolvedVenues = async (
+	account: CalendarAccount,
+	fresh: ScrapedEvent[],
+): Promise<{ groups: UnresolvedVenue[]; venueOptions: VenueOption[] }> => {
+	const perEventSources = IMPORT_SOURCES.filter((source) => source.venue === 'per-event');
+	if (perEventSources.length === 0) return { groups: [], venueOptions: [] };
+
+	const existing = await loadExistingEvents(account);
+	const groups = new Map<string, UnresolvedVenue>();
+	let venueOptions: VenueOption[] = [];
+
+	for (const source of perEventSources) {
+		const lookup = await loadVenueLookup(source.scraperKey);
+		venueOptions = lookup.venues;
+		const events = fresh.filter((event) => event.sourceKey === source.scraperKey);
+		const actions = planSync(events, existing, { autoPublish: false, venueIdFor: (event) => resolveVenueId(lookup, event) });
+
+		for (const action of actions) {
+			if (action.kind !== 'skip' || action.reason !== 'venue unresolved') continue;
+			const lookupKey = venueLookupKey(action.event);
+			const groupKey = `${source.scraperKey}|${lookupKey}`;
+			const group = groups.get(groupKey) ?? {
+				sourceKey: source.scraperKey,
+				lookupKey,
+				venue: action.event.venue,
+				label: action.event.venue?.name ?? action.event.headline,
+				events: [],
+			};
+			group.events.push({ headline: action.event.headline, startsAt: action.event.startsAt, sourceUrl: action.event.sourceUrl });
+			groups.set(groupKey, group);
+		}
+	}
+
+	return { groups: [...groups.values()], venueOptions: venueOptions.sort((a, b) => a.name.localeCompare(b.name)) };
+};
+
 export const getReviewData = async (): Promise<ReviewData> => {
 	const account = await getCalendarAccount();
 	const now = new Date();
@@ -69,7 +122,7 @@ export const getReviewData = async (): Promise<ReviewData> => {
 				posttypes: { posttype: { not: REJECTED_POST_TYPE } },
 				events: { eventdate: { gte: now } },
 			},
-			include: { events: { include: { venues: true } } },
+			include: { events: { include: { venues: { include: { cities: true } } } } },
 			orderBy: { events: { eventdate: 'asc' } },
 		}),
 		prisma.posts.findMany({
@@ -91,6 +144,7 @@ export const getReviewData = async (): Promise<ReviewData> => {
 			eventName: post.events.eventname ?? '(untitled)',
 			eventDate: post.events.eventdate,
 			venueName: post.events.venues?.venuename ?? null,
+			venueCity: post.events.venues?.cities?.city ?? null,
 			content: post.content ?? '',
 			sourceUrl,
 			hasImage: Boolean(post.postfile),
@@ -113,5 +167,6 @@ export const getReviewData = async (): Promise<ReviewData> => {
 		}
 	}
 
-	return { pending, missing, notes: snapshots.notes };
+	const unresolved = await findUnresolvedVenues(account, snapshots.fresh);
+	return { unresolvedVenues: unresolved.groups, venueOptions: unresolved.venueOptions, pending, missing, notes: snapshots.notes };
 };
