@@ -332,6 +332,22 @@ export const getGallery = async ():Promise<FeedRow[]> => {
     )
 }
 
+export const getZine = async ():Promise<FeedRow[]> => {
+    const viewerId = await viewerUserdetailsId()
+
+    return await prisma.$queryRaw<FeedRow[]>(
+        paginatedFeedQuery(
+            feedRowInnerQuery(
+                Prisma.sql`FROM posts p`,
+                Prisma.sql`WHERE pt.posttype = 'zine'`,
+                false,
+                viewerId
+            ),
+            0
+        )
+    )
+}
+
 export const searchPosts = async (queryString:string):Promise<FeedRow[]> => {
     const trimmedQuery = queryString.trim()
 
@@ -438,7 +454,10 @@ export const savePost = async (postData:any) => {
 
     const userdetailsid = admin && postData?.userdetailsid ? postData.userdetailsid : sessionUserdetailsId
 
-    return saveTrustedPost({ ...postData, userdetailsid })
+    // Zine posts are public only after review, so the author cannot choose their visibility.
+    const needsReview = postData?.posttype === 'zine' && !admin
+
+    return saveTrustedPost({ ...postData, userdetailsid, ...(needsReview && { privatepost: true }) })
 }
 
 // This is a server action, so any client can call it with any id: authorize here.
@@ -552,4 +571,4 @@ export const deletePost = async (postid:number) => {
 
     return true;
 }
-
+

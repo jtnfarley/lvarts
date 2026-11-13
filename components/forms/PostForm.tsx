@@ -307,7 +307,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                         {saved && (
                             <div className="me-2 bg-green-200 text-xs font-semibold uppercase text-green-700 border-1 border-green-700 px-2 py-1 my-2 rounded-sm"
                                 style={{ opacity: 0, animation: 'fade-in-out 3s ease-in-out' }}>
-                                Post Saved
+                                {activeType === 'zine' ? 'Submitted for review' : 'Post Saved'}
                             </div>
                         )}
 

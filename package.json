@@ -16,6 +16,8 @@
     "test:importer": "npx tsx --tsconfig scripts/tsconfig.json --test lib/importer/*.test.ts",
     "import-events": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/import-events.ts",
     "seed:calendar": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/seed-calendar.ts",
+    "seed:zine": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/seed-zine.ts",
+    "test:zine": "npx tsx --tsconfig scripts/tsconfig.json --test lib/zine/*.test.ts",
     "try-models": "npx tsx --env-file=.env --tsconfig scripts/tsconfig.json scripts/try-models.ts"
   },
   "dependencies": {

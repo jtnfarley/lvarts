@@ -155,11 +155,14 @@ export const saveTrustedPost = async (postData:any) => {
             await notifyParentPostAuthor(Number.parseInt(parentPostId), userdetailsid);
         }
 
-        await notifyMentionedUsers({
-            postid: post.id,
-            authorUserDetailsId: userdetailsid,
-            lexical
-        })
+        // A post waiting for review (e.g. a zine submission) stays quiet until it is public.
+        if (!privatepost) {
+            await notifyMentionedUsers({
+                postid: post.id,
+                authorUserDetailsId: userdetailsid,
+                lexical
+            })
+        }
     }
     
     return post

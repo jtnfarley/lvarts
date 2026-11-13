@@ -1,6 +1,6 @@
 'use client'
 
-import { BiSolidHomeAlt2, BiImage, BiSolidBell, BiSolidCalendar,  BiArrowFromLeft, BiSolidCircle } from "react-icons/bi";
+import { BiSolidHomeAlt2, BiImage, BiSolidBell, BiSolidCalendar, BiBookOpen, BiArrowFromLeft, BiSolidCircle } from "react-icons/bi";
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import User from "@/lib/models/user";
@@ -12,6 +12,7 @@ const navLinks = [
 	{ href: '/notifications', label: 'Notifications', icon: BiSolidBell },
 	{ href: '/calendar', label: 'Calendar', icon: BiSolidCalendar },
 	{ href: '/gallery', label: 'Art Gallery', icon: BiImage },
+	{ href: '/zine', label: 'Literary Zine', icon: BiBookOpen },
 ]
 
 export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNotifications:Function, shade?:string, theme?:'lvartsmusic'}) {
@@ -88,6 +89,11 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 					<Link href="/gallery" className={`leftsidebar_link flex flex-row items-center`} title="Art Gallery">
 						<div className="relative">
 							<BiImage className={shadeClass}/>
+						</div>
+					</Link>
+					<Link href="/zine" className={`leftsidebar_link flex flex-row items-center`} title="Literary Zine">
+						<div className="relative">
+							<BiBookOpen className={shadeClass}/>
 						</div>
 					</Link>
 				</>

@@ -1,11 +1,12 @@
 'use client'
 
-import { BiSolidFilePlus, BiSolidMusic, BiCalendarPlus } from 'react-icons/bi'
+import { BiSolidFilePlus, BiSolidMusic, BiCalendarPlus, BiBookOpen } from 'react-icons/bi'
 
 const types = [
     { type: 'post',  label: 'Post',  Icon: BiSolidFilePlus },
     { type: 'audio', label: 'Audio', Icon: BiSolidMusic },
     { type: 'event', label: 'Event', Icon: BiCalendarPlus },
+    { type: 'zine',  label: 'Zine',  Icon: BiBookOpen },
 ]
 
 export default function PostTypeSelector({ activeType, onChange }: { activeType: string, onChange: (type: string) => void }) {

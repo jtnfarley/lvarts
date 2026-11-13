@@ -1,3 +1,5 @@
+'use client'
+
 import PostMediaImage from "./PostMediaImage";
 import PostMediaAudio from "./PostMediaAudio";
 import PostMediaEmbed from "./PostMediaEmbed";
