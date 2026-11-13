@@ -1,15 +1,10 @@
-'use client'
-
-import { useState } from 'react';
 import type { FeedRow } from '@/lib/models/initFeedRow';
 import EventContent from './EventContent';
 
 export default function EventUi(props:{post:FeedRow}) {
-	const [post, setPost] = useState<FeedRow>(props.post);
-
     return (
-		<div key={post.id} className="w-full gap-4 event">
-			<EventContent post={post} googleMapsApiKey={''}/>
-		</div>		
+		<div className="event overflow-hidden rounded-lg border border-lvartsmusic-border shadow-md">
+			<EventContent post={props.post} googleMapsApiKey={''}/>
+		</div>
     )
 }

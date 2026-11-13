@@ -30,8 +30,8 @@ export default async function CalendarLayout({
 		>
 			<TopBar theme="lvartsmusic" user={user}/>
 			<main>
-				<section className="calendar-container">
-					<div className="flex flex-col w-full max-w-[1000px] mx-auto min-h-screen">
+				<section className="calendar-container overflow-visible">
+					<div className="flex flex-col w-full max-w-[1200px] mx-auto min-h-screen">
 						{children}
 					</div>
 				</section>

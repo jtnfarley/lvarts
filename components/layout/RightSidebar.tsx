@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { BiCalendar } from "react-icons/bi";
 import RecUsers from '../RecUsers';
 import SidebarSearch from "@/components/layout/SidebarSearch";
 import UpcomingEvents from "@/components/UpcomingEvents";
@@ -17,7 +19,10 @@ export default async function RightSidebar() {
 
 			<section className="lvartsmusic-card">
 				<h2 className="px-4 pt-3 text-xl font-extrabold text-lvartsmusic-foreground">
-					Upcoming Events
+					<Link href="/calendar" className="flex items-center gap-2" title="View the event calendar">
+						Upcoming Events
+						<BiCalendar className="text-2xl" aria-hidden="true" />
+					</Link>
 				</h2>
 				<UpcomingEvents />
 			</section>

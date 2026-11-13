@@ -337,11 +337,7 @@ a.editor-link, a.link {
 /*** calendar ***/
 
 .calendar .event {
-    background: #fff;
-}
-
-.dark .calendar .event {
-    background: #222;
+    background: var(--lvartsmusic-card);
 }
 
 /**** switch ***/

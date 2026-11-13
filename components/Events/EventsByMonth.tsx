@@ -1,88 +1,70 @@
-'use client'
-
 import type { FeedRow } from '@/lib/models/initFeedRow';
 import EventUi from './EventUi';
-import EventsByMonthHeader from './EventsByMonthHeader';
-import { useRef, useState } from 'react';
+import BackToTop from './BackToTop';
 
-export default function EventsByMonth(props:{events:FeedRow[]}) {
-	const events = props.events;
-	const monthsRef = useRef<HTMLDivElement | null>(null);
-	const [currentMonthIndex, setCurrentMonthIndex] = useState(0);
+type MonthBucket = { id: string, name: string, year: string, events: FeedRow[] };
 
-	const months = ["January", "February", "March", 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+const monthFormat = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', month: 'long' });
+const yearFormat = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric' });
+const monthNumberFormat = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', month: '2-digit' });
 
-	// Bucket by year + month so e.g. January 2027 sorts after December 2026.
-	const eventsByMonth:Array<{name:string,year:string,events:FeedRow[]}> = [];
-
+// Bucket by year + month (Eastern) so e.g. January 2027 sorts after December 2026.
+function groupByMonth(events: FeedRow[]): MonthBucket[] {
 	const sortedEvents = events
 		.filter(event => event.eventdate)
 		.sort((a, b) => a.eventdate!.getTime() - b.eventdate!.getTime());
 
+	const buckets: MonthBucket[] = [];
 	for (const event of sortedEvents) {
 		const date = event.eventdate!;
-		const name = months[date.getMonth()];
-		const year = date.getFullYear().toString();
-		const lastBucket = eventsByMonth[eventsByMonth.length - 1];
-		if (lastBucket?.name === name && lastBucket.year === year) {
+		const year = yearFormat.format(date);
+		const id = `${year}-${monthNumberFormat.format(date)}`;
+		const lastBucket = buckets[buckets.length - 1];
+		if (lastBucket?.id === id) {
 			lastBucket.events.push(event);
 		} else {
-			eventsByMonth.push({ name, year, events: [event] });
+			buckets.push({ id, name: monthFormat.format(date), year, events: [event] });
 		}
 	}
+	return buckets;
+}
 
-	const scrollToMonth = (index: number) => {
-		const container = monthsRef.current;
-		if (!container) return;
-		const width = container.clientWidth;
-		container.scrollTo({ left: width * index, behavior: 'smooth' });
-	};
+export default function EventsByMonth(props:{events:FeedRow[]}) {
+	const months = groupByMonth(props.events);
 
-	const forward = () => {
-		setCurrentMonthIndex(prev => {
-			const next = Math.min(prev + 1, eventsByMonth.length - 1);
-			scrollToMonth(next);
-			return next;
-		});
-	};
+	if (months.length === 0) {
+		return <div>No upcoming events.</div>;
+	}
 
-	const back = () => {
-		setCurrentMonthIndex(prev => {
-			const next = Math.max(prev - 1, 0);
-			scrollToMonth(next);
-			return next;
-		});
-	};
-
-    return (
-		<div className='max-h-screen overflow-x-hidden overflow-y-scroll relative'>
-			<div
-				className='flex flex-row flex-nowrap w-full overflow-x-auto'
-				id='months'
-				ref={monthsRef}
+	return (
+		<div>
+			<BackToTop/>
+			{/* top-16 sits below the sticky TopBar */}
+			<nav
+				aria-label='Jump to month'
+				className='sticky top-16 z-10 -mx-1 mb-6 flex gap-2 overflow-x-auto bg-lvartsmusic-background/90 px-1 py-3 backdrop-blur'
 			>
-				{
-					(eventsByMonth && eventsByMonth.length) &&
-						eventsByMonth.map(({name, year, events}) => {
-							if (events && events.length) {
-								return (	
-									<div className='month w-full flex flex-col flex-shrink-0 items-center' key={`${year}-${name}`}>
-										<EventsByMonthHeader month={name} year={year} forward={forward} back={back}/>
-										<div  className="flex flex-col gap-10 w-full">
-										{
-											events.map((post:FeedRow) => {
-												return (
-													<EventUi key={post.id} post={post} />
-												)
-											})
-										}
-										</div>
-									</div>
-								)
-							}
-						})
-				}
-			</div>
+				{months.map(({ id, name, year }) => (
+					<a
+						key={id}
+						href={`#${id}`}
+						className='shrink-0 rounded-full border border-lvartsmusic-border px-3 py-1 text-sm font-semibold hover:bg-lvartsmusic-accent hover:text-lvartsmusic-accent-foreground'
+					>
+						{name.slice(0, 3)} {year}
+					</a>
+				))}
+			</nav>
+
+			{months.map(({ id, name, year, events }) => (
+				<section key={id} id={id} className='scroll-mt-32 mb-12'>
+					<h2 className='mb-5 border-b border-lvartsmusic-border pb-2 text-2xl font-bold'>
+						{name} {year}
+					</h2>
+					<div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+						{events.map(post => <EventUi key={post.id} post={post}/>)}
+					</div>
+				</section>
+			))}
 		</div>
-    )
+	)
 }
