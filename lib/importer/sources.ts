@@ -15,6 +15,7 @@ export const IMPORT_SOURCES: ImportSource[] = [
 	{ scraperKey: 'godfrey', venue: 'fixed', venueName: 'Godfrey Daniels', autoPublish: false },
 	{ scraperKey: 'inkwell', venue: 'fixed', venueName: 'Inkwell.', autoPublish: false },
 	{ scraperKey: 'djbradscott', venue: 'per-event', autoPublish: false },
+	{ scraperKey: 'touchstone', venue: 'per-event', autoPublish: false },
 ];
 
 // IMPORT_AUTO_PUBLISH=off is a kill switch that overrides every source without a deploy.

@@ -1,6 +1,7 @@
 import { djBradScottAdapter } from './adapters/djbradscott';
 import { godfreyAdapter } from './adapters/godfrey';
 import { inkwellAdapter } from './adapters/inkwell';
+import { touchstoneAdapter } from './adapters/touchstone';
 import type { SourceAdapter } from './types';
 
 export type Source = {
@@ -15,4 +16,5 @@ export const SOURCES: Source[] = [
 	{ key: 'godfrey', displayName: 'Godfrey Daniels', venueName: 'Godfrey Daniels', adapter: godfreyAdapter },
 	{ key: 'inkwell', displayName: 'Inkwell.', venueName: 'Inkwell.', adapter: inkwellAdapter },
 	{ key: 'djbradscott', displayName: 'DJ Brad Scott', adapter: djBradScottAdapter },
+	{ key: 'touchstone', displayName: 'Touchstone Theatre', adapter: touchstoneAdapter },
 ];

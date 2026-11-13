@@ -73,8 +73,8 @@ export const scrapeSource = async (
 			event.venue = earlier.venue;
 			event.detailFetchedAt = earlier.detailFetchedAt;
 			event.warnings = earlier.warnings;
-		} else if (detailsFetched < DETAIL_FETCH_CAP) {
-			detailsFetched += 1;
+		} else if (source.adapter.detailsInListing || detailsFetched < DETAIL_FETCH_CAP) {
+			if (!source.adapter.detailsInListing) detailsFetched += 1;
 			try {
 				const detail = await source.adapter.fetchDetail(item.sourceUrl, fetcher.getHtml);
 				event.description = detail.description;

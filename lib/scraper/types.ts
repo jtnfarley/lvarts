@@ -95,6 +95,8 @@ export type EventDetail = {
 export type GetHtml = (url: string) => Promise<string>;
 
 export type SourceAdapter = {
+	// True when fetchListing already read every detail, so fetchDetail makes no request and the per-run detail cap doesn't apply.
+	detailsInListing?: boolean;
 	// `report` records a note (e.g. a skipped item) in the run's errors list without failing the run.
 	fetchListing(getHtml: GetHtml, report: (message: string) => void): Promise<ListingItem[]>;
 	fetchDetail(url: string, getHtml: GetHtml): Promise<EventDetail>;
