@@ -37,12 +37,13 @@ export default async function RootLayout({
 				<body>
 					<RandoBgs/>
 
-					<main className='lg:flex lg:justify-center'>
-						<div className="lg:w-full">
-							{children}
-						</div>
-					</main>
-					<Radio/>
+					<Radio>
+						<main className='lg:flex lg:justify-center'>
+							<div className="lg:w-full">
+								{children}
+							</div>
+						</main>
+					</Radio>
 					<SupportChatServer/>
 					<ModalRoot/>
 				</body>

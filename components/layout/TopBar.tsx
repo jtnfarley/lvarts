@@ -5,6 +5,7 @@ import Avatar from "@/components/shared/Avatar"
 import imageUrl from '@/constants/imageUrl'
 import Link from "next/link"
 import UserMenu from "./UserMenu"
+import { ListenLiveButton } from "@/components/Radio/RadioControls"
 
 const TopBar = (props: {theme?:'lvartsmusic', user?:User}) => {
     if (props.theme === 'lvartsmusic') {
@@ -31,6 +32,7 @@ const TopBar = (props: {theme?:'lvartsmusic', user?:User}) => {
                     }
 
                     <div className="flex shrink-0 items-center gap-1">
+                        <ListenLiveButton />
                         <ThemeToggle />
                         {userdetails &&
                             <>

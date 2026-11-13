@@ -38,7 +38,7 @@ export default function SupportChatWidget() {
     };
 
     return (
-        <div className="fixed bottom-36 md:bottom-28 right-4 md:right-6 z-[60] flex flex-col items-end">
+        <div className="fixed bottom-[calc(55px+var(--radio-h,0px)+1rem)] md:bottom-6 right-4 md:right-6 z-[60] flex flex-col items-end">
             {open &&
                 <div className="lvartsmusic-card mb-3 flex w-[320px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden shadow-xl">
                     <div className="flex items-center justify-between border-b border-lvartsmusic-border px-4 py-3">

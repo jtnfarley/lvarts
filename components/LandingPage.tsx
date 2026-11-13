@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useModal } from '@/app/contextProviders/modalProvider'
 import { BG_IMAGES } from '@/components/layout/RandoBgs'
+import { ListenLiveHero } from '@/components/Radio/RadioControls'
 
 export default function LandingPage() {
     const [error, setError] = useState<string | undefined>();
@@ -93,7 +94,11 @@ export default function LandingPage() {
                         Sign Up/Sign In with Google
                     </button>
 
-                    <div className='flex flex-col sm:flex-row justify-center mt-8 gap-3'>
+                    <div className="mt-6">
+                        <ListenLiveHero/>
+                    </div>
+
+                    <div className='flex flex-col sm:flex-row justify-center mt-2 gap-3'>
                         <Link href='/calendar' className="lvartsmusic-pill-outline text-center">Events Calendar</Link>
                         <Link href='/gallery' className="lvartsmusic-pill-outline text-center">Community Art Gallery</Link>
                     </div>
