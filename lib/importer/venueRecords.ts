@@ -20,6 +20,10 @@ const sameText = (a: string, b: string): boolean => a.trim().toLowerCase() === b
 export const pickExistingVenue = (candidates: Candidate[], city: string): Candidate | undefined =>
 	candidates.find((candidate) => candidate.city && sameText(candidate.city, city)) ?? candidates.find((candidate) => !candidate.city);
 
+// The app shows a venue's `address` as one line (e.g. "70 S Main St, New Hope, PA"), so it carries city and state too.
+export const fullAddress = ({ address, city, state }: Pick<VenueInput, 'address' | 'city' | 'state'>): string | undefined =>
+	address?.trim() ? [address.trim(), city, state].join(', ') : undefined;
+
 const ensureCity = async (city: string): Promise<number> =>
 	(await prisma.cities.findFirst({ where: { city: { equals: city, mode: 'insensitive' } } }))?.id ??
 	(await prisma.cities.create({ data: { city } })).id;
@@ -51,7 +55,7 @@ export const ensureVenue = async (input: VenueInput): Promise<{ id: number; crea
 
 	if (!existing) {
 		const venue = await prisma.venues.create({
-			data: { venuename: input.name, address: input.address, cityid: cityId, stateid: stateId, zipcodeid: zipId },
+			data: { venuename: input.name, address: fullAddress(input), cityid: cityId, stateid: stateId, zipcodeid: zipId },
 			select: { id: true },
 		});
 		return { id: venue.id, created: true };

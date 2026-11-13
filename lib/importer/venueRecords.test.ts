@@ -1,6 +1,17 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { pickExistingVenue } from './venueRecords';
+import { fullAddress, pickExistingVenue } from './venueRecords';
+
+describe('fullAddress', () => {
+	it('appends city and state to the street', () => {
+		assert.equal(fullAddress({ address: '70 S Main St', city: 'New Hope', state: 'PA' }), '70 S Main St, New Hope, PA');
+	});
+
+	it('leaves the address empty when there is no street', () => {
+		assert.equal(fullAddress({ city: 'New Hope', state: 'PA' }), undefined);
+		assert.equal(fullAddress({ address: '  ', city: 'New Hope', state: 'PA' }), undefined);
+	});
+});
 
 describe('pickExistingVenue', () => {
 	const easton = { id: 1, city: 'Easton' };
