@@ -30,7 +30,7 @@ export default async function GalleryLayout({
 		>
 			<TopBar theme="lvartsmusic" user={user}/>
 			<main>
-				<section className="calendar-container">
+				<section className="flex min-h-screen flex-1 flex-col items-center pt-3 pb-[120px] max-md:pb-32 overflow-auto">
 					<div className="flex flex-col w-full min-h-screen">
 						{children}
 					</div>

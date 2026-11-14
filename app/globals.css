@@ -408,8 +408,14 @@ input:checked + .slider:before {
 /*** gallery ***/
 
 .galleryGrid {
-    columns:auto 400px;
-    column-gap: 5rem;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* Keeps the last row at natural size, left-aligned, instead of stretching it. */
+.galleryGrid::after {
+    content: '';
+    flex-grow: 999;
 }
 
 

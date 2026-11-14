@@ -30,7 +30,7 @@ export default async function Gallery() {
 
 	return (
 		<div className='rounded-lg mt-5'>
-			<div className="flex flex-col gap-5 px-10 items-center w-full">
+			<div className="flex flex-col gap-5 items-center w-full">
 				<GalleryTitle/>
 				<div className='galleryGrid mt-20 w-full'>
 					{
