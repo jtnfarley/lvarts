@@ -8,6 +8,13 @@ import { useEffect, useState } from "react";
 import { useModal } from '@/app/contextProviders/modalProvider'
 import { BG_IMAGES } from '@/components/layout/RandoBgs'
 import { ListenLiveHero } from '@/components/Radio/RadioControls'
+import { BiSolidCalendar, BiImage, BiBookOpen } from 'react-icons/bi'
+
+const publicLinks = [
+    { href: '/calendar', label: 'Events Calendar', Icon: BiSolidCalendar },
+    { href: '/gallery', label: 'Community Art Gallery', Icon: BiImage },
+    { href: '/zine', label: 'LVAM Literary Zine', Icon: BiBookOpen },
+]
 
 export default function LandingPage() {
     const [error, setError] = useState<string | undefined>();
@@ -98,9 +105,12 @@ export default function LandingPage() {
                         <ListenLiveHero/>
                     </div>
 
-                    <div className='flex flex-col sm:flex-row justify-center mt-2 gap-3'>
-                        <Link href='/calendar' className="lvartsmusic-pill-outline text-center">Events Calendar</Link>
-                        <Link href='/gallery' className="lvartsmusic-pill-outline text-center">Community Art Gallery</Link>
+                    <div className='flex justify-center mt-2 gap-3'>
+                        {publicLinks.map(({ href, label, Icon }) => (
+                            <Link key={href} href={href} title={label} aria-label={label} className="rounded-full p-3 text-lvartsmusic-accent transition-colors hover:bg-lvartsmusic-accent/10">
+                                <Icon className="h-6 w-6" />
+                            </Link>
+                        ))}
                     </div>
 
                     <div className='flex justify-center mt-6 gap-5'>

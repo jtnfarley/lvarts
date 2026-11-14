@@ -29,7 +29,7 @@ export default async function Zine() {
 				const { title, bodyHtml } = splitTitle(entry.content ?? '');
 
 				return (
-					<article key={entry.id} className="flex flex-col gap-4">
+					<article key={entry.id} className="flex flex-col gap-4 border-t border-lvartsmusic-border pt-12 first-of-type:border-t-0 first-of-type:pt-0">
 						<h2 className="font-serif text-3xl font-bold">
 							<Link href={`/post/${entry.id}`}>{title}</Link>
 						</h2>
