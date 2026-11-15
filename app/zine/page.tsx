@@ -20,7 +20,7 @@ export default async function Zine() {
 		<div className="mx-auto flex w-full max-w-2xl flex-col gap-12 px-5 py-10">
 			<header className="flex flex-col gap-2 border-b border-lvartsmusic-border pb-8 text-center">
 				<div className="text-sm uppercase tracking-widest">Lehigh Valley Art &amp; Music</div>
-				<h1 className="font-serif text-4xl font-bold lg:text-6xl">LVAM Literary Zine</h1>
+				<h1 className="font-serif text-4xl font-bold lg:text-6xl">Literary Zine</h1>
 			</header>
 
 			{entries.length === 0 && <p className="text-center">Nothing here yet. Check back soon.</p>}
