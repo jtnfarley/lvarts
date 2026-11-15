@@ -13,5 +13,5 @@ export default function ZineBody({ html }: { html: string }) {
 		setCleanHtml(createDOMPurify(window).sanitize(html));
 	}, [html]);
 
-	return <div className="zine-body flex flex-col gap-4 text-lg leading-relaxed">{parse(cleanHtml)}</div>;
+	return <div className="zine-body flex flex-col gap-1 text-lg leading-relaxed">{parse(cleanHtml)}</div>;
 }
