@@ -31,6 +31,7 @@ function groupByMonth(events: FeedRow[]): MonthBucket[] {
 
 export default function EventsByMonth(props:{events:FeedRow[]}) {
 	const months = groupByMonth(props.events);
+	const eventCount = months.reduce((total, month) => total + month.events.length, 0);
 
 	if (months.length === 0) {
 		return <div>No upcoming events.</div>;
@@ -53,6 +54,9 @@ export default function EventsByMonth(props:{events:FeedRow[]}) {
 						{name.slice(0, 3)} {year}
 					</a>
 				))}
+				<span className='ml-auto shrink-0 self-center whitespace-nowrap pl-3 text-sm'>
+					{eventCount} {eventCount === 1 ? 'event' : 'events'}
+				</span>
 			</nav>
 
 			{months.map(({ id, name, year, events }) => (
