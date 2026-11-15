@@ -285,7 +285,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                 )}
 
                 <div className="mt-2 flex flex-col sm:flex-row p-4 gap-2">
-                    <div className="w-full sm:w-[50%]">
+                    <div className="w-full sm:w-auto sm:flex-1">
                         {allowTypeSwitch ? (
                             <div className="w-full flex items-center gap-3">
                                 <PostTypeSelector activeType={activeType} onChange={handleTypeChange} />
@@ -303,7 +303,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                             )
                         )}
                     </div>
-                    <div className="w-full flex justify-end sm:w-[50%]">
+                    <div className="w-full flex justify-end sm:w-auto sm:shrink-0">
                         {isSaving && <div className="me-2"><Spinner /></div>}
 
                         {saved && (
