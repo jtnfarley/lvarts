@@ -58,15 +58,23 @@ export default {
         if (parts.length < 2) {
             return new Response('Bad path', { status: 400, headers: corsHeaders(origin) });
         }
-        const [userdir, ...rest] = parts;
-        const filename = rest.join('/');
+        // pathname stays percent-encoded ("my%20pic.webp"), but the token was signed over the raw name.
+        let userdir: string;
+        let filename: string;
+        try {
+            const [rawUserdir, ...rest] = parts;
+            userdir = decodeURIComponent(rawUserdir);
+            filename = decodeURIComponent(rest.join('/'));
+        } catch {
+            return new Response('Bad path', { status: 400, headers: corsHeaders(origin) });
+        }
 
         const token = request.headers.get('X-Upload-Token');
         if (!token || !(await verifyToken(token, userdir, filename, env.UPLOAD_SECRET))) {
             return new Response('Unauthorized', { status: 401, headers: corsHeaders(origin) });
         }
 
-        const bunnyUrl = `https://${STORAGE_HOSTNAME}/${STORAGE_ZONE}/${userdir}/${filename}`;
+        const bunnyUrl = `https://${STORAGE_HOSTNAME}/${STORAGE_ZONE}/${encodeURIComponent(userdir)}/${encodeURIComponent(filename)}`;
         const bunnyRes = await fetch(bunnyUrl, {
             method: 'PUT',
             headers: {

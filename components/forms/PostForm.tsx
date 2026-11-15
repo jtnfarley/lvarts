@@ -153,8 +153,10 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
             const uploadResult = await handleUpload(values);
             Object.assign(values, uploadResult);
         } catch (error: any) {
+            console.error('Upload failed', error);
             const is413 = error?.statusCode === 413 || error?.message?.includes('Body exceeded');
-            setUploadError(is413 ? 'File is too large. Please upload an MP3 under 10MB.' : 'Upload failed. Please try again.');
+            const reason = error instanceof Error ? ` (${error.message})` : '';
+            setUploadError(is413 ? 'File is too large. Please upload an MP3 under 10MB.' : `Upload failed${reason}. Please try again.`);
             setIsSaving(false);
             return;
         }

@@ -14,7 +14,7 @@ export const uploadViaWorker = async (file: File, userdir: string) => {
     if (!workerUrl) throw new Error('NEXT_PUBLIC_UPLOAD_WORKER_URL is not set');
 
     const token = await getUploadToken(userdir, file.name);
-    const res = await fetch(`${workerUrl}/${userdir}/${file.name}`, {
+    const res = await fetch(`${workerUrl}/${encodeURIComponent(userdir)}/${encodeURIComponent(file.name)}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/octet-stream',
