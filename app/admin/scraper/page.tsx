@@ -190,36 +190,41 @@ async function SourceSection({ source, runs, selectedPath }: { source: Source; r
 	}
 
 	return (
-		<section className="flex flex-col gap-4">
-			<div className="flex items-center justify-between">
-				<h2 className="text-xl">{source.displayName}</h2>
+		<details open={sourceRuns.some((run) => run.snapshotPath === selectedPath)} className="group rounded border">
+			{/* Stays open after "View" on one of this source's runs, which reloads the page. */}
+			<summary className="flex cursor-pointer items-center justify-between gap-3 p-3">
+				<h2 className="text-xl">
+					<span className="inline-block transition-transform group-open:rotate-90">▸</span> {source.displayName}
+				</h2>
 				<form action={runSourceNow.bind(null, source.key)}>
 					<button type="submit" className="rounded border px-3 py-1.5 text-sm">
 						Run {source.displayName} now
 					</button>
 				</form>
-			</div>
-			<RunHistory source={source} runs={sourceRuns} selectedPath={selected?.snapshotPath} />
+			</summary>
+			<div className="flex flex-col gap-4 p-3 pt-0">
+				<RunHistory source={source} runs={sourceRuns} selectedPath={selected?.snapshotPath} />
 
-			{selected && snapshot && (
-				<>
-					<h3 className="text-lg">
-						Events from {formatWhen(selected.startedAt)}
-						{selected.snapshotPath !== sourceRuns.find((run) => !run.failed)?.snapshotPath && ' (older run)'}
-					</h3>
-					{snapshot.errors.length > 0 && (
-						<ul className="list-disc pl-5 text-sm text-red-600">
-							{snapshot.errors.map((error) => (
-								<li key={error}>{error}</li>
-							))}
-						</ul>
-					)}
-					<EventsTable events={snapshot.events} />
-					<h3 className="text-lg">Changes</h3>
-					{diff && <Changes diff={diff} />}
-				</>
-			)}
-		</section>
+				{selected && snapshot && (
+					<>
+						<h3 className="text-lg">
+							Events from {formatWhen(selected.startedAt)}
+							{selected.snapshotPath !== sourceRuns.find((run) => !run.failed)?.snapshotPath && ' (older run)'}
+						</h3>
+						{snapshot.errors.length > 0 && (
+							<ul className="list-disc pl-5 text-sm text-red-600">
+								{snapshot.errors.map((error) => (
+									<li key={error}>{error}</li>
+								))}
+							</ul>
+						)}
+						<EventsTable events={snapshot.events} />
+						<h3 className="text-lg">Changes</h3>
+						{diff && <Changes diff={diff} />}
+					</>
+				)}
+			</div>
+		</details>
 	);
 }
 

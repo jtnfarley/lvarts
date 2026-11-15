@@ -1,3 +1,4 @@
+import { alternativeGalleryAdapter } from './adapters/alternativegallery';
 import { djBradScottAdapter } from './adapters/djbradscott';
 import { godfreyAdapter } from './adapters/godfrey';
 import { inkwellAdapter } from './adapters/inkwell';
@@ -17,4 +18,5 @@ export const SOURCES: Source[] = [
 	{ key: 'inkwell', displayName: 'Inkwell.', venueName: 'Inkwell.', adapter: inkwellAdapter },
 	{ key: 'djbradscott', displayName: 'DJ Brad Scott', adapter: djBradScottAdapter },
 	{ key: 'touchstone', displayName: 'Touchstone Theatre', adapter: touchstoneAdapter },
+	{ key: 'alternativegallery', displayName: 'The Alternative Gallery', adapter: alternativeGalleryAdapter },
 ];

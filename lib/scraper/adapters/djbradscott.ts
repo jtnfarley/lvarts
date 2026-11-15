@@ -46,7 +46,7 @@ export const findVenue = (title: string, text: string): ScrapedVenue | null => {
 
 // Squarespace blocks carry their own <style> rules, which would otherwise end up in the text,
 // and adjacent blocks would run together without a space between them.
-const textFromHtml = (html: string | null | undefined): string => {
+export const textFromHtml =(html: string | null | undefined): string => {
 	if (!html) return '';
 	const $ = cheerio.load(html);
 	$('style, script').remove();
