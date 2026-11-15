@@ -12,7 +12,7 @@ export default function PrivacyPolicy() {
 	return (
 		<>
 			<h1 className="text-2xl font-bold">Privacy Policy</h1>
-			<p>Last updated: November 8, 2026</p>
+			<p>Last updated: November 15, 2026</p>
 			<p>
 				Lehigh Valley Art &amp; Music (&quot;we&quot;, &quot;us&quot;) runs the website at
 				www.lvartandmusic.com and the Lehigh Valley Art &amp; Music Android app, which displays that
@@ -123,6 +123,28 @@ export default function PrivacyPolicy() {
 				The Service is not directed to anyone under 16, and we do not knowingly collect personal
 				information from them. If you believe a child has given us information, contact us and we will
 				remove it.
+			</p>
+
+			<h2 id="child-safety" className="text-xl font-bold">Child sexual abuse and exploitation policy</h2>
+			<p>
+				We have a zero-tolerance policy toward child sexual abuse and exploitation (CSAE), including
+				child sexual abuse material (CSAM). Any content that sexualizes, exploits or endangers a minor,
+				including grooming, solicitation and sharing or requesting such material, is strictly prohibited
+				anywhere on the Service, whether public or private.
+			</p>
+			<p>
+				When we find or are told about this content, we remove it, permanently ban the accounts
+				involved, preserve the relevant information, and report it to the National Center for Missing
+				&amp; Exploited Children (NCMEC) and to law enforcement as required by law. We do not give
+				warnings for this kind of content.
+			</p>
+			<p>
+				To report it, use the report option on a post or profile, or email us at{' '}
+				<a href={`mailto:${CONTACT_EMAIL}`} className="text-lvartsmusic-accent underline">
+					{CONTACT_EMAIL}
+				</a>
+				. If a child is in immediate danger, contact your local emergency services first. You can also
+				report to NCMEC at report.cybertip.org or 1-800-843-5678.
 			</p>
 
 			<h2 className="text-xl font-bold">International users</h2>
