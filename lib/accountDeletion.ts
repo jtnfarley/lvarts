@@ -104,6 +104,18 @@ const deleteProfileAndContent = async (
         LEFT JOIN audiotracks atr ON atr.postid = p.id
         WHERE p.id = ANY(${postIds}::int[])
     `;
+    const extraRows = await tx.$queryRaw<{ filename: string; userdir: string | null }[]>`
+        SELECT pi.filename, ud.userdir
+        FROM postimages pi
+        JOIN usertoposts ut ON ut.postid = pi.postid
+          AND ut.id = (SELECT MIN(first.id) FROM usertoposts first WHERE first.postid = pi.postid)
+        JOIN userdetails ud ON ud.id = ut.userdetailsid
+        WHERE pi.postid = ANY(${postIds}::int[])
+    `;
+    for (const { filename, userdir } of extraRows) {
+        if (userdir) cleanup.files.push({ userdir, filename });
+    }
+
     for (const { postfile, coverartfile, azuracastid, userdir } of fileRows) {
         if (azuracastid !== null) cleanup.azuracastIds.push(azuracastid);
         if (!userdir) continue;

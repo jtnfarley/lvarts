@@ -2,6 +2,7 @@ import { after } from 'next/server';
 import { prisma } from '@/prisma';
 import { pushPostActivity } from '@/lib/push';
 import { notifyMentionedUsers } from '@/app/data/postMentions';
+import { parsePostFiles } from '@/lib/posts/postImages';
 
 // Trusted: saves a post for whichever author the caller names, with NO authorization.
 // Only server code that has already decided who the author is (the AI bots, the event
@@ -15,6 +16,7 @@ export const saveTrustedPost = async (postData:any) => {
         userdetailsid, 
         posttype, 
         postfile, 
+        postfiles,
         postfiletype, 
         isgalleryfile,
         parentPostId, 
@@ -33,6 +35,10 @@ export const saveTrustedPost = async (postData:any) => {
     } = postData
 
     let {venueid, eventid} = postData
+
+    // `postfiles` is the ordered image list from the post form. Bots and the importer
+    // still pass a single `postfile`.
+    const images = postfiles === undefined ? undefined : parsePostFiles(postfiles)
 
     const date = new Date()
     const createdat = date
@@ -71,8 +77,10 @@ export const saveTrustedPost = async (postData:any) => {
         }
     }
 
+    const cover: string | null | undefined = images ? images.cover : postfile
+
     let postfiletypeid;
-    if (postfile && postfiletype) {
+    if (cover && postfiletype) {
         postfiletypeid = await prisma.filetypes.findFirst({
             where:{
                 filetype: postfiletype
@@ -92,7 +100,7 @@ export const saveTrustedPost = async (postData:any) => {
         privatepost,
         eventid: (eventid) ? eventid : null,
         postfiletypeid: (postfiletypeid?.id) ? postfiletypeid.id : null,
-        postfile,
+        postfile: cover,
         isgalleryfile
     }
 
@@ -111,6 +119,16 @@ export const saveTrustedPost = async (postData:any) => {
     }
 
     if (post && post.id) {
+        // A new post with no extra images has nothing to write.
+        if (images && (id || images.extras.length)) {
+            await prisma.$transaction([
+                prisma.postimages.deleteMany({ where: { postid: post.id } }),
+                prisma.postimages.createMany({
+                    data: images.extras.map((filename, index) => ({ postid: post.id, filename, position: index + 1 })),
+                }),
+            ])
+        }
+
         await prisma.usertoposts.create({
             data: {
                 postid: post.id,

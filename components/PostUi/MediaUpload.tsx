@@ -6,7 +6,7 @@ import { BiSolidFilePlus } from "react-icons/bi";
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
-const MediaUpload = (props:{register:Function, setValue:Function, setTempImage:Function, saved:boolean}) => {
+const MediaUpload = (props:{register:Function, setValue:Function, setTempImages:(files: File[]) => void, saved:boolean}) => {
     const [fileIsSet, setFileIsSet] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const postfileRegister = props.register('postfileObj');
@@ -24,16 +24,19 @@ const MediaUpload = (props:{register:Function, setValue:Function, setTempImage:F
                     type="file"
                     className="hidden"
                     accept={ACCEPTED_IMAGE_TYPES.join(',')}
+                    multiple
                     onChange={(event) => {
-                        const file = event.target.files?.[0];
+                        const files = Array.from(event.target.files ?? []);
                         postfileRegister.onChange(event);
-                        props.setValue('postfileObj', file, { shouldValidate: true });
-                        props.setTempImage(file);
+                        props.setValue('postfileObj', files[0], { shouldValidate: true });
+                        props.setTempImages(files);
                         setFileIsSet(true)
+                        // Lets the same file be chosen again after it was removed.
+                        event.target.value = '';
                     }}
                 />
-                <button type="button" className="cursor-pointer" aria-label="Upload an image" onClick={() => fileInputRef.current?.click()}>
-                    <BiSolidFilePlus size={25} title="upload an image" />
+                <button type="button" className="cursor-pointer" aria-label="Upload images" onClick={() => fileInputRef.current?.click()}>
+                    <BiSolidFilePlus size={25} title="upload images" />
                 </button>
             </div>
             

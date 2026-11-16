@@ -18,6 +18,7 @@ import { useFileUpload } from "./hooks/useFileUpload";
 import { useVenueSearch } from "./hooks/useVenueSearch";
 import { useAIIfy } from "./hooks/useAIIfy";
 import PostTypeSelector from "./PostTypeSelector";
+import ImageStrip from "./ImageStrip";
 
 interface Props {
     savePost: Function,
@@ -106,7 +107,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
         defaultValues,
     });
 
-    const { tempFile, setTempFile, uploadError, setUploadError, setupTempFile, handleUpload } = useFileUpload(post, user, internalAddToRadio);
+    const { tempFile, images, addImages, removeImage, moveImage, clearFiles, uploadError, setUploadError, setupTempFile, handleUpload } = useFileUpload(post, user, internalAddToRadio);
 
     const { setVenueQuery, venueSuggestions, isVenueSearchOpen, setIsVenueSearchOpen, isVenueSearching, selectVenue, resetVenueSearch } =
         useVenueSearch(isScheduledPost, post?.venuename ?? '', setValue);
@@ -186,7 +187,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
 
         if (!post?.id) {
             setClearEditor(true);
-            setTempFile(undefined);
+            clearFiles();
         }
     };
 
@@ -247,13 +248,14 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                     />
                 }
 
-                {tempFile && (
+                {tempFile?.type.match(/audio/) && (
                     <div className="flex justify-center">
-                        {tempFile.type.match(/audio/)
-                            ? <audio src={tempFile.url} controls />
-                            : <img src={tempFile.url} />
-                        }
+                        <audio src={tempFile.url} controls />
                     </div>
+                )}
+
+                {activeType !== 'audio' && !tempFile && images.length > 0 && (
+                    <ImageStrip images={images} onRemove={removeImage} onMove={moveImage} />
                 )}
 
                 {uploadError && (
@@ -290,13 +292,13 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                             <div className="w-full flex items-center gap-3">
                                 <PostTypeSelector activeType={activeType} onChange={handleTypeChange} />
                                 {activeType !== 'audio' && (
-                                    <MediaUpload register={register} setValue={setValue} setTempImage={handleSetupTempFile} saved={saved} />
+                                    <MediaUpload register={register} setValue={setValue} setTempImages={addImages} saved={saved} />
                                 )}
                             </div>
                         ) : (
                             activeType !== 'audio' && (
                                 <div className="w-full flex gap-3">
-                                    <MediaUpload register={register} setValue={setValue} setTempImage={handleSetupTempFile} saved={saved} />
+                                    <MediaUpload register={register} setValue={setValue} setTempImages={addImages} saved={saved} />
                                     <AudioUploadLink />
                                     <AddEventLink />
                                 </div>

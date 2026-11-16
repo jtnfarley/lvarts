@@ -146,6 +146,7 @@ model posts {
   usertoposts                                        usertoposts[]
   postboosts                                         postboosts[]
   reports                                            reports[]
+  postimages                                         postimages[]
 
   @@index([postfile], map: "postfile_IX")
 }
@@ -313,6 +314,18 @@ model userstonotifications {
   notifications                                                       notifications @relation(fields: [notificationid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notificationFK")
   userdetails_userstonotifications_receiveruserdetailsidTouserdetails userdetails   @relation("userstonotifications_receiveruserdetailsidTouserdetails", fields: [receiveruserdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "receiverUserDetailsFK")
   userdetails_userstonotifications_senderuserdetailsidTouserdetails   userdetails   @relation("userstonotifications_senderuserdetailsidTouserdetails", fields: [senderuserdetailsid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "senderUserDetailsId")
+}
+
+// Images after the first on a post. The first image stays in posts.postfile, so everything
+// that reads a single image (gallery, cards, importer) keeps working. position starts at 1.
+model postimages {
+  id       Int    @id @default(autoincrement())
+  postid   Int
+  filename String @db.VarChar
+  position Int
+  posts    posts  @relation(fields: [postid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "postimages_postFK")
+
+  @@unique([postid, position], map: "postimages_post_position_unique")
 }
 
 model usertoposts {

@@ -31,6 +31,7 @@ export const buildAccountExport = async (userdetailsid: number) => {
                 include: {
                     posttypes: true,
                     audiotracks: true,
+                    postimages: { orderBy: { position: 'asc' } },
                     events: { include: { venues: true } },
                     commentstopost_commentstopost_commentpostidToposts: { select: { postid: true } },
                 },
@@ -98,6 +99,7 @@ export const buildAccountExport = async (userdetailsid: number) => {
             contentHtml: post.content,
             contentLexical: post.lexical,
             fileUrl: fileUrl(details.userdir, post.postfile),
+            extraImageUrls: post.postimages.map((image) => fileUrl(details.userdir, image.filename)),
             inGallery: post.isgalleryfile,
             repliedToPostId: post.commentstopost_commentstopost_commentpostidToposts[0]?.postid ?? null,
             event: post.events && {

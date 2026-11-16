@@ -36,6 +36,8 @@ export interface FeedRow {
         filetype: string | null
     }
     postfile: string | null
+    // Images after the first (postfile), in display order.
+    extrafiles: string[]
     likes: number | null
     parentPost?: {
         postid: number

@@ -74,6 +74,10 @@ const feedRowSelect = Prisma.sql`
             WHERE pb.postid = p.id AND ${activeBoostPredicate(Prisma.sql`pb`)}
         ) AS isboosted,
         p.postfile,
+        COALESCE(
+            (SELECT json_agg(pi.filename ORDER BY pi.position) FROM postimages pi WHERE pi.postid = p.id),
+            '[]'::json
+        ) AS extrafiles,
         json_build_object(
             'id', ud.id,
             'userid', ud.userid,
