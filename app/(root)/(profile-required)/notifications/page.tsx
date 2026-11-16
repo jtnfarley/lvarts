@@ -1,8 +1,11 @@
 import NotificationsFeed from "@/components/NotificationsFeed";
 import Notification from '@/lib/models/notification';
 import type { Metadata } from 'next';
-import {currentUser} from "@/app/data/currentUser";
+import {currentUser, isLoggedIn} from "@/app/data/currentUser";
 import { prisma } from "@/prisma";
+
+// Always render fresh so a cached copy of the list never replaces new notifications.
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Notifications - Lehigh Vally Arts & Music',
@@ -26,21 +29,22 @@ const getNotifications = async (userdetailsid:number):Promise<Notification[]> =>
 	return notifications
 }
 
-const updateNotis = async (notis:Notification[] | undefined) => {
+const markNotificationsRead = async (notificationIds:number[]) => {
 	'use server'
 
-    if (notis && notis.length) {
-        notis.forEach(async noti => {
-            await prisma.notifications.update({
-                where: {
-                    id: noti.notiid
-                },
-                data: {
-                    read: true
-                }
-            })
-        })
-    }
+	const user = await isLoggedIn();
+	const userdetailsid = user?.userdetails?.id;
+	if (!userdetailsid || !notificationIds.length) return;
+
+	// Only the session user's own notifications can be marked, whatever ids the browser sends.
+	await prisma.notifications.updateMany({
+		where: {
+			id: { in: notificationIds },
+			read: false,
+			userstonotifications: { some: { receiveruserdetailsid: userdetailsid } },
+		},
+		data: { read: true },
+	})
 }
 
 export default async function Notifications() {
@@ -52,7 +56,7 @@ export default async function Notifications() {
 
 	return (
 		<div>
-			<NotificationsFeed user={user} notis={notis} updateNotis={updateNotis} />
+			<NotificationsFeed user={user} notis={notis} markNotificationsRead={markNotificationsRead} />
 		</div>
 	);
 }

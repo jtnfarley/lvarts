@@ -1,11 +1,17 @@
 import Link from "next/link"
 import User from "@/lib/models/user";
 import { prisma } from "@/prisma";
+import { isLoggedIn } from "@/app/data/currentUser";
 import { BiSolidArrowToRight } from "react-icons/bi";
 import NavClient from "./NavClient";
 
-const hasNewNotifications = async (userdetailsid:number):Promise<boolean> => {
+const hasNewNotifications = async ():Promise<boolean> => {
 	'use server'
+
+	// Public endpoint: the user comes from the session, never from an argument.
+	const user = await isLoggedIn();
+	const userdetailsid = user?.userdetails?.id;
+	if (!userdetailsid) return false;
 
 	const notifications = await prisma.$queryRaw<Array<{ count: string }>>`
 		select count(n.id) from notifications n
@@ -24,7 +30,7 @@ export default async function Nav(props: {user?:User, shade?:string, theme?:'lva
 	let hasNotis = false;
 
 	if (user && user.userdetails) {
-		hasNotis = await hasNewNotifications(user.userdetails.id);
+		hasNotis = await hasNewNotifications();
 	}
 
 	return (

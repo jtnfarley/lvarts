@@ -22,15 +22,23 @@ export default function NavClient(props: {user?:User, hasNotis:boolean, hasNewNo
 	const pathname = usePathname();
 
 	const checkNotis = async () => {
-		const newNotis = await hasNewNotifications(user?.id);
+		if (document.hidden) return;
+
+		const newNotis = await hasNewNotifications();
 		setHasNotis(newNotis);
 	}
 
 	useEffect(() => {
+		const clearDot = () => setHasNotis(false);
 		const interval = setInterval(checkNotis, 60000)
+
+		window.addEventListener('notificationsRead', clearDot)
+		document.addEventListener('visibilitychange', checkNotis)
 
 		return () => {
 			clearInterval(interval);
+			window.removeEventListener('notificationsRead', clearDot)
+			document.removeEventListener('visibilitychange', checkNotis)
 		}
 	}, [])
 

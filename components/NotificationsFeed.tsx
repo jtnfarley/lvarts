@@ -7,15 +7,19 @@ import Link from 'next/link';
 import imageUrl from '@/constants/imageUrl';
 import Avatar from '@/components/shared/Avatar';
 
-export default function NotificationsFeed(props:{user:User, notis:Notification[], updateNotis:Function}) {
-	const { user, updateNotis } = props;
-	const [notis, setNotis] = useState<Array<Notification>>(props.notis);
+export default function NotificationsFeed(props:{user:User, notis:Notification[], markNotificationsRead:(notificationIds:number[]) => Promise<void>}) {
+	const { user, markNotificationsRead } = props;
+	const [notis] = useState<Array<Notification>>(props.notis);
 
+	// Mark as read when the list is shown. The cards keep their "new" highlight from the initial data.
 	useEffect(() => {
-		return () => {
-			updateNotis(notis);
+		const markRead = async () => {
+			await markNotificationsRead(notis.flatMap(noti => (!noti.read && noti.notiid !== undefined) ? [noti.notiid] : []));
+			window.dispatchEvent(new Event('notificationsRead'));
 		}
-	})
+
+		markRead().catch(error => console.error('Could not mark notifications as read', error));
+	}, [])
 
 	return (
         <div className='flex flex-col gap-5'>
