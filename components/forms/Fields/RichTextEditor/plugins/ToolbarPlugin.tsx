@@ -2,7 +2,7 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import { LOW_PRIORITY, RICH_TEXT_OPTIONS, RichTextAction } from "../constants";
 import { $getSelection, $isRangeSelection, FORMAT_ELEMENT_COMMAND, FORMAT_TEXT_COMMAND, SELECTION_CHANGE_COMMAND } from 'lexical';
 import {INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, REMOVE_LIST_COMMAND, $insertList, $removeList} from '@lexical/list'
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import {mergeRegister} from '@lexical/utils';
 import { MapToolbarPlugin } from './MapPlugin';
 import { EmojiToolbarPlugin } from './EmojiPlugin';
@@ -11,7 +11,7 @@ function Divider(props:{key:string}) {
   return <div className="divider border border-right"/>;
 }
 
-export default function ToolbarPlugin() {
+export default function ToolbarPlugin({ extras }: { extras?: ReactNode }) {
     const [editor] = useLexicalComposerContext();
 
     const [selectionMap, setSelectionMap] = useState<{[id:string]:boolean}>({});
@@ -104,6 +104,7 @@ export default function ToolbarPlugin() {
             <MapToolbarPlugin/>
             <Divider key={'emojiDiv'}/>
             <EmojiToolbarPlugin/>
+            {extras && <div className="ml-auto flex items-center gap-2 pe-2">{extras}</div>}
         </div>
     )
 }

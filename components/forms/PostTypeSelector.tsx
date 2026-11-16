@@ -4,14 +4,14 @@ import { BiSolidFilePlus, BiSolidMusic, BiCalendarPlus, BiBookOpen } from 'react
 
 const types = [
     { type: 'post',  label: 'Post',  Icon: BiSolidFilePlus },
-    { type: 'audio', label: 'Audio', Icon: BiSolidMusic },
     { type: 'event', label: 'Event', Icon: BiCalendarPlus },
+    { type: 'audio', label: 'Audio', Icon: BiSolidMusic },
     { type: 'zine',  label: 'Zine',  Icon: BiBookOpen },
 ]
 
 export default function PostTypeSelector({ activeType, onChange }: { activeType: string, onChange: (type: string) => void }) {
     return (
-        <div className="flex rounded-lg border border-[var(--lvartsmusic-border)] p-0.5 gap-0.5">
+        <div className="flex p-0.5 gap-0.5">
             {types.map(({ type, label, Icon }) => (
                 <button
                     key={type}

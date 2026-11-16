@@ -60,7 +60,8 @@ export default function RTEditor(props:{
 	onChange: (html:object) => void,
 	clearEditor:boolean,
 	content?:InitialEditorStateType | undefined,
-	currentUserDetailsId: number
+	currentUserDetailsId: number,
+	toolbarExtras?: React.ReactNode
 }) {
 	const initialConfig:InitialConfigType = {
 		namespace: 'MyEditor',
@@ -73,7 +74,7 @@ export default function RTEditor(props:{
 	return <div>
 		<LexicalComposer initialConfig={initialConfig}>
 			<div className="editor-container">
-				<ToolbarPlugin />
+				<ToolbarPlugin extras={props.toolbarExtras} />
 				<div className="editor-inner">
 					<EditorRefPlugin editorRef={props.ref} />
 					<RichTextPlugin

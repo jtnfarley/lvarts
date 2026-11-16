@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from "react";
-import { BiSolidFilePlus } from "react-icons/bi";
+import { BiSolidImageAdd } from "react-icons/bi";
 
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -36,7 +36,7 @@ const MediaUpload = (props:{register:Function, setValue:Function, setTempImages:
                     }}
                 />
                 <button type="button" className="cursor-pointer" aria-label="Upload images" onClick={() => fileInputRef.current?.click()}>
-                    <BiSolidFilePlus size={25} title="upload images" />
+                    <BiSolidImageAdd size={25} title="upload images" />
                 </button>
             </div>
             

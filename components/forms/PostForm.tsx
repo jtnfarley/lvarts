@@ -19,6 +19,7 @@ import { useVenueSearch } from "./hooks/useVenueSearch";
 import { useAIIfy } from "./hooks/useAIIfy";
 import PostTypeSelector from "./PostTypeSelector";
 import ImageStrip from "./ImageStrip";
+import { BiSolidMagicWand } from "react-icons/bi";
 
 interface Props {
     savePost: Function,
@@ -212,6 +213,48 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
         }
     };
 
+    const aiIfyControls = (
+        <>
+            {isAIIfied && (
+                <button onClick={() => resetPost(editorRef)} type='button' className="bg-white border border-gray-500 px-2.5 py-0.5 rounded-full text-gray-500 uppercase font-semibold cursor-pointer text-xs">
+                    Reset
+                </button>
+            )}
+            <div className="relative">
+                {showTones && (
+                    <>
+                        <div className="fixed inset-0 z-10" aria-hidden="true" onClick={() => setShowTones(false)} onKeyDown={(e) => e.key === 'Escape' && setShowTones(false)} />
+                        <div className="absolute top-full mt-2 right-0 z-20 bg-white border border-gray-200 rounded-xl shadow-lg p-3 w-82 max-w-[calc(100vw-3rem)]">
+                            <div className="text-xs font-semibold text-gray-400 uppercase mb-2">Pick a tone</div>
+                            <div className="flex flex-wrap gap-2">
+                                {boringAdjectives?.map((adjective) => (
+                                    <button
+                                        key={adjective}
+                                        type="button"
+                                        onClick={() => aiIfy(editorRef, adjective)}
+                                        className="px-3 py-1 rounded-full bg-gray-100 hover:bg-orange hover:text-white text-sm font-medium text-gray-700 transition-colors capitalize cursor-pointer"
+                                    >
+                                        {adjective}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                )}
+                <button
+                    onClick={() => setShowTones(!showTones)}
+                    type='button'
+                    className="flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:text-orange cursor-pointer disabled:opacity-50"
+                    disabled={isSaving}
+                    aria-label="AI-ify your post"
+                    title="AI-ify"
+                >
+                    <BiSolidMagicWand size={20} />
+                </button>
+            </div>
+        </>
+    );
+
     return (
         <form onSubmit={handleSubmit(onSubmit, (errors) => console.log('Zod validation errors:', errors))}>
             <div>
@@ -243,6 +286,7 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                                 clearEditor={clearEditor}
                                 content={post?.lexical ?? ""}
                                 currentUserDetailsId={user?.userdetails?.id || 0}
+                                toolbarExtras={aiIfyControls}
                             />
                         )}
                     />
@@ -286,71 +330,36 @@ const PostForm = ({ user, edited, savePost, post, onAudioFileSelected, addToRadi
                     </>
                 )}
 
-                <div className="mt-2 flex flex-col sm:flex-row p-4 gap-2">
-                    <div className="w-full sm:w-auto sm:flex-1">
-                        {allowTypeSwitch ? (
-                            <div className="w-full flex items-center gap-3">
-                                <PostTypeSelector activeType={activeType} onChange={handleTypeChange} />
-                                {activeType !== 'audio' && (
-                                    <MediaUpload register={register} setValue={setValue} setTempImages={addImages} saved={saved} />
+                {allowTypeSwitch && (
+                    <div className="mt-2 px-4 flex items-center gap-2">
+                        <span className="text-xs font-medium text-gray-500 whitespace-nowrap">Post Type:</span>
+                        <PostTypeSelector activeType={activeType} onChange={handleTypeChange} />
+                    </div>
+                )}
+
+                <div className={`${allowTypeSwitch ? '' : 'mt-2 '}flex items-center p-4 gap-2`}>
+                    <div className="flex-1 min-w-0">
+                        {activeType !== 'audio' && (
+                            <div className="flex gap-3">
+                                <MediaUpload register={register} setValue={setValue} setTempImages={addImages} saved={saved} />
+                                {!allowTypeSwitch && (
+                                    <>
+                                        <AudioUploadLink />
+                                        <AddEventLink />
+                                    </>
                                 )}
                             </div>
-                        ) : (
-                            activeType !== 'audio' && (
-                                <div className="w-full flex gap-3">
-                                    <MediaUpload register={register} setValue={setValue} setTempImages={addImages} saved={saved} />
-                                    <AudioUploadLink />
-                                    <AddEventLink />
-                                </div>
-                            )
                         )}
                     </div>
-                    <div className="w-full flex justify-end sm:w-auto sm:shrink-0">
+                    <div className="flex items-center shrink-0">
                         {isSaving && <div className="me-2"><Spinner /></div>}
 
                         {saved && (
-                            <div className="me-2 bg-green-200 text-xs font-semibold uppercase text-green-700 border-1 border-green-700 px-2 py-1 my-2 rounded-sm"
+                            <div className="me-2 bg-green-200 text-xs font-semibold uppercase text-green-700 border-1 border-green-700 px-2 py-1 rounded-sm"
                                 style={{ opacity: 0, animation: 'fade-in-out 3s ease-in-out' }}>
                                 {activeType === 'zine' ? 'Submitted for review' : 'Post Saved'}
                             </div>
                         )}
-
-                        {isAIIfied && (
-                            <button onClick={() => resetPost(editorRef)} type='button' className="me-2 bg-white border border-gray-500 px-3.5 py-1.5 rounded-full text-gray-500 uppercase font-semibold cursor-pointer disabled:bg-orange-200 text-sm">
-                                Reset
-                            </button>
-                        )}
-
-                        <div className="relative me-2">
-                            {showTones && (
-                                <>
-                                    <div className="fixed inset-0 z-10" aria-hidden="true" onClick={() => setShowTones(false)} onKeyDown={(e) => e.key === 'Escape' && setShowTones(false)} />
-                                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-20 bg-white border border-gray-200 rounded-xl shadow-lg p-3 w-82">
-                                        <div className="text-xs font-semibold text-gray-400 uppercase mb-2">Pick a tone</div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {boringAdjectives?.map((adjective) => (
-                                                <button
-                                                    key={adjective}
-                                                    type="button"
-                                                    onClick={() => aiIfy(editorRef, adjective)}
-                                                    className="px-3 py-1 rounded-full bg-gray-100 hover:bg-orange hover:text-white text-sm font-medium text-gray-700 transition-colors capitalize cursor-pointer"
-                                                >
-                                                    {adjective}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                            <button
-                                onClick={() => setShowTones(!showTones)}
-                                type='button'
-                                className="bg-white border border-gray-500 px-3.5 py-1.5 rounded-full text-gray-500 uppercase font-semibold cursor-pointer disabled:bg-orange-200 text-sm"
-                                disabled={isSaving}
-                            >
-                                AI-ify
-                            </button>
-                        </div>
 
                         <button type='submit' className="bg-orange px-3.5 py-1.5 rounded-full text-white uppercase font-semibold cursor-pointer disabled:bg-orange-200 text-sm" disabled={isSaving}>
                             Post
