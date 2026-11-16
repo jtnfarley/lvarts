@@ -16,6 +16,7 @@ export default async function Home() {
 
 	if (!user) redirect('/');
 
+	const fetchedAt = new Date(); // taken before the query so the client's catch-up poll can't miss a post
 	const feed = await getFeedRow(user.userdetails!, 0, undefined, true);
 
 	const googleMapsApiKey = process.env.GOOGLE_MAPS; //has to be handled on the server
@@ -30,7 +31,7 @@ export default async function Home() {
 				<AddPostForm user={user} posttype='post' edited={false} savePost={savePost} />
 			</div>
 			<div>
-				<Feed feed={feed} user={user} getFeedRow={getFeedRow} googleMapsApiKey={googleMapsApiKey}/>
+				<Feed feed={feed} fetchedAt={fetchedAt} user={user} getFeedRow={getFeedRow} googleMapsApiKey={googleMapsApiKey}/>
 			</div>
 		</div>
 	);
