@@ -4,7 +4,7 @@ import path from 'node:path';
 import { describe, it } from 'node:test';
 import { toEasternIso } from '../eastern';
 import { cleanTitle } from '../titles';
-import { createInkwellAdapter, normalizeTitle, parseVariantStart } from './inkwell';
+import { createInkwellAdapter, normalizeTitle, parseDescriptionStarts, parseVariantStart } from './inkwell';
 
 const fixtureJson = readFileSync(path.join(__dirname, '..', '__fixtures__', 'inkwell-products.json'), 'utf8');
 const NOW = new Date('2026-11-11T15:00:00Z');
@@ -35,6 +35,36 @@ describe('parseVariantStart', () => {
 	it('returns null for variants without a date', () => {
 		assert.equal(parseVariantStart('Default Title', NOW), null);
 		assert.equal(parseVariantStart('General Admission', NOW), null);
+	});
+});
+
+describe('parseDescriptionStarts', () => {
+	const starts = (text: string): string[] => parseDescriptionStarts(text, NOW).starts.map((parsed) => toEasternIso(parsed.startsAt));
+
+	it('prefers the show time over doors', () => {
+		assert.deepEqual(starts('Friday, November 13, 2026 | Doors: 6:30 PM | Music: 7 PM | Advance: $15'), ['2026-11-13T19:00:00-05:00']);
+		assert.deepEqual(starts('Friday, November 20, 2026 • Show at 8 PM'), ['2026-11-20T20:00:00-05:00']);
+	});
+
+	it('falls back to doors when it is the only time', () => {
+		assert.deepEqual(starts('Saturday, November 28, 2026 | Doors: 6:30 PM'), ['2026-11-28T18:30:00-05:00']);
+	});
+
+	it('finds the time on a later line when the first mention has none, and assumes the year', () => {
+		const text = 'Join us Sunday, November 22, for a morning of movement. SUNDAY, NOVEMBER 22 Workout: 8:15 AM Community 5K: 9 AM';
+		const parsed = parseDescriptionStarts(text, NOW);
+		assert.deepEqual(parsed.starts.map((entry) => toEasternIso(entry.startsAt)), ['2026-11-22T08:15:00-05:00']);
+		assert.equal(parsed.starts[0].yearAssumed, true);
+	});
+
+	it('ignores dates without a weekday, ranges and deadlines', () => {
+		assert.deepEqual(starts('On November 13 at 7 PM. Returns February 19-21, 2027. Submissions open through November 30, 2026.'), []);
+	});
+
+	it('rejects a weekday that does not match the date', () => {
+		const parsed = parseDescriptionStarts('Tuesday, November 25 at 7 PM', NOW);
+		assert.deepEqual(parsed.starts, []);
+		assert.deepEqual(parsed.mismatches, ['Tuesday, November 25']);
 	});
 });
 
@@ -72,15 +102,45 @@ describe('inkwell adapter', () => {
 	});
 
 	it('keeps separate products at the same time as separate events', async () => {
-		const items = await listing;
-		const urls = new Set(items.filter((item) => toEasternIso(item.startsAt).startsWith('2026-11-25T19:00')).map((item) => item.sourceUrl));
-		assert.equal(urls.size, 2);
+		const product = (handle: string) => ({
+			title: handle,
+			handle,
+			body_html: null,
+			images: [],
+			variants: [{ title: 'November 25, 2026 07:00 PM / General Admission' }],
+		});
+		const same = JSON.stringify({ products: [product('one'), product('two')] });
+		const items = await createInkwellAdapter(() => NOW).fetchListing(async () => same, () => {});
+		assert.equal(new Set(items.map((item) => item.sourceUrl)).size, 2);
 	});
 
-	it('skips products with no dated variant and says so', async () => {
+	it('uses the description date when no variant has one', async () => {
 		const items = await listing;
-		assert.ok(!items.some((item) => item.sourceUrl.endsWith('/louder-all-female-fronted-rock-showcase')));
-		assert.ok(notes.some((note) => note.includes('louder-all-female-fronted-rock-showcase')));
+		const startOf = (handle: string) => items.filter((item) => item.sourceUrl.endsWith(`/${handle}`)).map((item) => toEasternIso(item.startsAt));
+		assert.deepEqual(startOf('friday-the-13th-live-at-inkwell'), ['2026-11-13T19:00:00-05:00']);
+		assert.deepEqual(startOf('albert-davis-friends-live-at-inkwell'), ['2026-11-20T20:00:00-05:00']);
+		assert.deepEqual(startOf('louder-all-female-fronted-rock-showcase'), ['2026-11-28T19:00:00-05:00']);
+		assert.deepEqual(startOf('inkwell-s-2nd-annual-fit-friendsgiving'), ['2026-11-22T08:15:00-05:00']);
+	});
+
+	it('trusts the description over a lone variant date that disagrees with it', async () => {
+		const items = await listing;
+		const zumba = items.filter((item) => item.sourceUrl.endsWith('/inkwell-ness-presents-zumba-masterclass-miami-heat-edition'));
+		assert.deepEqual(zumba.map((item) => toEasternIso(item.startsAt)), ['2026-11-24T19:00:00-05:00']);
+		assert.ok(notes.some((note) => note.includes('zumba') && note.includes('disagrees')));
+	});
+
+	it('keeps variant dates when a series mentions only one of them in the description', async () => {
+		const items = await listing;
+		assert.equal(items.filter((item) => item.sourceUrl.endsWith('/brew-ha-ha-comedy-over-coffee-4')).length, 3);
+	});
+
+	it('skips recurring series and sign-up pages and says so', async () => {
+		const items = await listing;
+		for (const handle of ['the-creative-collective-a-mixed-media-open-mic-1', 'dopamine-caffeine-mellow-dj-sets-over-coffee', 'inkwell-run-club-5k-sunday', 'allentown-comedy-festival-comedian-submissions']) {
+			assert.ok(!items.some((item) => item.sourceUrl.endsWith(`/${handle}`)), handle);
+			assert.ok(notes.some((note) => note.includes(handle) && note.includes('skipped')), handle);
+		}
 	});
 
 	it('serves details from the listing without another request', async () => {
