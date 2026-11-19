@@ -8,7 +8,6 @@ export type RoundupCoverProps = {
 	headline: string;
 	dateLabel: string;
 	shownCount: number;
-	moreCount: number;
 	logoUrl: string;
 };
 
@@ -39,7 +38,7 @@ function WeekdayStamp({ dateLabel }: Pick<RoundupCoverProps, 'dateLabel'>) {
 	);
 }
 
-export function RoundupCover({ kind, headline, dateLabel, shownCount, moreCount, logoUrl }: RoundupCoverProps) {
+export function RoundupCover({ kind, headline, dateLabel, shownCount, logoUrl }: RoundupCoverProps) {
 	return (
 		<div
 			style={{
@@ -68,11 +67,6 @@ export function RoundupCover({ kind, headline, dateLabel, shownCount, moreCount,
 				<div style={{ display: 'flex', fontFamily: fonts.body, fontSize: 36, fontWeight: 700, color: colors.ink }}>
 					{`${countLine(shownCount)} · swipe >`}
 				</div>
-				{moreCount > 0 && (
-					<div style={{ display: 'flex', fontFamily: fonts.body, fontSize: 30, color: colors.ink, marginTop: 10 }}>
-						{`+ ${moreCount} more at ${theme.siteName}`}
-					</div>
-				)}
 			</div>
 		</div>
 	);

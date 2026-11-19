@@ -72,7 +72,6 @@ export const renderCoverForRoundup = async (roundup: Roundup): Promise<Buffer> =
 			headline: roundup.headline,
 			dateLabel: roundup.dateLabel,
 			shownCount: roundup.events.length,
-			moreCount: roundup.moreCount,
 			logoUrl: await getCoverLogoUrl(),
 		}),
 	);

@@ -47,8 +47,8 @@ const buildEventFixtures = async (): Promise<Record<string, CardEvent>> => ({
 });
 
 const covers = [
-	{ name: 'daily', window: resolveWindow({ preset: 'today', date: '2026-10-22' }), shownCount: 6, moreCount: 0 },
-	{ name: 'weekend', window: resolveWindow({ preset: 'weekend', date: '2026-10-22' }), shownCount: 9, moreCount: 4 },
+	{ name: 'daily', window: resolveWindow({ preset: 'today', date: '2026-10-22' }), shownCount: 6 },
+	{ name: 'weekend', window: resolveWindow({ preset: 'weekend', date: '2026-10-22' }), shownCount: 13 },
 ];
 
 const main = async () => {
@@ -58,8 +58,8 @@ const main = async () => {
 	for (const [name, event] of Object.entries(eventFixtures)) {
 		await writeFile(path.join(outputDir, `event-${name}.jpg`), await renderCardForEvent(event));
 	}
-	for (const { name, window, shownCount, moreCount } of covers) {
-		const jpeg = await renderCoverForRoundup({ ...window, events: Array(shownCount).fill(base), skipped: [], moreCount });
+	for (const { name, window, shownCount } of covers) {
+		const jpeg = await renderCoverForRoundup({ ...window, events: Array(shownCount).fill(base), skipped: [] });
 		await writeFile(path.join(outputDir, `cover-${name}.jpg`), jpeg);
 	}
 

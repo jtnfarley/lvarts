@@ -20,5 +20,4 @@ export const theme = {
 	coverLogoAspect: 423 / 296,
 	siteName: 'lvartandmusic.com',
 	jpegQuality: 90,
-	maxRoundupEvents: 9,
 } as const;
