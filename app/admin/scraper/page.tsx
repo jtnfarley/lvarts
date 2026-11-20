@@ -189,13 +189,27 @@ async function SourceSection({ source, runs, selectedPath }: { source: Source; r
 		[snapshot, diff] = await Promise.all([readSnapshot(selected.snapshotPath), readDiff(selected.diffPath)]);
 	}
 
+	const latestRun = sourceRuns[0];
+	const latestGoodRun = sourceRuns.find((run) => !run.failed);
+
 	return (
 		<details open={sourceRuns.some((run) => run.snapshotPath === selectedPath)} className="group rounded border">
-			{/* Stays open after "View" on one of this source's runs, which reloads the page. */}
+	{/* Stays open after "View" on one of this source's runs, which reloads the page. */}
 			<summary className="flex cursor-pointer items-center justify-between gap-3 p-3">
 				<h2 className="text-xl">
 					<span className="inline-block transition-transform group-open:rotate-90">▸</span> {source.displayName}
 				</h2>
+				<div className="ml-auto flex items-center gap-2 text-sm">
+					{latestRun && isBadRun(latestRun) && <Badge tone="red">Last run failed</Badge>}
+					{latestGoodRun && (
+						<>
+							<span className={latestGoodRun.newCount > 0 ? 'font-semibold' : 'opacity-60'}>
+								{latestGoodRun.newCount > 0 ? `${latestGoodRun.newCount} new` : 'No new events'}
+							</span>
+							<span className="text-xs opacity-60">{formatWhen(latestGoodRun.startedAt)}</span>
+						</>
+					)}
+				</div>
 				<form action={runSourceNow.bind(null, source.key)}>
 					<button type="submit" className="rounded border px-3 py-1.5 text-sm">
 						Run {source.displayName} now
