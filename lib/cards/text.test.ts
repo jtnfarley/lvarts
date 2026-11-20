@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
+	cleanCoverTitle,
 	cleanText,
+	COVER_TITLE_MAX_LENGTH,
+	coverHeadlineSize,
 	easternWallTimeToDate,
 	formatDateLine,
 	stripEmoji,
@@ -88,5 +91,28 @@ describe('easternWallTimeToDate', () => {
 	it('is DST-aware', () => {
 		assert.equal(easternWallTimeToDate(2026, 10, 31).toISOString(), '2026-10-31T04:00:00.000Z');
 		assert.equal(easternWallTimeToDate(2026, 11, 8).toISOString(), '2026-11-08T05:00:00.000Z');
+	});
+});
+
+describe('cleanCoverTitle', () => {
+	it('falls back to the default when blank or emoji-only', () => {
+		assert.equal(cleanCoverTitle(undefined), undefined);
+		assert.equal(cleanCoverTitle('   '), undefined);
+		assert.equal(cleanCoverTitle('🎉🎷'), undefined);
+	});
+
+	it('strips emoji and caps the length', () => {
+		assert.equal(cleanCoverTitle('Jazz 🎷 Week'), 'Jazz Week');
+		const long = cleanCoverTitle('word '.repeat(40));
+		assert.ok(long && long.length <= COVER_TITLE_MAX_LENGTH);
+	});
+});
+
+describe('coverHeadlineSize', () => {
+	it('shrinks as the headline grows', () => {
+		assert.equal(coverHeadlineSize('Jazz Week'), 127);
+		assert.equal(coverHeadlineSize('This Weekend in the Valley'), 127);
+		assert.equal(coverHeadlineSize('A Month of Local Music and Art'), 100);
+		assert.equal(coverHeadlineSize('x'.repeat(60)), 80);
 	});
 });

@@ -3,11 +3,11 @@ import { notFound } from 'next/navigation';
 import { isAdmin } from '@/lib/auth/isAdmin';
 import { getRoundup } from '@/lib/cards/getRoundup';
 import { addDays, easternToday, formatDay, InvalidRoundupInput, RoundupOptions } from '@/lib/cards/roundupWindow';
-import { formatDateLine } from '@/lib/cards/text';
+import { COVER_TITLE_MAX_LENGTH, formatDateLine } from '@/lib/cards/text';
 
 export const dynamic = 'force-dynamic';
 
-type SearchParams = Promise<{ view?: string; start?: string; end?: string }>;
+type SearchParams = Promise<{ view?: string; start?: string; end?: string; title?: string }>;
 
 const VIEWS = [
 	{ key: 'today', label: 'Today' },
@@ -15,11 +15,17 @@ const VIEWS = [
 	{ key: 'weekend', label: 'This Weekend' },
 ] as const;
 
-const optionsFor = ({ view, start, end }: Awaited<SearchParams>): RoundupOptions => {
-	if (view === 'custom') return { start, end };
-	if (view === 'tomorrow') return { preset: 'today', date: formatDay(addDays(easternToday(), 1)) };
-	if (view === 'weekend') return { preset: 'weekend' };
-	return { preset: 'today' };
+const optionsFor = ({ view, start, end, title }: Awaited<SearchParams>): RoundupOptions => {
+	if (view === 'custom') return { start, end, title };
+	if (view === 'tomorrow') return { preset: 'today', date: formatDay(addDays(easternToday(), 1)), title };
+	if (view === 'weekend') return { preset: 'weekend', title };
+	return { preset: 'today', title };
+};
+
+const viewQuery = (view: string, title: string | undefined): string => {
+	const params = new URLSearchParams({ view });
+	if (title) params.set('title', title);
+	return params.toString();
 };
 
 const coverQuery = (options: RoundupOptions): string => {
@@ -65,12 +71,13 @@ export default async function CardsPreviewPage({ searchParams }: { searchParams:
 
 			<div className="flex flex-wrap items-end gap-3">
 				{VIEWS.map(({ key, label }) => (
-					<Link key={key} href={`/admin/cards?view=${key}`} className={`rounded border px-3 py-1 ${view === key ? 'font-bold' : ''}`}>
+					<Link key={key} href={`/admin/cards?${viewQuery(key, query.title)}`} className={`rounded border px-3 py-1 ${view === key ? 'font-bold' : ''}`}>
 						{label}
 					</Link>
 				))}
 				<form className="flex flex-wrap items-end gap-2" action="/admin/cards">
 					<input type="hidden" name="view" value="custom" />
+					{query.title && <input type="hidden" name="title" value={query.title} />}
 					<label className="flex flex-col text-sm">
 						Start
 						<input type="date" name="start" defaultValue={query.start} required className="rounded border px-2 py-1" />
@@ -85,7 +92,24 @@ export default async function CardsPreviewPage({ searchParams }: { searchParams:
 				</form>
 			</div>
 
-			{inputError && <p role="alert">{inputError}</p>}
+			<form action="/admin/cards" className="flex flex-wrap items-end gap-2">
+				<input type="hidden" name="view" value={view} />
+				{query.start && <input type="hidden" name="start" value={query.start} />}
+				{query.end && <input type="hidden" name="end" value={query.end} />}
+				<label className="flex flex-col text-sm">
+					Cover title (blank for the default)
+					<input
+						type="text"
+						name="title"
+						defaultValue={query.title}
+						maxLength={COVER_TITLE_MAX_LENGTH}
+						className="w-80 rounded border px-2 py-1"
+					/>
+				</label>
+				<button type="submit" className="rounded border px-3 py-1">Apply title</button>
+			</form>
+
+			{inputError &&<p role="alert">{inputError}</p>}
 
 			{roundup && (
 				<>

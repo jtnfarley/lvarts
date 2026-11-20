@@ -64,6 +64,24 @@ export const titleStyle = (title: string, hasImage: boolean): TitleStyle => {
 	return { text, fontSize: hasImage ? tier.withImage : tier.withoutImage };
 };
 
+export const COVER_TITLE_MAX_LENGTH = 60;
+
+// Blank (or emoji-only) input means "use the default headline".
+export const cleanCoverTitle = (raw: string | undefined): string | undefined => {
+	const cleaned = truncate(cleanText(raw ?? ''), COVER_TITLE_MAX_LENGTH);
+	return cleaned || undefined;
+};
+
+const COVER_HEADLINE_TIERS = [
+	{ maxLength: 26, fontSize: 127 },
+	{ maxLength: 42, fontSize: 100 },
+	{ maxLength: Infinity, fontSize: 80 },
+];
+
+// Satori can't measure text, so the cover headline size is picked from the character count.
+export const coverHeadlineSize = (headline: string): number =>
+	(COVER_HEADLINE_TIERS.find((tier) => headline.length <= tier.maxLength) ?? COVER_HEADLINE_TIERS[2]).fontSize;
+
 type EasternParts = {
 	year: number;
 	month: number;

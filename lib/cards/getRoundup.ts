@@ -1,4 +1,5 @@
 import { CardEvent, getCardEventsBetween } from './getCardEvent';
+import { cleanCoverTitle } from './text';
 import { resolveWindow, RoundupOptions, RoundupWindow } from './roundupWindow';
 
 export type SkippedEvent = { id: number; title?: string; reason: string };
@@ -19,5 +20,5 @@ export const getRoundup = async (options: RoundupOptions): Promise<Roundup> => {
 		else skipped.push({ id: result.id, title: result.title, reason: result.reason });
 	}
 
-	return { ...window, events: renderable, skipped };
+	return { ...window, headline: cleanCoverTitle(options.title) ?? window.headline, events: renderable, skipped };
 };

@@ -5,6 +5,8 @@ export type RoundupOptions = {
 	date?: string;
 	start?: string;
 	end?: string;
+	// Replaces the default cover headline; never stored.
+	title?: string;
 };
 
 export type RoundupKind = 'daily' | 'weekend' | 'custom';

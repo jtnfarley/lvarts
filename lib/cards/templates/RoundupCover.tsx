@@ -1,4 +1,5 @@
 import type { RoundupKind } from '../roundupWindow';
+import { coverHeadlineSize } from '../text';
 import { theme } from '../theme';
 
 const { colors, fonts, margin } = theme;
@@ -56,7 +57,7 @@ export function RoundupCover({ kind, headline, dateLabel, shownCount, logoUrl }:
 				{kind === 'daily' && <WeekdayStamp dateLabel={dateLabel} />}
 			</div>
 			<div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'center' }}>
-				<div style={{ display: 'flex', fontFamily: fonts.cover, fontSize: 127, lineHeight: 1.05, color: colors.paper }}>
+				<div style={{ display: 'flex', fontFamily: fonts.cover, fontSize: coverHeadlineSize(headline), lineHeight: 1.05, color: colors.paper }}>
 					{headline}
 				</div>
 				<div style={{ display: 'flex', fontFamily: fonts.body, fontSize: 58, fontWeight: 700, color: colors.ink, marginTop: 36 }}>
