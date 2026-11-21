@@ -5,6 +5,7 @@ import { Prisma } from '@prisma/client';
 import { isLoggedIn } from '@/app/data/currentUser';
 import { prisma } from '@/prisma';
 import { sendAdminAlert } from '@/lib/mail';
+import { claimAiUse } from '@/lib/aiUsage';
 import { REPORT_REASONS, reportInputSchema, type ReportReason } from '@/lib/reports';
 
 type ReportResult = { ok: true } | { ok: false; error: string };
@@ -40,6 +41,10 @@ export const reportContent = async (input: unknown): Promise<ReportResult> => {
             : (await prisma.userdetails.findUnique({ where: { id: userdetailsid }, select: { id: true } }))?.id;
     if (reportedUserId === undefined) return { ok: false, error: 'That content no longer exists.' };
     if (reportedUserId === reporterId) return { ok: false, error: "You can't report your own content." };
+
+    // Each report emails the admin, so one account cannot send an unlimited number.
+    const claim = await claimAiUse('report', reporterId, { perUserLimit: 20, siteLimit: 300, windowHours: 24 });
+    if (!claim.ok) return { ok: false, error: 'You have sent a lot of reports today. Please try again tomorrow.' };
 
     try {
         await prisma.reports.create({

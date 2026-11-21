@@ -7,6 +7,11 @@ export interface Env {
 const STORAGE_HOSTNAME = 'ny.storage.bunnycdn.com';
 const STORAGE_ZONE = 'lvartsmusic-ny';
 
+// The site only uploads post/avatar images and mp3 audio. Anything else, or anything huge,
+// is refused so a signed-in user cannot use the storage zone as a free file host.
+const ALLOWED_EXTENSIONS = new Set(['webp', 'jpg', 'jpeg', 'png', 'gif', 'avif', 'mp3']);
+const MAX_UPLOAD_BYTES = 60 * 1024 * 1024;
+
 async function verifyToken(token: string, userdir: string, filename: string, secret: string): Promise<boolean> {
     try {
         const dot = token.lastIndexOf('.');
@@ -43,7 +48,9 @@ function corsHeaders(origin: string): Record<string, string> {
 
 export default {
     async fetch(request: Request, env: Env): Promise<Response> {
-        const origin = env.ALLOWED_ORIGIN || '*';
+        // No wildcard fallback: a missing setting must fail closed, not open the Worker to every site.
+        const origin = env.ALLOWED_ORIGIN;
+        if (!origin) return new Response('Worker is not configured', { status: 500 });
 
         if (request.method === 'OPTIONS') {
             return new Response(null, { status: 204, headers: corsHeaders(origin) });
@@ -74,6 +81,17 @@ export default {
             return new Response('Unauthorized', { status: 401, headers: corsHeaders(origin) });
         }
 
+        const extension = filename.split('.').pop()?.toLowerCase() ?? '';
+        if (!ALLOWED_EXTENSIONS.has(extension)) {
+            return new Response('File type not allowed', { status: 415, headers: corsHeaders(origin) });
+        }
+
+        // Browsers send Content-Length for a File body, so a missing or oversized one is refused up front.
+        const declaredSize = Number(request.headers.get('Content-Length'));
+        if (!Number.isFinite(declaredSize) || declaredSize <= 0 || declaredSize > MAX_UPLOAD_BYTES) {
+            return new Response('File too large', { status: 413, headers: corsHeaders(origin) });
+        }
+
         const bunnyUrl = `https://${STORAGE_HOSTNAME}/${STORAGE_ZONE}/${encodeURIComponent(userdir)}/${encodeURIComponent(filename)}`;
         const bunnyRes = await fetch(bunnyUrl, {
             method: 'PUT',
@@ -87,7 +105,7 @@ export default {
         if (!bunnyRes.ok) {
             const bunnyBody = await bunnyRes.text();
             console.error(`BunnyCDN ${bunnyRes.status}: ${bunnyBody}`);
-            return new Response(`CDN upload failed: ${bunnyRes.status} ${bunnyBody}`, {
+            return new Response('CDN upload failed', {
                 status: 502,
                 headers: corsHeaders(origin),
             });

@@ -1,6 +1,6 @@
 'use server'
 
-import { followUserDAL, unfollowUserDAL, getUserDAL, getUserDetailsDAL } from "../data/user"
+import { followUserDAL, unfollowUserDAL } from "../data/user"
 import { isLoggedIn } from "../data/currentUser"
 
 // The follower is always the logged-in user; the browser does not get to say who is following.
@@ -17,12 +17,4 @@ export const followUser = async ({followinguserdetailsid}:{followinguserdetailsi
 
 export const unfollowUser = async ({followinguserdetailsid}:{followinguserdetailsid: number}) => {
     return unfollowUserDAL({userdetailsid: await requireUserdetailsId(), followinguserdetailsid});
-}
-
-export const getUser = async (handle:string) => {
-    return await getUserDAL(handle);
-}
-
-export const getUserDetails = async (userid:number) => {
-    return await getUserDetailsDAL(userid);
 }

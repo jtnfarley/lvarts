@@ -88,6 +88,12 @@ export const activateBoostFromPaymentIntent = async (paymentIntent: Stripe.Payme
 }
 
 export const recordBoostImpressionDAL = async (postid: number, userdetailsid: number) => {
+    if (!Number.isInteger(postid)) return
+
+    // The author looking at their own boosted post is not reach they paid for.
+    const author = await prisma.usertoposts.findFirst({ where: { postid }, orderBy: { id: 'asc' }, select: { userdetailsid: true } })
+    if (!author || author.userdetailsid === userdetailsid) return
+
     const activeBoosts = await prisma.$queryRaw<Array<{ id: number }>>(
         Prisma.sql`
             SELECT pb.id

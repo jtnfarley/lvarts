@@ -51,9 +51,11 @@ export const uploadFile = async (params: { file: File; userdir: string }) => {
     const accessKey = process.env.BUNNY_KEY;
     if (!accessKey) throw new Error('Missing BUNNY_KEY environment variable');
 
-    await fetch(`${STORAGE_URL}/${userdir}/${encodeURIComponent(file.name)}`, {
+    const response = await fetch(`${STORAGE_URL}/${userdir}/${encodeURIComponent(file.name)}`, {
         method: 'PUT',
         headers: { AccessKey: accessKey, 'Content-Type': 'application/octet-stream' },
         body: Buffer.from(await file.arrayBuffer()),
+        signal: AbortSignal.timeout(BUNNY_TIMEOUT_MS),
     });
+    if (!response.ok) throw new Error(`BunnyCDN upload failed (${response.status}) for ${userdir}/${file.name}`);
 };

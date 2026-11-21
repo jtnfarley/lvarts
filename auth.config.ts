@@ -73,8 +73,19 @@ export default {
       return token
     },
     async session({ session, token }) {
+      const userdetails = await getUserDetails(token.id as number);
+
+      // A suspended account keeps its login but is treated as signed out everywhere:
+      // isLoggedIn() and currentUser() look for a user id, and admin checks look for an email.
+      if (userdetails?.suspended) {
+        session.user.id = ''
+        session.user.email = ''
+        session.user.userdetails = null
+        return session
+      }
+
       session.user.id = token.id as string
-      session.user.userdetails = await getUserDetails(token.id as number);
+      session.user.userdetails = userdetails
       return session
     },
   },

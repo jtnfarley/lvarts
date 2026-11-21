@@ -5,6 +5,10 @@ import { getTextResponse } from "@/lib/ai";
 import { sendAdminAlert } from "@/lib/mail";
 import { currentUser } from "@/app/data/currentUser";
 import { SUPPORT_KNOWLEDGE } from "@/lib/supportKnowledge";
+import { claimAiUse, releaseAiUse, type UsageRules } from "@/lib/aiUsage";
+
+const CHAT_LIMITS: UsageRules = { perUserLimit: 40, siteLimit: 1000, windowHours: 24 };
+const ALERT_LIMITS: UsageRules = { perUserLimit: 5, siteLimit: 30, windowHours: 24 };
 
 export interface SupportChatMessage {
     role: 'user' | 'assistant';
@@ -53,13 +57,29 @@ STATUS: resolved|unknown|issue
 - Use "unknown" if their question isn't covered by the information above and you can't confidently answer it.
 - Use "resolved" only if you gave a complete answer grounded in the information above.`;
 
-    const response = await getTextResponse(prompt, { temperature: 0, kind: 'support' });
+    const userdetailsid = user.userdetails?.id;
+    if (!userdetailsid) throw new Error('Not signed in');
+
+    const claim = await claimAiUse('support-chat', userdetailsid, CHAT_LIMITS);
+    if (!claim.ok) return { reply: "You've sent a lot of messages today. Please try again tomorrow." };
+
+    let response: string;
+    try {
+        response = await getTextResponse(prompt, { temperature: 0, kind: 'support' });
+    } catch (error) {
+        await releaseAiUse(claim.id);
+        throw error;
+    }
     const [firstLine, ...rest] = response.split('\n');
     const statusMatch = /^STATUS:\s*(resolved|unknown|issue)/i.exec(firstLine);
     const status = statusMatch ? statusMatch[1].toLowerCase() : 'resolved';
     const reply = rest.join('\n').trim() || response;
 
-    if (status === 'issue' || status === 'unknown') {
+    // A user can steer the reply into "issue", so the alert emails are capped too. Over the
+    // cap the reply still goes out; only the email is skipped.
+    const alertClaim = status === 'resolved' ? undefined : await claimAiUse('support-alert', userdetailsid, ALERT_LIMITS);
+
+    if (alertClaim?.ok) {
         const reporter = user.userdetails?.displayname ?? user.userdetails?.handle ?? user.email ?? `user ${user.id}`;
         const subject = status === 'issue'
             ? 'LVArts support: technical issue reported'

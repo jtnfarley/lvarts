@@ -18,18 +18,17 @@ const modelList = (envName: string, defaults: string[]): string[] => {
 };
 
 // Free models first, then a cheap paid model as the safety net.
-const creativeModels = () => modelList('AI_CREATIVE_MODELS', [
+const FREE_THEN_PAID_MODELS = [
     'nvidia/nemotron-3-ultra-550b-a55b:free',
     'nvidia/nemotron-3.5-lightning:free',
     'mistralai/mistral-small-24b-instruct-2501',
-]);
+];
 
-// Paid only: the support chat must follow the STATUS format reliably, and its messages should
-// only reach providers that don't keep prompts.
-const supportModels = () => modelList('AI_SUPPORT_MODELS', [
-    'mistralai/mistral-small-24b-instruct-2501',
-    'nvidia/nemotron-3.5-lightning',
-]);
+const creativeModels = () => modelList('AI_CREATIVE_MODELS', FREE_THEN_PAID_MODELS);
+
+// Same free-first chain. Free providers may keep prompts, so the support chat's messages can
+// be retained by them; a reply that skips the STATUS line is treated as resolved.
+const supportModels = () => modelList('AI_SUPPORT_MODELS', FREE_THEN_PAID_MODELS);
 
 const imageModel = () => process.env.AI_IMAGE_MODEL?.trim() || 'openai/gpt-5-image-mini';
 
@@ -55,21 +54,17 @@ const chatResponseSchema = z.object({
 
 type TextOptions = {
     temperature?: number;
-    // 'support' uses the paid chain and only allows providers that don't retain prompts.
     kind?: 'creative' | 'support';
 };
 
 export const getTextResponse = async (prompt: string, options: TextOptions = {}): Promise<string> => {
-    const isSupport = options.kind === 'support';
-
     const result = await postToOpenRouter('/chat/completions', {
-        models: isSupport ? supportModels() : creativeModels(),
+        models: options.kind === 'support' ? supportModels() : creativeModels(),
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 500,
         temperature: options.temperature,
         // Reasoning models can spend the whole token budget thinking and return nothing.
         reasoning: { enabled: false },
-        ...(isSupport ? { provider: { data_collection: 'deny' } } : {}),
     }, chatResponseSchema, TEXT_TIMEOUT_MS);
 
     const text = result.choices[0].message.content?.trim();

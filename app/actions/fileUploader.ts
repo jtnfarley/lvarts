@@ -8,7 +8,7 @@ import { isSafeFilename } from '@/lib/bunny';
 // passes through Vercel — only the filename + a server-to-server relay.
 // This is a server action, so the folder must be one the caller may use.
 export const radioUpload = async (filename: string, userdir: string) => {
-    if (!isSafeFilename(filename) || !(await canUploadToUserdir(userdir))) {
+    if (!isSafeFilename(filename) || !/\.mp3$/i.test(filename) || !(await canUploadToUserdir(userdir))) {
         throw new Error('Not allowed to send this file to the radio');
     }
 

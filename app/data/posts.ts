@@ -8,6 +8,8 @@ import { activeBoostPredicate } from '@/lib/boostQueries';
 import { FeedRow } from '@/lib/models/initFeedRow';
 import UserDetails from '@/lib/models/userDetails';
 import { isAdmin } from '@/lib/auth/isAdmin';
+import { isSafeFilename } from '@/lib/bunny';
+import { claimAiUse, type UsageRules } from '@/lib/aiUsage';
 import { canModifyPost } from '@/lib/auth/canModifyPost';
 import { isLoggedIn } from './currentUser';
 import { notBlockedByViewer } from '@/lib/blocks';
@@ -461,7 +463,38 @@ export const savePost = async (postData:any) => {
     // Zine posts are public only after review, so the author cannot choose their visibility.
     const needsReview = postData?.posttype === 'zine' && !admin
 
-    return saveTrustedPost({ ...postData, userdetailsid, ...(needsReview && { privatepost: true }) })
+    // The browser must not pick which event row gets rewritten: a non-admin can only keep
+    // the event already attached to the post they are editing, never point at someone else's.
+    const eventid = admin ? postData?.eventid : await ownEventId(postData?.id)
+
+    if (postData?.postfile && !isSafeFilename(postData.postfile)) {
+        throw new Error('Invalid file name')
+    }
+
+    if (postData?.posttype === 'comment' && !admin) {
+        await assertCanCommentOn(postData.parentPostId)
+    }
+
+    if (postData?.id === undefined && !admin) {
+        const claim = await claimAiUse('new-post', sessionUserdetailsId, NEW_POST_LIMITS)
+        if (!claim.ok) throw new Error('You are posting too fast. Please try again later.')
+    }
+
+    return saveTrustedPost({ ...postData, userdetailsid, eventid, ...(needsReview && { privatepost: true }) })
+}
+
+// Not AI spending, but the same counter works for any per-user daily cap.
+const NEW_POST_LIMITS: UsageRules = { perUserLimit: 200, siteLimit: 5000, windowHours: 24 }
+
+const ownEventId = async (postid: unknown): Promise<number | undefined> => {
+    if (postid === undefined) return undefined
+    const post = await prisma.posts.findUnique({ where: { id: Number(postid) }, select: { eventid: true } })
+    return post?.eventid ?? undefined
+}
+
+const assertCanCommentOn = async (parentPostId: unknown) => {
+    const parent = await prisma.posts.findUnique({ where: { id: Number(parentPostId) }, select: { privatepost: true } })
+    if (!parent || parent.privatepost) throw new Error('That post is not available for comments')
 }
 
 // This is a server action, so any client can call it with any id: authorize here.

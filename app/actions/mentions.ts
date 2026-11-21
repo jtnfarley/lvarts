@@ -3,6 +3,7 @@
 import { Prisma } from "@prisma/client";
 import { normalizeHandle } from "@/lib/handles";
 import { prisma } from "@/prisma";
+import { isLoggedIn } from "@/app/data/currentUser";
 
 export interface MentionSuggestion {
   [key: string]: string | number | boolean | null;
@@ -22,6 +23,8 @@ export const searchMentionUsers = async ({
   query = "",
   currentUserDetailsId,
 }: SearchMentionUsersParams): Promise<MentionSuggestion[]> => {
+  if (!(await isLoggedIn())) return [];
+
   const trimmedQuery = query.trim();
   const normalizedQuery = normalizeHandle(query);
 

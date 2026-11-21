@@ -144,7 +144,7 @@ export const saveTrustedPost = async (postData:any) => {
                     album,
                     artist,
                     releaseyear: Number.parseInt(releaseyear),
-                    coverartfile: coverartfile.name || undefined
+                    coverartfile: coverartfile?.name || undefined
                 }
             })
 
@@ -275,7 +275,8 @@ const addToPlaylist = async (filename:string):Promise<number | undefined> => {
         
         const file = files.find((item:any) => item.path === filename.toLowerCase())
 
-        if (!file?.playlists?.length) {
+        // The station may not have indexed the upload yet.
+        if (file && !file.playlists?.length) {
             file.playlists = [{id: 6820}];
             // PHP requires "length" as float; JSON.stringify drops the decimal for whole numbers
             const body = JSON.stringify(file).replace(/"length":(\d+)(?=[,}])/g, '"length":$1.0');

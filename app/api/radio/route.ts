@@ -1,30 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
- 
+import { z } from 'zod'
+
+const STATION_ID = 614
+
+const webhookSchema = z.object({ station: z.object({ id: z.number() }) })
+
+// AzuraCast webhook: only acknowledges payloads for our station. Nothing is acted on.
 export async function POST(request: NextRequest) {
-    if (!request?.body) return NextResponse.json({ success: false });
-    
-    const reader = request.body?.getReader(); // Locks the stream
-    const decoder = new TextDecoder();
+    const parsed = webhookSchema.safeParse(await request.json().catch(() => null));
 
-    try {
-        while (true) {
-            // read() returns an object with 'value' (Uint8Array) and 'done' (boolean)
-            const { done, value } = await reader.read(); 
-            
-            if (done) {
-                break; // Stream completed
-            }
-            
-            const textChunk = decoder.decode(value, { stream: true });
-            const res = JSON.parse(textChunk);
-
-            if (!res.station?.id || res.station.id !== 614) {
-                return NextResponse.json({ success: false });
-            }
-        }
-    } finally {
-        reader.releaseLock(); // Always release the lock when finished
-    }
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: parsed.success && parsed.data.station.id === STATION_ID });
 }
